@@ -93,8 +93,8 @@ public class KnnServiceImpl implements KnnService {
                     .build());
         }
 
-        // 2. Select top K nearest neighbors
-        neighborMatches.sort(Comparator.comparingDouble(NeighborMatch::getDistance));
+        // 2. Sort neighbors from closest to farthest distance and pick the top K
+        Collections.sort(neighborMatches, Comparator.comparingDouble(NeighborMatch::getDistance));
         int effectiveK = Math.min(k, neighborMatches.size());
         List<NeighborMatch> kNearest = neighborMatches.subList(0, effectiveK);
 
@@ -110,11 +110,29 @@ public class KnnServiceImpl implements KnnService {
 
             for (DestinationRatingRecord ratingRec : neighbor.getTravelerItem().getVisitedDestinations()) {
                 String destName = ratingRec.getDestinationName();
-                double normalizedRating = (double) ratingRec.getRating() / 5.0; // 0.2 to 1.0
+                // Convert rating (1-5) into a 0.2–1.0 range
+                double normalizedRating = (double) ratingRec.getRating() / 5.0;
 
-                weightedDestinationScores.merge(destName, w * normalizedRating, Double::sum);
-                destinationVoteCounts.merge(destName, 1, Integer::sum);
-                destinationTotalRatings.merge(destName, (double) ratingRec.getRating(), Double::sum);
+                // Add this neighbor's weighted rating to the running total for this destination
+                if (weightedDestinationScores.containsKey(destName)) {
+                    weightedDestinationScores.put(destName, weightedDestinationScores.get(destName) + (w * normalizedRating));
+                } else {
+                    weightedDestinationScores.put(destName, w * normalizedRating);
+                }
+
+                // Count how many neighbors voted for this destination
+                if (destinationVoteCounts.containsKey(destName)) {
+                    destinationVoteCounts.put(destName, destinationVoteCounts.get(destName) + 1);
+                } else {
+                    destinationVoteCounts.put(destName, 1);
+                }
+
+                // Accumulate total raw ratings (used to compute average later)
+                if (destinationTotalRatings.containsKey(destName)) {
+                    destinationTotalRatings.put(destName, destinationTotalRatings.get(destName) + ratingRec.getRating());
+                } else {
+                    destinationTotalRatings.put(destName, (double) ratingRec.getRating());
+                }
             }
         }
 
@@ -144,7 +162,8 @@ public class KnnServiceImpl implements KnnService {
                     .build());
         }
 
-        evidences.sort(Comparator.comparingDouble(KnnRecommendationResult.KnnDestinationEvidence::getEvidenceScore).reversed());
+        // Sort the evidences from highest to lowest score so the best destinations appear first
+        Collections.sort(evidences, Comparator.comparingDouble(KnnRecommendationResult.KnnDestinationEvidence::getEvidenceScore).reversed());
 
         return KnnRecommendationResult.builder()
                 .kUsed(effectiveK)

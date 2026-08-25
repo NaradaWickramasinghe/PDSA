@@ -104,8 +104,16 @@ public class DecisionTreeClassifier {
 
                 if (left.isEmpty() || right.isEmpty()) continue;
 
-                int[] leftArr = left.stream().mapToInt(Integer::intValue).toArray();
-                int[] rightArr = right.stream().mapToInt(Integer::intValue).toArray();
+                // Convert the left and right index lists into simple arrays
+                int[] leftArr = new int[left.size()];
+                for (int j = 0; j < left.size(); j++) {
+                    leftArr[j] = left.get(j);
+                }
+
+                int[] rightArr = new int[right.size()];
+                for (int j = 0; j < right.size(); j++) {
+                    rightArr[j] = right.get(j);
+                }
 
                 double leftGini = calculateGini(countClasses(y, leftArr), leftArr.length);
                 double rightGini = calculateGini(countClasses(y, rightArr), rightArr.length);
@@ -152,11 +160,23 @@ public class DecisionTreeClassifier {
         return counts;
     }
 
+    /**
+     * Find the class label that appears the most times in the counts map.
+     * This is the "majority class" — the label that the leaf node will predict.
+     */
     private String getMajorityClass(Map<String, Integer> counts) {
-        return counts.entrySet().stream()
-                .max(Map.Entry.comparingByValue())
-                .map(Map.Entry::getKey)
-                .orElse("UNKNOWN");
+        String bestClass = "UNKNOWN";
+        int highestCount = -1;
+
+        // Loop through each class label and its count
+        for (Map.Entry<String, Integer> entry : counts.entrySet()) {
+            if (entry.getValue() > highestCount) {
+                highestCount = entry.getValue();
+                bestClass = entry.getKey();
+            }
+        }
+
+        return bestClass;
     }
 
     private Map<String, Double> normalizeDistribution(Map<String, Integer> counts, int total) {

@@ -23,7 +23,6 @@ import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -77,10 +76,11 @@ public class RecommendationServiceImpl implements RecommendationService {
                 topN
         );
 
-        // 6. Map to DestinationRecommendation DTOs
-        List<DestinationRecommendation> recommendationDTOs = rankedCandidates.stream()
-                .map(this::mapToDestinationRecommendation)
-                .collect(Collectors.toList());
+        // 6. Map each ranked candidate to a DTO (data transfer object) for the API response
+        List<DestinationRecommendation> recommendationDTOs = new ArrayList<>();
+        for (RankedDestinationCandidate candidate : rankedCandidates) {
+            recommendationDTOs.add(mapToDestinationRecommendation(candidate));
+        }
 
         // 7. Persist Audit Decision Logs
         persistDecisionLogs(request, rankedCandidates);

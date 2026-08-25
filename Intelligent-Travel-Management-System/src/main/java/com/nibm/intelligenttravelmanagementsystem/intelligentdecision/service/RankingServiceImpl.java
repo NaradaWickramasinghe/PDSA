@@ -14,10 +14,8 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -135,21 +133,34 @@ public class RankingServiceImpl implements RankingService {
         }
 
         // Deterministic Ranking with Tie-Breaking:
-        // 1. Primary: finalScore descending
-        // 2. Secondary: preferenceScore descending
-        // 3. Tertiary: destinationName alphabetical ascending
-        candidates.sort(Comparator
-                .comparingDouble(RankedDestinationCandidate::getFinalScore).reversed()
-                .thenComparing(Comparator.comparingDouble(RankedDestinationCandidate::getPreferenceScore).reversed())
-                .thenComparing(RankedDestinationCandidate::getDestinationName));
+        // 1. Primary:   finalScore descending  (highest score first)
+        // 2. Secondary: preferenceScore descending (if scores are equal)
+        // 3. Tertiary:  destinationName alphabetical ascending (for fully identical ties)
+        Collections.sort(candidates, (a, b) -> {
+            // Compare by final score descending
+            int byScore = Double.compare(b.getFinalScore(), a.getFinalScore());
+            if (byScore != 0) return byScore;
 
-        // Assign sequential 1-based ranks
+            // If scores are equal, compare by preference score descending
+            int byPref = Double.compare(b.getPreferenceScore(), a.getPreferenceScore());
+            if (byPref != 0) return byPref;
+
+            // If both scores are equal, sort alphabetically by destination name
+            return a.getDestinationName().compareTo(b.getDestinationName());
+        });
+
+        // Assign sequential 1-based ranks (rank 1 = best match)
         for (int i = 0; i < candidates.size(); i++) {
             candidates.get(i).setRank(i + 1);
         }
 
+        // Return only the top-N results (or all if topN is 0 or negative)
         int limit = topN > 0 ? Math.min(topN, candidates.size()) : candidates.size();
-        return candidates.stream().limit(limit).collect(Collectors.toList());
+        List<RankedDestinationCandidate> topCandidates = new ArrayList<>();
+        for (int i = 0; i < limit; i++) {
+            topCandidates.add(candidates.get(i));
+        }
+        return topCandidates;
     }
 
     private double calculatePreferenceCompatibility(TravelerFeatureRecord traveler, Destination dest) {
