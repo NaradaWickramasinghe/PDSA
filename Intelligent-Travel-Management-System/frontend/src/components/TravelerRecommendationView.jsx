@@ -113,11 +113,6 @@ export default function TravelerRecommendationView() {
                             <p><strong>Match Score:</strong> {rec.matchPercentage}%</p>
                             <p><strong>Suitability:</strong> {rec.suitabilityLabel}</p>
                             <p><strong>Reason:</strong> {rec.reason}</p>
-                            <div className="meta-info">
-                                <span>Cost: ${rec.averageDailyCost}/day</span> | 
-                                <span> Stay: {rec.minimumDays}-{rec.maximumDays} days</span> | 
-                                <span> Difficulty: Level {rec.difficultyLevel}/5</span>
-                            </div>
                         </div>
                     ))}
                 </div>

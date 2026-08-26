@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Travel Recommendation System — Group 4</title>
+    <title>Travel Recommendation System — Task 4</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -532,7 +532,7 @@
                 <div className="container">
                     <header className="app-header">
                         <h1 className="app-title">Travel Recommendation System</h1>
-                        <p className="app-subtitle">Group 4 — Personalized Destination Decision Engine</p>
+                        <p className="app-subtitle">Task 4 — Personalized Destination Decision Engine</p>
                     </header>
 
                     <div className="layout-grid">
@@ -677,18 +677,6 @@
 
                                                 <div className="reason-text">
                                                     {rec.reason}
-                                                </div>
-
-                                                <div className="specs-row">
-                                                    <div className="spec-cell">
-                                                        Cost: <strong>${rec.averageDailyCost || 65}/day</strong>
-                                                    </div>
-                                                    <div className="spec-cell">
-                                                        Optimal Stay: <strong>{rec.minimumDays || 2}-{rec.maximumDays || 5} days</strong>
-                                                    </div>
-                                                    <div className="spec-cell">
-                                                        Difficulty: <strong>Level {rec.difficultyLevel || 3}/5</strong>
-                                                    </div>
                                                 </div>
                                             </div>
                                         ))}
