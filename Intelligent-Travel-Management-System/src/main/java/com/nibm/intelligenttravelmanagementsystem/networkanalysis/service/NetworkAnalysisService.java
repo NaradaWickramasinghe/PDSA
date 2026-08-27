@@ -61,18 +61,26 @@ public class NetworkAnalysisService {
         // Step 2: Run Brandes' algorithm — computes both metrics in one pass
         CentralityService.CentralityResult result = centralityService.computeCentrality(graph);
 
-        // Step 3: Build a name lookup map (nodeId → display name)
-        Map<String, String> namesByNodeId = nodeRepository.findAll().stream()
-                .collect(Collectors.toMap(Node::getNodeId, Node::getName));
+        // Step 3: Build a lookup map (nodeId → Node entity)
+        Map<String, Node> nodeMap = nodeRepository.findAll().stream()
+                .collect(Collectors.toMap(Node::getNodeId, node -> node));
 
         // Step 4: Assemble CentralityScoreDTO list for all nodes
         List<CentralityScoreDTO> scores = graph.allNodeIds().stream()
-                .map(nodeId -> new CentralityScoreDTO(
-                        nodeId,
-                        namesByNodeId.getOrDefault(nodeId, "Unknown"),
-                        result.betweenness().getOrDefault(nodeId, 0.0),
-                        result.closeness().getOrDefault(nodeId, 0.0)
-                ))
+                .map(nodeId -> {
+                    Node node = nodeMap.get(nodeId);
+                    String name = node != null ? node.getName() : "Unknown";
+                    Double lat = node != null ? node.getLatitude() : 0.0;
+                    Double lng = node != null ? node.getLongitude() : 0.0;
+                    return new CentralityScoreDTO(
+                            nodeId,
+                            name,
+                            result.betweenness().getOrDefault(nodeId, 0.0),
+                            result.closeness().getOrDefault(nodeId, 0.0),
+                            lat,
+                            lng
+                    );
+                })
                 .toList();
 
         long elapsedMs = (System.nanoTime() - startNanos) / 1_000_000;

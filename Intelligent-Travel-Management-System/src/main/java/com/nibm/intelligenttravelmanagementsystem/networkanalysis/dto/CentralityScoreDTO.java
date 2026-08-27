@@ -14,11 +14,15 @@ package com.nibm.intelligenttravelmanagementsystem.networkanalysis.dto;
  *                    the destination acts as a gateway/bridge between regions
  * @param closeness   the closeness centrality score — higher values indicate
  *                    the destination is well-positioned to reach all others quickly
+ * @param latitude    the latitude coordinate of the destination for map visualization
+ * @param longitude   the longitude coordinate of the destination for map visualization
  */
 public record CentralityScoreDTO(
         String nodeId,
         String name,
         double betweenness,
-        double closeness
+        double closeness,
+        Double latitude,
+        Double longitude
 ) {
 }
