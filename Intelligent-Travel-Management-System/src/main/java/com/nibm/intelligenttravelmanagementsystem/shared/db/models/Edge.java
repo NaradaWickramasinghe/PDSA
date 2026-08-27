@@ -47,4 +47,19 @@ public class Edge {
 
     @Column(name = "risk_level", nullable = false)
     private Short riskLevel;
+    @Column(name = "id", insertable = false, updatable = false)
+    private Long id;
+
+    @Column(name = "distance")
+    private Double distance;
+
+    @Column(name = "source_node_id")
+    private Long sourceNodeId;
+
+    @Column(name = "target_node_id")
+    private Long targetNodeId;
+
+    @Column(name = "travel_time")
+    private Double travelTime;
+
 }

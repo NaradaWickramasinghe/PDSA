@@ -18,6 +18,9 @@ public class Node {
     @Column(name = "node_id", length = 20)
     private String nodeId;
 
+    @Column(name = "id", insertable = false, updatable = false)
+    private Long id;
+
     @Column(nullable = false, length = 100)
     private String name;
 
