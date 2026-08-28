@@ -1,7 +1,10 @@
 package com.nibm.intelligenttravelmanagementsystem.shared.db.models;
 
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
 @Table(name = "nodes")
@@ -9,35 +12,30 @@ import lombok.*;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
-@ToString
 public class Node {
 
     @Id
-    @Column(name = "node_id", nullable = false, unique = true)
+    @Column(name = "node_id", length = 20)
     private String nodeId;
 
-    @Column(name = "id", insertable = false, updatable = false)
-    private Long id;
-
-    @Column(name = "name", nullable = false)
+    @Column(nullable = false, length = 100)
     private String name;
 
-    @Column(name = "node_type")
+    @Column(name = "node_type", nullable = false, length = 30)
     private String nodeType;
 
-    @Column(name = "province")
+    @Column(nullable = false, length = 50)
     private String province;
 
-    @Column(name = "district")
+    @Column(nullable = false, length = 50)
     private String district;
 
-    @Column(name = "latitude", nullable = false)
+    @Column(nullable = false)
     private Double latitude;
 
-    @Column(name = "longitude", nullable = false)
+    @Column(nullable = false)
     private Double longitude;
 
-    @Column(name = "description", columnDefinition = "TEXT")
+    @Column(columnDefinition = "TEXT")
     private String description;
 }

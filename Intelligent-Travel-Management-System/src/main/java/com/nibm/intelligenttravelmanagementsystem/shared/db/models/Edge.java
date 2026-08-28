@@ -1,7 +1,10 @@
 package com.nibm.intelligenttravelmanagementsystem.shared.db.models;
 
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
 @Table(name = "edges")
@@ -9,18 +12,16 @@ import lombok.*;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
-@ToString
 public class Edge {
 
     @Id
-    @Column(name = "edge_id", nullable = false, unique = true)
+    @Column(name = "edge_id", length = 20)
     private String edgeId;
 
-    @Column(name = "source", nullable = false)
+    @Column(nullable = false, length = 20)
     private String source;
 
-    @Column(name = "destination", nullable = false)
+    @Column(nullable = false, length = 20)
     private String destination;
 
     @Column(name = "distance_km", nullable = false)
@@ -33,32 +34,17 @@ public class Edge {
     private Integer estimatedCostLkr;
 
     @Column(name = "road_quality", nullable = false)
-    private Integer roadQuality;
+    private Short roadQuality;
 
     @Column(name = "traffic_level", nullable = false)
-    private Integer trafficLevel;
+    private Short trafficLevel;
 
-    @Column(name = "transport_mode", nullable = false)
+    @Column(name = "transport_mode", nullable = false, length = 20)
     private String transportMode;
 
-    @Column(name = "accessibility", nullable = false)
-    private Integer accessibility;
+    @Column(nullable = false)
+    private Short accessibility;
 
     @Column(name = "risk_level", nullable = false)
-    private Integer riskLevel;
-
-    @Column(name = "id", insertable = false, updatable = false)
-    private Long id;
-
-    @Column(name = "distance")
-    private Double distance;
-
-    @Column(name = "source_node_id")
-    private Long sourceNodeId;
-
-    @Column(name = "target_node_id")
-    private Long targetNodeId;
-
-    @Column(name = "travel_time")
-    private Double travelTime;
+    private Short riskLevel;
 }
