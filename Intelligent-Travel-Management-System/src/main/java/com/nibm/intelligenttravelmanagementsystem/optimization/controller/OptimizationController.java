@@ -11,7 +11,6 @@ import java.util.*;
 
 @RestController
 @RequestMapping("/api/v1/optimization")
-@CrossOrigin(origins = "*")
 public class OptimizationController {
 
     private final OptimizationService optimizationService;
