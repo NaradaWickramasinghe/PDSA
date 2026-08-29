@@ -53,7 +53,7 @@ export default function TravelerRecommendationView() {
             <h2>Personalized Travel Recommendations</h2>
             <form onSubmit={handleSubmit}>
                 <div className="form-group">
-                    <label>Budget ($):</label>
+                    <label>Budget (Rs):</label>
                     <input
                         type="number"
                         min="0"

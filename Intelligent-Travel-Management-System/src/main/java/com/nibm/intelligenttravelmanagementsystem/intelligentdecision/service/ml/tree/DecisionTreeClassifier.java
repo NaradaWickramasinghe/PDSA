@@ -193,22 +193,43 @@ public class DecisionTreeClassifier {
         }
 
         DecisionTreeNode current = root;
-        List<String> pathRules = new ArrayList<>();
+        CustomStack<DecisionStep> decisionStack = new CustomStack<>();
 
         while (!current.isLeaf()) {
             int featIdx = current.getFeatureIndex();
             double val = sample[featIdx];
             String featName = current.getFeatureName();
+            double threshold = current.getThreshold();
+            boolean goLeft = (val <= threshold);
 
-            if (val <= current.getThreshold()) {
-                pathRules.add(String.format("%s (%.2f) <= %.2f", featName, val, current.getThreshold()));
+            String ruleDescription = String.format("%s (%.2f) %s %.2f",
+                    featName, val, goLeft ? "<=" : ">", threshold);
+
+            // Push the decision step onto the LIFO Stack
+            decisionStack.push(DecisionStep.builder()
+                    .node(current)
+                    .featureIndex(featIdx)
+                    .featureName(featName)
+                    .featureValue(val)
+                    .threshold(threshold)
+                    .branchLeft(goLeft)
+                    .ruleDescription(ruleDescription)
+                    .build());
+
+            if (goLeft) {
                 if (current.getLeftChild() == null) break;
                 current = current.getLeftChild();
             } else {
-                pathRules.add(String.format("%s (%.2f) > %.2f", featName, val, current.getThreshold()));
                 if (current.getRightChild() == null) break;
                 current = current.getRightChild();
             }
+        }
+
+        // Reconstruct decision path rules from the stack in chronological (root-to-leaf) order
+        List<DecisionStep> steps = decisionStack.toChronologicalList();
+        List<String> pathRules = new ArrayList<>(steps.size());
+        for (DecisionStep step : steps) {
+            pathRules.add(step.getFormattedRule());
         }
 
         return DecisionTreePrediction.builder()
@@ -218,6 +239,13 @@ public class DecisionTreeClassifier {
                 .decisionPathRules(pathRules)
                 .rationale("Tree decision traversed: " + String.join(" -> ", pathRules))
                 .build();
+    }
+
+    /**
+     * Inspect the root node of the trained Decision Tree.
+     */
+    public DecisionTreeNode getRoot() {
+        return this.root;
     }
 
     private static class BestSplit {
@@ -234,3 +262,4 @@ public class DecisionTreeClassifier {
         }
     }
 }
+
