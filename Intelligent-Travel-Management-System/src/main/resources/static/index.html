@@ -1,0 +1,1159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Module 5: Multi-Objective Hiking & Travel Optimization</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --bg-base: #f5f6f8;
+            --bg-card: #ffffff;
+            --bg-card-border: #d4d9e2;
+            --text-primary: #1a1f36;
+            --text-secondary: #6b7280;
+            --accent-emerald: #2563eb;
+            --accent-cyan: #1e40af;
+            --accent-purple: #7c3aed;
+            --accent-amber: #d97706;
+            --accent-rose: #dc2626;
+            --font-sans: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-base);
+            color: var(--text-primary);
+            font-family: var(--font-sans);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            background-attachment: fixed;
+        }
+
+        .glass-panel {
+            background: var(--bg-card);
+            border: 1px solid var(--bg-card-border);
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        header {
+            padding: 1.1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--bg-card-border);
+            background: #ffffff;
+        }
+
+        .logo-group {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .badge-pill {
+            background: #e0e7ff;
+            color: #2563eb;
+            border: 1px solid #c7d2fe;
+            padding: 0.35rem 0.85rem;
+            border-radius: 9999px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+        }
+
+        .header-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #1a1f36;
+        }
+
+        main {
+            display: grid;
+            grid-template-columns: 340px 1fr 380px;
+            gap: 1.25rem;
+            padding: 1.25rem 1.75rem;
+            flex: 1;
+        }
+
+        @media (max-width: 1200px) {
+            main {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .section-title {
+            font-size: 0.95rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--accent-cyan);
+            margin-bottom: 1.1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        label {
+            display: block;
+            font-size: 0.82rem;
+            color: var(--text-secondary);
+            margin-bottom: 0.35rem;
+            font-weight: 500;
+        }
+
+        select, input[type="number"], input[type="text"] {
+            width: 100%;
+            background: #ffffff;
+            border: 1px solid #d4d9e2;
+            color: var(--text-primary);
+            padding: 0.6rem 0.8rem;
+            border-radius: 6px;
+            font-family: var(--font-sans);
+            font-size: 0.88rem;
+            transition: all 0.2s;
+        }
+
+        select:focus, input:focus {
+            outline: none;
+            border-color: #2563eb;
+            box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.1);
+        }
+
+        .slider-group {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        input[type="range"] {
+            flex: 1;
+            accent-color: #1e40af;
+            height: 6px;
+            border-radius: 3px;
+            background: #e5e7eb;
+        }
+
+        .slider-val {
+            font-family: var(--font-mono);
+            font-size: 0.82rem;
+            width: 38px;
+            color: #1e40af;
+            text-align: right;
+        }
+
+        .btn-primary {
+            width: 100%;
+            background: #1e40af;
+            color: #ffffff;
+            border: none;
+            padding: 0.8rem 1.2rem;
+            border-radius: 6px;
+            font-size: 0.92rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            transition: all 0.2s;
+            margin-top: 0.5rem;
+        }
+
+        .btn-primary:hover {
+            background: #1e3a8a;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+        }
+
+        .btn-secondary {
+            background: #f3f4f6;
+            color: var(--text-primary);
+            border: 1px solid #d4d9e2;
+            padding: 0.55rem 0.95rem;
+            border-radius: 6px;
+            font-size: 0.82rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-secondary:hover {
+            background: #e5e7eb;
+        }
+
+        /* Canvas visualizer */
+        .visualizer-container {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            padding: 1.25rem;
+        }
+
+        .canvas-box {
+            position: relative;
+            width: 100%;
+            height: 520px;
+            border-radius: 8px;
+            background: #f9fafb;
+            border: 1px solid #d4d9e2;
+            overflow: hidden;
+            cursor: grab;
+        }
+
+        .canvas-box:active {
+            cursor: grabbing;
+        }
+
+        #networkCanvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+        }
+
+        /* Floating map controls */
+        .map-controls {
+            position: absolute;
+            top: 0.75rem;
+            right: 0.75rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.4rem;
+            z-index: 10;
+        }
+
+        .map-btn {
+            background: #ffffff;
+            border: 1px solid #d4d9e2;
+            color: var(--text-primary);
+            width: 32px;
+            height: 32px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: all 0.15s;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+        }
+
+        .map-btn:hover {
+            background: #f3f4f6;
+            border-color: #2563eb;
+            color: #2563eb;
+        }
+
+        /* Floating Tooltip */
+        .map-tooltip {
+            position: absolute;
+            background: #ffffff;
+            border: 1px solid #2563eb;
+            padding: 0.5rem 0.75rem;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            color: #1a1f36;
+            pointer-events: none;
+            z-index: 20;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            transform: translate(-50%, -120%);
+            white-space: nowrap;
+        }
+
+        .map-tooltip .tip-title {
+            font-weight: 700;
+            color: #2563eb;
+            margin-bottom: 2px;
+        }
+
+        .map-tooltip .tip-sub {
+            font-size: 0.72rem;
+            color: var(--text-secondary);
+        }
+
+        /* Stat cards */
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 0.65rem;
+            margin-bottom: 1rem;
+        }
+
+        .stat-card {
+            background: #f9fafb;
+            border: 1px solid #e5e7eb;
+            padding: 0.75rem;
+            border-radius: 6px;
+        }
+
+        .stat-label {
+            font-size: 0.72rem;
+            color: var(--text-secondary);
+            margin-bottom: 0.2rem;
+        }
+
+        .stat-value {
+            font-size: 1.1rem;
+            font-weight: 700;
+            font-family: var(--font-mono);
+            color: var(--text-primary);
+        }
+
+        .route-path-container {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 0.35rem;
+            margin: 0.75rem 0;
+            padding: 0.65rem;
+            background: #f9fafb;
+            border-radius: 6px;
+            border: 1px solid #e5e7eb;
+            font-family: var(--font-mono);
+            font-size: 0.8rem;
+            max-height: 90px;
+            overflow-y: auto;
+        }
+
+        .node-tag {
+            background: #dbeafe;
+            color: #2563eb;
+            border: 1px solid #bfdbfe;
+            padding: 0.2rem 0.45rem;
+            border-radius: 4px;
+            font-weight: 600;
+        }
+
+        .path-arrow {
+            color: var(--text-secondary);
+            font-size: 0.75rem;
+        }
+
+        .alt-card {
+            background: #f9fafb;
+            border: 1px solid #e5e7eb;
+            border-radius: 6px;
+            padding: 0.65rem;
+            margin-bottom: 0.4rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .alt-card:hover {
+            border-color: #2563eb;
+            background: #f0f4ff;
+        }
+
+        .alt-title {
+            font-weight: 600;
+            font-size: 0.82rem;
+            color: #2563eb;
+            margin-bottom: 0.2rem;
+        }
+
+        .alt-stats {
+            font-size: 0.72rem;
+            color: var(--text-secondary);
+            display: flex;
+            gap: 0.65rem;
+        }
+
+        /* Benchmark Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.4);
+            z-index: 100;
+            justify-content: center;
+            align-items: center;
+            padding: 2rem;
+        }
+
+        .modal-content {
+            background: #ffffff;
+            border: 1px solid #d4d9e2;
+            border-radius: 8px;
+            max-width: 900px;
+            width: 100%;
+            max-height: 85vh;
+            overflow-y: auto;
+            padding: 2rem;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1.25rem 0;
+            font-size: 0.85rem;
+        }
+
+        th, td {
+            padding: 0.75rem 1rem;
+            text-align: left;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        th {
+            color: #2563eb;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .badge-success {
+            color: #059669;
+            background: #d1fae5;
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="logo-group">
+            <div class="header-title">Intelligent Multi-Objective Hiking & Travel Optimizer</div>
+        </div>
+        <button class="btn-secondary" onclick="openBenchmarkModal()">
+            Run Empirical Benchmark Suite
+        </button>
+    </header>
+
+    <main>
+        <!-- Left Column: Preference & Constraint Inputs -->
+        <section class="glass-panel" style="padding: 1.25rem;">
+            <div class="section-title">Trip Configuration</div>
+
+            <div class="form-group">
+                <label>Starting Point (Origin):</label>
+                <select id="sourceSelect"></select>
+            </div>
+
+            <div class="form-group">
+                <label>Destination (Target):</label>
+                <select id="destSelect"></select>
+            </div>
+
+            <div class="form-group">
+                <label>Algorithm Selection:</label>
+                <select id="algoSelect">
+                    <option value="BRANCH_AND_BOUND">1. Branch & Bound (Exact Search)</option>
+                    <option value="PARETO_DYNAMIC_PROGRAMMING">2. Pareto Dynamic Programming (Trade-offs)</option>
+                    <option value="GENETIC_ALGORITHM">3. Genetic Algorithm (Metaheuristic - LO3)</option>
+                </select>
+            </div>
+
+            <div class="section-title" style="margin-top: 1.25rem; font-size: 0.85rem;">Multi-Objective Weights</div>
+
+            <div class="form-group">
+                <label>Speed / Travel Time Priority</label>
+                <div class="slider-group">
+                    <input type="range" id="wTime" min="0" max="100" value="35" oninput="updateWeights()">
+                    <span class="slider-val" id="valTime">35%</span>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Financial Budget / Cost Priority</label>
+                <div class="slider-group">
+                    <input type="range" id="wCost" min="0" max="100" value="35" oninput="updateWeights()">
+                    <span class="slider-val" id="valCost">35%</span>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Safety & Hazard Minimization</label>
+                <div class="slider-group">
+                    <input type="range" id="wSafety" min="0" max="100" value="20" oninput="updateWeights()">
+                    <span class="slider-val" id="valSafety">20%</span>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Road & Track Quality Comfort</label>
+                <div class="slider-group">
+                    <input type="range" id="wQuality" min="0" max="100" value="10" oninput="updateWeights()">
+                    <span class="slider-val" id="valQuality">10%</span>
+                </div>
+            </div>
+
+            <div class="section-title" style="margin-top: 1.25rem; font-size: 0.85rem;">Hard Constraints</div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem;">
+                <div class="form-group">
+                    <label>Max Time (Mins)</label>
+                    <input type="number" id="maxTime" placeholder="e.g. 500" value="600">
+                </div>
+                <div class="form-group">
+                    <label>Max Budget (LKR)</label>
+                    <input type="number" id="maxBudget" placeholder="e.g. 15000" value="25000">
+                </div>
+            </div>
+
+            <button class="btn-primary" onclick="planRoute()">
+                 Optimize Hiking Route
+            </button>
+        </section>
+
+        <!-- Center Column: Interactive Network & Route Visualizer -->
+        <section class="glass-panel visualizer-container">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
+                <div class="section-title" style="margin-bottom: 0;">Sri Lanka Trail & Travel Topology</div>
+                <span id="runtimeBadge" style="font-family: var(--font-mono); font-size: 0.78rem; color: var(--accent-emerald);">Ready</span>
+            </div>
+
+            <div class="canvas-box" id="canvasBox">
+                <canvas id="networkCanvas"></canvas>
+
+                <!-- Map Floating Controls -->
+                <div class="map-controls">
+                    <button class="map-btn" onclick="zoomMap(1.25)" title="Zoom In">➕</button>
+                    <button class="map-btn" onclick="zoomMap(0.8)" title="Zoom Out">➖</button>
+                    <button class="map-btn" onclick="resetMap()" title="Reset View">⟲</button>
+                </div>
+
+                <!-- Hover Tooltip -->
+                <div id="mapTooltip" class="map-tooltip" style="display: none;"></div>
+            </div>
+
+            <div style="font-size: 0.78rem; color: var(--text-secondary); margin-top: 0.65rem; display: flex; justify-content: space-between;">
+                <span>🟢 Origin &nbsp; 🔴 Destination &nbsp; 🟣 Checkpoints</span>
+                <span>Scroll to Zoom | Click & Drag to Move | Click Node to Select</span>
+            </div>
+        </section>
+
+        <!-- Right Column: Optimal Results & Multi-Objective Radar Analysis -->
+        <section class="glass-panel" style="padding: 1.25rem; display: flex; flex-direction: column;">
+            <div class="section-title"> Optimal Plan Evaluation</div>
+
+            <div class="metrics-grid">
+                <div class="stat-card">
+                    <div class="stat-label">Total Distance</div>
+                    <div class="stat-value" id="statDist">- km</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Estimated Time</div>
+                    <div class="stat-value" id="statTime">- min</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Estimated Cost</div>
+                    <div class="stat-value" id="statCost">LKR -</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Average Risk (1-5)</div>
+                    <div class="stat-value" id="statRisk">-</div>
+                </div>
+            </div>
+
+            <label style="margin-bottom: 0.2rem; font-size: 0.8rem;">Generated Route Sequence:</label>
+            <div class="route-path-container" id="pathPills">
+                <span style="color: var(--text-secondary); font-size: 0.8rem;">Click 'Optimize Hiking Route' to solve</span>
+            </div>
+
+            <div style="height: 160px; margin-top: 0.4rem;">
+                <canvas id="radarChart"></canvas>
+            </div>
+
+            <div class="section-title" style="margin-top: 0.85rem; font-size: 0.82rem;"> Pareto Trade-off Alternatives</div>
+            <div id="alternativesList" style="flex: 1; overflow-y: auto; max-height: 130px;">
+                <div style="font-size: 0.78rem; color: var(--text-secondary);">Select Pareto DP algorithm to discover trade-off options.</div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Benchmark Modal -->
+    <div class="modal" id="benchmarkModal">
+        <div class="modal-content">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                <h2 style="color: var(--accent-cyan); font-size: 1.25rem;">Empirical Algorithm Benchmark Suite (PDSA Evaluation)</h2>
+                <button class="btn-secondary" onclick="closeBenchmarkModal()">✕ Close</button>
+            </div>
+            
+            <p style="color: var(--text-secondary); font-size: 0.85rem; margin-bottom: 1rem;">
+                Comparative empirical testing across <strong>Branch & Bound (Exact)</strong>, <strong>Pareto Dynamic Programming</strong>, and <strong>Genetic Algorithm (Metaheuristic - LO3)</strong> on the active trail network.
+            </p>
+
+            <table id="benchmarkTable">
+                <thead>
+                    <tr>
+                        <th>Algorithm</th>
+                        <th>Runtime (ms)</th>
+                        <th>Memory (KB)</th>
+                        <th>Composite Score</th>
+                        <th>Duration</th>
+                        <th>Cost (LKR)</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody id="benchmarkBody">
+                    <tr><td colspan="7" style="text-align: center; color: var(--text-secondary);">Running benchmarks...</td></tr>
+                </tbody>
+            </table>
+
+            <div style="height: 240px; margin-top: 1.5rem;">
+                <canvas id="benchmarkChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Interactive JavaScript -->
+    <script>
+        let networkData = { nodes: [], edges: [] };
+        let activeRoutePath = [];
+        let radarChartInstance = null;
+        let benchmarkChartInstance = null;
+
+        // Pan & Zoom Interactive State
+        let viewState = {
+            zoom: 1.0,
+            panX: 0,
+            panY: 0,
+            isDragging: false,
+            startX: 0,
+            startY: 0,
+            hoveredNode: null,
+            screenNodePos: {}
+        };
+
+        async function loadNetwork() {
+            try {
+                const res = await fetch('/api/v1/optimization/network');
+                networkData = await res.json();
+
+                const srcSelect = document.getElementById('sourceSelect');
+                const dstSelect = document.getElementById('destSelect');
+                srcSelect.innerHTML = '';
+                dstSelect.innerHTML = '';
+
+                networkData.nodes.forEach((node) => {
+                    const opt1 = new Option(`${node.name} (${node.nodeId})`, node.nodeId);
+                    const opt2 = new Option(`${node.name} (${node.nodeId})`, node.nodeId);
+                    srcSelect.add(opt1);
+                    dstSelect.add(opt2);
+                });
+
+                if (srcSelect.options.length > 0) srcSelect.selectedIndex = 0; // CMB
+                if (dstSelect.options.length > 5) dstSelect.selectedIndex = 5; // ELL
+
+                // Add responsive event listeners on dropdowns so map indicators update immediately!
+                srcSelect.addEventListener('change', () => { drawNetwork(); });
+                dstSelect.addEventListener('change', () => { drawNetwork(); });
+
+                setupCanvasInteractions();
+                drawNetwork();
+                initRadarChart();
+            } catch (err) {
+                console.error("Error loading network:", err);
+            }
+        }
+
+        function updateWeights() {
+            const t = document.getElementById('wTime').value;
+            const c = document.getElementById('wCost').value;
+            const s = document.getElementById('wSafety').value;
+            const q = document.getElementById('wQuality').value;
+
+            document.getElementById('valTime').textContent = t + '%';
+            document.getElementById('valCost').textContent = c + '%';
+            document.getElementById('valSafety').textContent = s + '%';
+            document.getElementById('valQuality').textContent = q + '%';
+        }
+
+        // Map Zoom & Pan Helpers with Strict Boundary Limits
+        function applyPanBounds(boxWidth, boxHeight) {
+            const maxPanX = Math.max(50, (boxWidth * 0.3) * (viewState.zoom - 0.7));
+            const maxPanY = Math.max(70, (boxHeight * 0.3) * (viewState.zoom - 0.7));
+            viewState.panX = Math.max(-maxPanX, Math.min(maxPanX, viewState.panX));
+            viewState.panY = Math.max(-maxPanY, Math.min(maxPanY, viewState.panY));
+        }
+
+        function zoomMap(factor) {
+            viewState.zoom = Math.max(0.85, Math.min(3.5, viewState.zoom * factor));
+            const box = document.getElementById('canvasBox');
+            if (box) applyPanBounds(box.clientWidth, box.clientHeight);
+            drawNetwork();
+        }
+
+        function resetMap() {
+            viewState.zoom = 1.0;
+            viewState.panX = 0;
+            viewState.panY = 0;
+            drawNetwork();
+        }
+
+        // Setup Mouse Wheel Zoom, Dragging, Hover Tooltip & Click-to-Select
+        function setupCanvasInteractions() {
+            const box = document.getElementById('canvasBox');
+            const canvas = document.getElementById('networkCanvas');
+            const tooltip = document.getElementById('mapTooltip');
+
+            box.addEventListener('wheel', (e) => {
+                e.preventDefault();
+                const zoomFactor = e.deltaY < 0 ? 1.15 : 0.85;
+                zoomMap(zoomFactor);
+            }, { passive: false });
+
+            box.addEventListener('mousedown', (e) => {
+                viewState.isDragging = true;
+                viewState.startX = e.clientX - viewState.panX;
+                viewState.startY = e.clientY - viewState.panY;
+            });
+
+            window.addEventListener('mousemove', (e) => {
+                const boxRect = box.getBoundingClientRect();
+                if (viewState.isDragging) {
+                    viewState.panX = e.clientX - viewState.startX;
+                    viewState.panY = e.clientY - viewState.startY;
+                    applyPanBounds(box.clientWidth, box.clientHeight);
+                    drawNetwork();
+                }
+
+                // Check for hovered node
+                const mouseX = e.clientX - boxRect.left;
+                const mouseY = e.clientY - boxRect.top;
+
+                let foundNode = null;
+                for (const [nodeId, pos] of Object.entries(viewState.screenNodePos)) {
+                    const dist = Math.hypot(pos.x - mouseX, pos.y - mouseY);
+                    if (dist <= 14) {
+                        foundNode = networkData.nodes.find(n => n.nodeId === nodeId);
+                        break;
+                    }
+                }
+
+                viewState.hoveredNode = foundNode;
+
+                if (foundNode && !viewState.isDragging) {
+                    tooltip.style.display = 'block';
+                    tooltip.style.left = mouseX + 'px';
+                    tooltip.style.top = mouseY + 'px';
+                    tooltip.innerHTML = `
+                        <div class="tip-title">${foundNode.name} (${foundNode.nodeId})</div>
+                        <div class="tip-sub">📍 ${foundNode.district || ''}, ${foundNode.province || ''} Province</div>
+                        <div class="tip-sub" style="color: var(--accent-emerald); margin-top:2px;">Click to set as destination</div>
+                    `;
+                } else {
+                    tooltip.style.display = 'none';
+                }
+            });
+
+            window.addEventListener('mouseup', () => {
+                viewState.isDragging = false;
+            });
+
+            // Click node on canvas to select destination
+            box.addEventListener('click', () => {
+                if (viewState.hoveredNode) {
+                    const dstSelect = document.getElementById('destSelect');
+                    dstSelect.value = viewState.hoveredNode.nodeId;
+                    drawNetwork();
+                }
+            });
+        }
+
+        // Draw Canvas Trail Network
+        function drawNetwork() {
+            const box = document.getElementById('canvasBox');
+            const canvas = document.getElementById('networkCanvas');
+            if (!box || !canvas) return;
+
+            const ctx = canvas.getContext('2d');
+            const width = box.clientWidth;
+            const height = box.clientHeight;
+
+            canvas.width = width;
+            canvas.height = height;
+            ctx.clearRect(0, 0, width, height);
+
+            if (!networkData.nodes || networkData.nodes.length === 0) return;
+
+            // Sri Lanka Geographic Bounds
+            const minLat = 5.75, maxLat = 9.95;
+            const minLon = 79.45, maxLon = 82.05;
+
+            const latSpan = maxLat - minLat; // ~4.20
+            const lonSpan = maxLon - minLon; // ~2.60
+
+            // True aspect ratio: lon deg is ~0.99 of lat deg at Sri Lanka latitudes
+            const geoAspect = (lonSpan * 0.99) / latSpan; // ~0.61
+
+            const padding = 35;
+            const availW = width - (padding * 2);
+            const availH = height - (padding * 2);
+
+            let mapW, mapH;
+            if (availW / availH > geoAspect) {
+                mapH = availH;
+                mapW = availH * geoAspect;
+            } else {
+                mapW = availW;
+                mapH = availW / geoAspect;
+            }
+
+            const baseOffsetX = (width - mapW) / 2;
+            const baseOffsetY = (height - mapH) / 2;
+
+            // Apply Pan & Zoom
+            ctx.save();
+            ctx.translate(width / 2 + viewState.panX, height / 2 + viewState.panY);
+            ctx.scale(viewState.zoom, viewState.zoom);
+            ctx.translate(-width / 2, -height / 2);
+
+            const project = (lat, lon) => {
+                const normX = (lon - minLon) / lonSpan;
+                const normY = 1.0 - ((lat - minLat) / latSpan);
+                const x = baseOffsetX + (normX * mapW);
+                const y = baseOffsetY + (normY * mapH);
+                return { x, y };
+            };
+
+            // 1. Draw Sri Lanka Coastline Silhouette
+            const coastline = [
+                { lat: 9.82, lon: 80.24 }, { lat: 9.66, lon: 80.02 }, { lat: 9.05, lon: 79.90 },
+                { lat: 8.23, lon: 79.71 }, { lat: 7.20, lon: 79.84 }, { lat: 6.93, lon: 79.84 },
+                { lat: 6.42, lon: 79.99 }, { lat: 6.05, lon: 80.22 }, { lat: 5.92, lon: 80.58 },
+                { lat: 6.12, lon: 81.12 }, { lat: 6.37, lon: 81.52 }, { lat: 6.84, lon: 81.83 },
+                { lat: 7.72, lon: 81.70 }, { lat: 8.58, lon: 81.22 }, { lat: 9.27, lon: 80.81 },
+                { lat: 9.82, lon: 80.24 }
+            ];
+
+            ctx.beginPath();
+            coastline.forEach((pt, i) => {
+                const p = project(pt.lat, pt.lon);
+                if (i === 0) ctx.moveTo(p.x, p.y);
+                else ctx.lineTo(p.x, p.y);
+            });
+            ctx.closePath();
+            ctx.fillStyle = 'rgba(226, 232, 240, 0.3)';
+            ctx.fill();
+            ctx.strokeStyle = '#cbd5e1';
+            ctx.lineWidth = 1;
+            ctx.setLineDash([4, 4]);
+            ctx.stroke();
+            ctx.setLineDash([]);
+
+            // 2. Project Nodes
+            viewState.screenNodePos = {};
+            const rawNodePos = {};
+            networkData.nodes.forEach(n => {
+                const p = project(n.latitude, n.longitude);
+                rawNodePos[n.nodeId] = p;
+
+                const screenX = (p.x - width / 2) * viewState.zoom + width / 2 + viewState.panX;
+                const screenY = (p.y - height / 2) * viewState.zoom + height / 2 + viewState.panY;
+                viewState.screenNodePos[n.nodeId] = { x: screenX, y: screenY };
+            });
+
+            // 3. Draw Edges
+            networkData.edges.forEach(e => {
+                const p1 = rawNodePos[e.source];
+                const p2 = rawNodePos[e.destination];
+                if (p1 && p2) {
+                    const isOptimal = isEdgeInActiveRoute(e.source, e.destination);
+                    ctx.beginPath();
+                    ctx.moveTo(p1.x, p1.y);
+                    ctx.lineTo(p2.x, p2.y);
+                    if (isOptimal) {
+                        ctx.strokeStyle = '#1e40af';
+                        ctx.lineWidth = 4 / viewState.zoom;
+                        ctx.shadowColor = '#1e40af';
+                        ctx.shadowBlur = 6;
+                    } else {
+                        ctx.strokeStyle = '#d4d9e2';
+                        ctx.lineWidth = 1.2 / viewState.zoom;
+                        ctx.shadowBlur = 0;
+                    }
+                    ctx.stroke();
+                    ctx.shadowBlur = 0;
+                }
+            });
+
+            // 4. Draw Nodes
+            const src = document.getElementById('sourceSelect').value;
+            const dst = document.getElementById('destSelect').value;
+
+            networkData.nodes.forEach((n, idx) => {
+                const p = rawNodePos[n.nodeId];
+                if (!p) return;
+
+                const isSrc = n.nodeId === src;
+                const isDst = n.nodeId === dst;
+                const isPath = activeRoutePath.includes(n.nodeId);
+                const isHover = viewState.hoveredNode && viewState.hoveredNode.nodeId === n.nodeId;
+
+                ctx.beginPath();
+                const radius = ((isSrc || isDst) ? 9 : (isPath ? 7 : (isHover ? 7.5 : 5))) / Math.sqrt(viewState.zoom);
+                ctx.arc(p.x, p.y, radius, 0, Math.PI * 2);
+
+                if (isSrc) {
+                    ctx.fillStyle = '#059669'; // Green for Origin
+                    ctx.shadowColor = '#059669';
+                    ctx.shadowBlur = 8;
+                } else if (isDst) {
+                    ctx.fillStyle = '#dc2626'; // Red for Destination
+                    ctx.shadowColor = '#dc2626';
+                    ctx.shadowBlur = 8;
+                } else if (isPath) {
+                    ctx.fillStyle = '#2563eb'; // Blue for Route Path
+                    ctx.shadowColor = '#2563eb';
+                    ctx.shadowBlur = 6;
+                } else if (isHover) {
+                    ctx.fillStyle = '#f59e0b'; // Amber on Hover
+                    ctx.shadowColor = '#f59e0b';
+                    ctx.shadowBlur = 6;
+                } else {
+                    ctx.fillStyle = '#7c3aed'; // Purple for normal checkpoints
+                    ctx.shadowBlur = 0;
+                }
+
+                ctx.fill();
+                ctx.strokeStyle = '#ffffff';
+                ctx.lineWidth = 1.5 / Math.sqrt(viewState.zoom);
+                ctx.lineWidth = 1.5 / Math.sqrt(viewState.zoom);
+                ctx.stroke();
+                ctx.shadowBlur = 0;
+
+                // Smart Staggered Labels
+                ctx.font = (isSrc || isDst || isPath) ? '600 11px Outfit, sans-serif' : '400 9.5px Outfit, sans-serif';
+                ctx.fillStyle = (isSrc || isDst || isPath) ? '#f8fafc' : '#94a3b8';
+
+                const offsetX = (n.longitude > 80.75) ? 8 : -8;
+                const align = (n.longitude > 80.75) ? 'left' : 'right';
+                ctx.textAlign = align;
+                ctx.textBaseline = 'middle';
+                ctx.fillText(n.nodeId, p.x + offsetX, p.y + (idx % 2 === 0 ? -4 : 4));
+            });
+
+            ctx.restore();
+        }
+
+        function isEdgeInActiveRoute(u, v) {
+            for (let i = 0; i < activeRoutePath.length - 1; i++) {
+                if ((activeRoutePath[i] === u && activeRoutePath[i+1] === v) ||
+                    (activeRoutePath[i] === v && activeRoutePath[i+1] === u)) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        async function planRoute() {
+            const req = {
+                sourceNodeId: document.getElementById('sourceSelect').value,
+                destinationNodeId: document.getElementById('destSelect').value,
+                algorithm: document.getElementById('algoSelect').value,
+                timeWeight: parseFloat(document.getElementById('wTime').value) / 100,
+                costWeight: parseFloat(document.getElementById('wCost').value) / 100,
+                safetyWeight: parseFloat(document.getElementById('wSafety').value) / 100,
+                qualityWeight: parseFloat(document.getElementById('wQuality').value) / 100,
+                maxTimeMinutes: parseInt(document.getElementById('maxTime').value) || null,
+                maxBudgetLkr: parseInt(document.getElementById('maxBudget').value) || null
+            };
+
+            try {
+                const res = await fetch('/api/v1/optimization/plan', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(req)
+                });
+                const data = await res.json();
+
+                if (data.success && data.bestRoute) {
+                    activeRoutePath = data.bestRoute.pathNodeIds;
+                    document.getElementById('runtimeBadge').textContent = 
+                        ` ${data.executionTimeMs.toFixed(2)} ms | Mem: ${data.memoryUsedKb.toFixed(1)} KB | Explored: ${data.nodesExploredCount}`;
+
+                    document.getElementById('statDist').textContent = `${data.bestRoute.totalDistanceKm} km`;
+                    document.getElementById('statTime').textContent = `${data.bestRoute.totalDurationMinutes} min`;
+                    document.getElementById('statCost').textContent = `LKR ${data.bestRoute.totalCostLkr.toLocaleString()}`;
+                    document.getElementById('statRisk').textContent = `${data.bestRoute.averageRiskLevel.toFixed(1)} / 5`;
+
+                    const pillContainer = document.getElementById('pathPills');
+                    pillContainer.innerHTML = '';
+                    data.bestRoute.pathNodeNames.forEach((name, i) => {
+                        const span = document.createElement('span');
+                        span.className = 'node-tag';
+                        span.textContent = name;
+                        pillContainer.appendChild(span);
+                        if (i < data.bestRoute.pathNodeNames.length - 1) {
+                            const arr = document.createElement('span');
+                            arr.className = 'path-arrow';
+                            arr.textContent = '➔';
+                            pillContainer.appendChild(arr);
+                        }
+                    });
+
+                    const altContainer = document.getElementById('alternativesList');
+                    altContainer.innerHTML = '';
+                    if (data.paretoAlternatives && data.paretoAlternatives.length > 0) {
+                        data.paretoAlternatives.forEach(alt => {
+                            const card = document.createElement('div');
+                            card.className = 'alt-card';
+                            card.innerHTML = `
+                                <div class="alt-title">${alt.label}</div>
+                                <div class="alt-stats">
+                                    <span> ${alt.totalDurationMinutes}m</span>
+                                    <span> LKR ${alt.totalCostLkr}</span>
+                                    <span> Risk: ${alt.averageRiskLevel}</span>
+                                </div>
+                            `;
+                            card.onclick = () => {
+                                activeRoutePath = alt.pathNodeIds;
+                                drawNetwork();
+                            };
+                            altContainer.appendChild(card);
+                        });
+                    } else {
+                        altContainer.innerHTML = '<div style="font-size: 0.78rem; color: var(--text-secondary);">Select Pareto DP to discover alternative trade-off routes.</div>';
+                    }
+
+                    updateRadarChart(data.bestRoute);
+                    drawNetwork();
+                } else {
+                    alert("Optimization Result: " + data.message);
+                }
+            } catch (err) {
+                console.error("Error planning route:", err);
+            }
+        }
+
+        function initRadarChart() {
+            const ctx = document.getElementById('radarChart').getContext('2d');
+            radarChartInstance = new Chart(ctx, {
+                type: 'radar',
+                data: {
+                    labels: ['Speed', 'Low Cost', 'Safety', 'Quality'],
+                    datasets: [{
+                        label: 'Route Profile',
+                        data: [75, 60, 85, 90],
+                        backgroundColor: 'rgba(37, 99, 235, 0.15)',
+                        borderColor: '#2563eb',
+                        borderWidth: 2,
+                        pointBackgroundColor: '#2563eb'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        r: {
+                            angleLines: { color: '#e5e7eb' },
+                            grid: { color: '#e5e7eb' },
+                            pointLabels: { color: '#6b7280', font: { size: 9.5 } },
+                            ticks: { display: false, max: 100, min: 0 }
+                        }
+                    },
+                    plugins: { legend: { display: false } }
+                }
+            });
+        }
+
+        function updateRadarChart(route) {
+            if (!radarChartInstance) return;
+            const speedScore = Math.max(10, 100 - (route.totalDurationMinutes / 5.0));
+            const costScore = Math.max(10, 100 - (route.totalCostLkr / 150.0));
+            const safetyScore = (5.0 - route.averageRiskLevel) * 20;
+            const qualityScore = route.averageRoadQuality * 20;
+
+            radarChartInstance.data.datasets[0].data = [speedScore, costScore, safetyScore, qualityScore];
+            radarChartInstance.update();
+        }
+
+        async function openBenchmarkModal() {
+            document.getElementById('benchmarkModal').style.display = 'flex';
+            const src = document.getElementById('sourceSelect').value || 'CMB';
+            const dst = document.getElementById('destSelect').value || 'ELL';
+
+            try {
+                const res = await fetch(`/api/v1/optimization/benchmark?sourceNodeId=${src}&destinationNodeId=${dst}`, { method: 'POST' });
+                const bench = await res.json();
+
+                const tbody = document.getElementById('benchmarkBody');
+                tbody.innerHTML = '';
+
+                const labels = [];
+                const runtimes = [];
+
+                for (const [key, metric] of Object.entries(bench.algorithmMetrics)) {
+                    labels.push(metric.algorithmName);
+                    runtimes.push(metric.executionTimeMs);
+
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td style="font-weight: 600;">${metric.algorithmName}</td>
+                        <td style="font-family: var(--font-mono); color: var(--accent-emerald);">${metric.executionTimeMs.toFixed(2)} ms</td>
+                        <td style="font-family: var(--font-mono);">${metric.memoryUsedKb.toFixed(1)} KB</td>
+                        <td style="font-family: var(--font-mono);">${metric.bestCompositeScore}</td>
+                        <td>${metric.totalDurationMinutes} min</td>
+                        <td>LKR ${metric.totalCostLkr.toLocaleString()}</td>
+                        <td><span class="badge-success">Optimal</span></td>
+                    `;
+                    tbody.appendChild(tr);
+                }
+
+                renderBenchmarkChart(labels, runtimes);
+            } catch (err) {
+                console.error("Benchmark error:", err);
+            }
+        }
+
+        function closeBenchmarkModal() {
+            document.getElementById('benchmarkModal').style.display = 'none';
+        }
+
+        function renderBenchmarkChart(labels, runtimes) {
+            const ctx = document.getElementById('benchmarkChart').getContext('2d');
+            if (benchmarkChartInstance) benchmarkChartInstance.destroy();
+
+            benchmarkChartInstance = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Execution Time (ms)',
+                        data: runtimes,
+                        backgroundColor: ['#2563eb', '#1e40af', '#7c3aed'],
+                        borderRadius: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        title: { display: true, text: 'Algorithm Execution Runtime Comparison (ms)', color: '#1a1f36' }
+                    },
+                    scales: {
+                        y: { grid: { color: '#e5e7eb' }, ticks: { color: '#6b7280' } },
+                        x: { grid: { display: false }, ticks: { color: '#1a1f36' } }
+                    }
+                }
+            });
+        }
+
+        window.onload = loadNetwork;
+        window.onresize = drawNetwork;
+    </script>
+</body>
+</html>

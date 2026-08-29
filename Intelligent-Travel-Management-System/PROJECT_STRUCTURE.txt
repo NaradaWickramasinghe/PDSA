@@ -1,0 +1,137 @@
+INTELLIGENT TRAVEL MANAGEMENT SYSTEM - PROJECT STRUCTURE
+=========================================================
+
+Intelligent-Travel-Management-System/
+│
+├── pom.xml                                          (Maven Configuration)
+├── mvnw                                             (Maven Wrapper - Linux/Mac)
+├── mvnw.cmd                                         (Maven Wrapper - Windows)
+├── .gitignore
+├── .gitattributes
+├── .idea/                                           (IDE Configuration)
+├── .mvn/                                            (Maven Files)
+├── PROJECT_STRUCTURE.txt                            (This File)
+│
+├── src/
+│   ├── main/
+│   │   ├── java/
+│   │   │   └── com/nibm/intelligenttravelmanagementsystem/
+│   │   │       │
+│   │   │       ├── IntelligentTravelManagementSystemApplication.java
+│   │   │       │
+│   │   │       ├── optimization/
+│   │   │       │   ├── controller/
+│   │   │       │   │   └── OptimizationController.java
+│   │   │       │   │
+│   │   │       │   ├── dto/                         (Data Transfer Objects)
+│   │   │       │   │   ├── AlgorithmType.java
+│   │   │       │   │   ├── BenchmarkResponse.java
+│   │   │       │   │   ├── NetworkResponseDTO.java
+│   │   │       │   │   ├── OptimizationRequest.java
+│   │   │       │   │   ├── OptimizationResponse.java
+│   │   │       │   │   └── RouteSummaryDTO.java
+│   │   │       │   │
+│   │   │       │   ├── model/                       (Core Optimization Algorithms)
+│   │   │       │   │   ├── BranchAndBoundOptimizer.java
+│   │   │       │   │   ├── CostEvaluator.java
+│   │   │       │   │   ├── GeneticRouteOptimizer.java
+│   │   │       │   │   ├── OptimizationAlgorithm.java
+│   │   │       │   │   ├── OptimizationResult.java
+│   │   │       │   │   ├── ParetoFrontierOptimizer.java
+│   │   │       │   │   ├── RouteCandidate.java
+│   │   │       │   │   ├── TravelEdge.java
+│   │   │       │   │   ├── TravelGraph.java
+│   │   │       │   │   └── TravelNode.java
+│   │   │       │   │
+│   │   │       │   ├── repository/
+│   │   │       │   │   ├── OptimizationEdgeRepository.java
+│   │   │       │   │   └── OptimizationNodeRepository.java
+│   │   │       │   │
+│   │   │       │   └── service/
+│   │   │       │       ├── BenchmarkService.java
+│   │   │       │       └── OptimizationService.java
+│   │   │       │
+│   │   │       └── shared/
+│   │   │           └── db/
+│   │   │               ├── models/
+│   │   │               │   ├── Edge.java
+│   │   │               │   └── Node.java
+│   │   │               │
+│   │   │               └── repositories/
+│   │   │                   ├── EdgeRepository.java
+│   │   │                   └── NodeRepository.java
+│   │   │
+│   │   └── resources/
+│   │       ├── application.properties                (Spring Boot Configuration)
+│   │       └── static/
+│   │           └── index.html                        (Frontend UI)
+│   │
+│   └── test/
+│       └── java/
+│           └── com/nibm/intelligenttravelmanagementsystem/
+│               ├── IntelligentTravelManagementSystemApplicationTests.java
+│               └── MultiObjectiveOptimizationTests.java
+│
+└── target/                                           (Build Output - Auto Generated)
+    ├── classes/
+    ├── generated-sources/
+    ├── generated-test-sources/
+    ├── maven-status/
+    ├── surefire-reports/
+    └── test-classes/
+
+
+KEY COMPONENTS OVERVIEW
+=======================
+
+1. CONTROLLERS
+   - OptimizationController: Handles REST API endpoints for optimization requests
+
+2. SERVICES
+   - OptimizationService: Core service logic for running optimization algorithms
+   - BenchmarkService: Handles benchmarking and performance testing
+
+3. MODELS (Optimization Algorithms)
+   - BranchAndBoundOptimizer: Exact algorithm for multi-objective optimization
+   - ParetoFrontierOptimizer: Dynamic programming approach for Pareto frontiers
+   - GeneticRouteOptimizer: Metaheuristic genetic algorithm
+   - TravelGraph/TravelNode/TravelEdge: Graph data structures
+   - RouteCandidate/OptimizationResult: Result management
+
+4. DATABASE LAYER
+   - Entity Models: Node.java, Edge.java
+   - JPA Repositories: NodeRepository, EdgeRepository
+   - Optimization Repositories: OptimizationNodeRepository, OptimizationEdgeRepository
+
+5. DTOs (Data Transfer Objects)
+   - OptimizationRequest: Input parameters
+   - OptimizationResponse: Algorithm output
+   - BenchmarkResponse: Performance metrics
+   - NetworkResponseDTO: Network data
+   - RouteSummaryDTO: Route details
+   - AlgorithmType: Enum for algorithm selection
+
+6. FRONTEND
+   - index.html: Single-page application with interactive map visualization
+   - Features: Route planning, algorithm comparison, benchmarking
+
+7. CONFIGURATION
+   - pom.xml: Maven dependencies (Spring Boot, JPA, PostgreSQL)
+   - application.properties: Database connection and app settings
+
+
+BUILD & DEPLOYMENT
+==================
+
+- Framework: Spring Boot 4.1.0
+- Language: Java 17
+- Database: PostgreSQL (Supabase)
+- Build Tool: Maven
+- Port: 8080 (HTTP)
+
+Default Profile: "default"
+Dev Tools: Enabled (Spring DevTools for hot reload)
+
+
+END OF STRUCTURE
+================
