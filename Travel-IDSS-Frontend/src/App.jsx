@@ -12,7 +12,7 @@ function App() {
       <Navbar />
       <Routes>
         <Route path="/" element={<Dashboard />} />
-        {/* Module routes — pages will be built inside each folder */}
+        {/* Module routes */}
         <Route path="/route-optimization" element={<PlaceholderPage title="Route Optimization" />} />
         <Route path="/resource-allocation" element={<PlaceholderPage title="Resource Allocation" />} />
         <Route path="/network-analysis" element={<NetworkAnalysis />} />
