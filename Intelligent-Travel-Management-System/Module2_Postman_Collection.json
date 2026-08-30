@@ -1,0 +1,170 @@
+{
+  "info": {
+    "_postman_id": "m2-resource-allocation-tests",
+    "name": "Module 2 - Intelligent Resource Allocation API Tests",
+    "description": "Postman Collection for Module 2 Resource Allocation API (Spring Boot)",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "1. Valid Allocation Request (GREEDY)",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"totalBudget\": 500.0,\n  \"emergencyReserve\": 100.0,\n  \"availableHours\": 12.0,\n  \"luggageCapacity\": 15.0,\n  \"travellerCount\": 2,\n  \"selectedAlgorithm\": \"GREEDY\"\n}"
+        },
+        "url": {
+          "raw": "http://localhost:8080/api/resource-allocation/allocate",
+          "protocol": "http",
+          "host": [ "localhost" ],
+          "port": "8080",
+          "path": [ "api", "resource-allocation", "allocate" ]
+        }
+      }
+    },
+    {
+      "name": "2. Valid Allocation Request (DYNAMIC_PROGRAMMING)",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"totalBudget\": 400.0,\n  \"emergencyReserve\": 50.0,\n  \"availableHours\": 10.0,\n  \"luggageCapacity\": 10.0,\n  \"travellerCount\": 1,\n  \"selectedAlgorithm\": \"DYNAMIC_PROGRAMMING\"\n}"
+        },
+        "url": {
+          "raw": "http://localhost:8080/api/resource-allocation/allocate",
+          "protocol": "http",
+          "host": [ "localhost" ],
+          "port": "8080",
+          "path": [ "api", "resource-allocation", "allocate" ]
+        }
+      }
+    },
+    {
+      "name": "3. Valid Allocation Request (GENETIC)",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"totalBudget\": 600.0,\n  \"emergencyReserve\": 100.0,\n  \"availableHours\": 15.0,\n  \"luggageCapacity\": 20.0,\n  \"travellerCount\": 3,\n  \"selectedAlgorithm\": \"GENETIC\"\n}"
+        },
+        "url": {
+          "raw": "http://localhost:8080/api/resource-allocation/allocate",
+          "protocol": "http",
+          "host": [ "localhost" ],
+          "port": "8080",
+          "path": [ "api", "resource-allocation", "allocate" ]
+        }
+      }
+    },
+    {
+      "name": "4. Invalid Request - Negative Budget",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"totalBudget\": -50.0,\n  \"emergencyReserve\": 10.0,\n  \"availableHours\": 5.0,\n  \"luggageCapacity\": 5.0,\n  \"selectedAlgorithm\": \"GREEDY\"\n}"
+        },
+        "url": {
+          "raw": "http://localhost:8080/api/resource-allocation/allocate",
+          "protocol": "http",
+          "host": [ "localhost" ],
+          "port": "8080",
+          "path": [ "api", "resource-allocation", "allocate" ]
+        }
+      }
+    },
+    {
+      "name": "5. Invalid Request - Reserve Greater Than Budget",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"totalBudget\": 100.0,\n  \"emergencyReserve\": 150.0,\n  \"availableHours\": 5.0,\n  \"luggageCapacity\": 5.0,\n  \"selectedAlgorithm\": \"GREEDY\"\n}"
+        },
+        "url": {
+          "raw": "http://localhost:8080/api/resource-allocation/allocate",
+          "protocol": "http",
+          "host": [ "localhost" ],
+          "port": "8080",
+          "path": [ "api", "resource-allocation", "allocate" ]
+        }
+      }
+    },
+    {
+      "name": "6. Invalid Request - Zero Available Hours",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"totalBudget\": 200.0,\n  \"emergencyReserve": 20.0,\n  \"availableHours\": 0.0,\n  \"luggageCapacity\": 5.0,\n  \"selectedAlgorithm\": \"GREEDY\"\n}"
+        },
+        "url": {
+          "raw": "http://localhost:8080/api/resource-allocation/allocate",
+          "protocol": "http",
+          "host": [ "localhost" ],
+          "port": "8080",
+          "path": [ "api", "resource-allocation", "allocate" ]
+        }
+      }
+    },
+    {
+      "name": "7. Invalid Request - Invalid Algorithm Name",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"totalBudget\": 200.0,\n  \"emergencyReserve\": 20.0,\n  \"availableHours\": 5.0,\n  \"luggageCapacity\": 5.0,\n  \"selectedAlgorithm\": \"UNKNOWN_ALGO\"\n}"
+        },
+        "url": {
+          "raw": "http://localhost:8080/api/resource-allocation/allocate",
+          "protocol": "http",
+          "host": [ "localhost" ],
+          "port": "8080",
+          "path": [ "api", "resource-allocation", "allocate" ]
+        }
+      }
+    },
+    {
+      "name": "8. Invalid Request - Missing Required Fields",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{}"
+        },
+        "url": {
+          "raw": "http://localhost:8080/api/resource-allocation/allocate",
+          "protocol": "http",
+          "host": [ "localhost" ],
+          "port": "8080",
+          "path": [ "api", "resource-allocation", "allocate" ]
+        }
+      }
+    }
+  ]
+}
