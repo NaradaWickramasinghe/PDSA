@@ -1,0 +1,51 @@
+.na-map-wrapper {
+  width: 100%;
+  height: 500px;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+}
+
+.na-leaflet-container {
+  width: 100%;
+  height: 100%;
+  z-index: 1; /* keep it below navbar */
+}
+
+.na-map-empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 500px;
+  background: var(--color-bg-secondary);
+  color: var(--color-text-muted);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-border);
+}
+
+/* Custom Tooltip Styling */
+.leaflet-tooltip.na-map-tooltip {
+  background: rgba(17, 24, 39, 0.95);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: var(--color-text-primary);
+  border-radius: var(--radius-sm);
+  padding: 0.5rem 0.75rem;
+  box-shadow: var(--shadow-md);
+  font-family: inherit;
+}
+
+.leaflet-tooltip.na-map-tooltip::before {
+  border-top-color: rgba(17, 24, 39, 0.95);
+}
+
+.na-map-tooltip-title {
+  font-weight: 700;
+  margin-bottom: 0.25rem;
+  font-size: 0.875rem;
+}
+
+.na-map-tooltip-score {
+  font-size: 0.75rem;
+  color: var(--color-text-secondary);
+}
+.na-dark-tiles { filter: invert(100%) hue-rotate(180deg) brightness(95%) contrast(90%); }
