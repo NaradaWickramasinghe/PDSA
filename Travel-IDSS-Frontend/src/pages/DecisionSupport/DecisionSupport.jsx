@@ -151,8 +151,11 @@ export default function DecisionSupport() {
         <header className="orig-app-header">
           <div className="orig-header-flex">
             <div>
-              <h1 className="orig-app-title">Intelligent Decision Support System</h1>
-              <p className="orig-app-subtitle">Task 4 — Multi-Algorithm Destination Decision & Recommendation Engine</p>
+              <div className="orig-topic-tag">
+                <span className="orig-topic-dot" /> Module 4
+              </div>
+              <h1 className="orig-app-title">Decision Support</h1>
+              <p className="orig-app-subtitle">Personalized Travel Recommendations via Multi-Algorithm Decision Engine</p>
             </div>
             <div className="orig-header-badges">
               <span className="orig-engine-badge">🌳 Decision Tree (35%)</span>
