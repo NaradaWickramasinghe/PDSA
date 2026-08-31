@@ -571,11 +571,11 @@
 
 .orig-algo-bars-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 8px 14px;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px 12px;
 }
 
-@media (max-width: 600px) {
+@media (max-width: 700px) {
   .orig-algo-bars-grid {
     grid-template-columns: 1fr;
   }

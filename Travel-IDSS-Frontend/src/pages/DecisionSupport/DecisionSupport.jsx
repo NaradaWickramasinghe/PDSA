@@ -24,11 +24,10 @@ const PRESETS = [
 ];
 
 const ALGORITHM_MODES = [
-  { id: 'ensemble', label: 'Hybrid Ensemble (35% Tree + 25% KNN + 30% Vector)', badge: '⚖️ Ensemble', desc: 'Combines all algorithms with multi-criteria weighted scoring and penalty constraints.' },
+  { id: 'ensemble', label: 'Hybrid Ensemble (Decision Tree + KNN + 6D Vector)', badge: '⚖️ Ensemble', desc: 'Combines all algorithms with multi-criteria weighted scoring for optimal destination recommendation.' },
   { id: 'tree', label: 'Decision Tree Classifier', badge: '🌳 Decision Tree', desc: 'Evaluates categorical suitability tiers using hierarchical decision rules (35% weight).' },
   { id: 'knn', label: 'K-Nearest Neighbors (KNN)', badge: '👥 KNN Similarity', desc: 'Finds destinations favored by similar historical traveler clusters via Cosine Similarity (25% weight).' },
-  { id: 'preference', label: '6D Preference Matching', badge: '🎯 Vector Cosine', desc: 'Direct cosine similarity matching across 6 travel dimension preference vectors (30% weight).' },
-  { id: 'feasibility', label: 'Constraint Feasibility', badge: '💰 Feasibility', desc: 'Scores destination compatibility with budget and trip duration constraints (10% weight).' }
+  { id: 'preference', label: '6D Preference Matching', badge: '🎯 Vector Cosine', desc: 'Direct cosine similarity matching across 6 travel dimension preference vectors (30% weight).' }
 ];
 
 export default function DecisionSupport() {
@@ -122,13 +121,6 @@ export default function DecisionSupport() {
       case 'preference':
         items.sort((a, b) => (b.preferenceScore ?? 0) - (a.preferenceScore ?? 0) || (b.score ?? 0) - (a.score ?? 0));
         break;
-      case 'feasibility':
-        items.sort((a, b) => {
-          const feasA = ((a.budgetScore ?? 0) + (a.durationScore ?? 0)) / 2;
-          const feasB = ((b.budgetScore ?? 0) + (b.durationScore ?? 0)) / 2;
-          return feasB - feasA || (b.score ?? 0) - (a.score ?? 0);
-        });
-        break;
       case 'ensemble':
       default:
         items.sort((a, b) => (b.score ?? 0) - (a.score ?? 0));
@@ -147,10 +139,6 @@ export default function DecisionSupport() {
         return { score: ((rec.knnEvidenceScore ?? 0) * 100).toFixed(1), label: 'KNN Match' };
       case 'preference':
         return { score: ((rec.preferenceScore ?? 0) * 100).toFixed(1), label: 'Vector Match' };
-      case 'feasibility': {
-        const feas = (((rec.budgetScore ?? 0) + (rec.durationScore ?? 0)) / 2) * 100;
-        return { score: feas.toFixed(1), label: 'Feasibility' };
-      }
       case 'ensemble':
       default:
         return { score: rec.matchPercentage?.toFixed(1) || ((rec.score ?? 0) * 100).toFixed(1), label: 'Ensemble Match' };
@@ -170,7 +158,6 @@ export default function DecisionSupport() {
               <span className="orig-engine-badge">🌳 Decision Tree (35%)</span>
               <span className="orig-engine-badge">👥 KNN Cosine (25%)</span>
               <span className="orig-engine-badge">🎯 6D Preferences (30%)</span>
-              <span className="orig-engine-badge">💰 Constraints (10%)</span>
             </div>
           </div>
         </header>
@@ -397,16 +384,6 @@ export default function DecisionSupport() {
                                   <div className="orig-progress-fill preference" style={{ width: `${Math.min(100, Math.max(0, (rec.preferenceScore ?? 0) * 100))}%` }} />
                                 </div>
                               </div>
-
-                              <div className="orig-algo-bar-item">
-                                <div className="orig-algo-bar-label">
-                                  <span>💰 Feasibility</span>
-                                  <strong>{((((rec.budgetScore ?? 0) + (rec.durationScore ?? 0)) / 2) * 100).toFixed(0)}%</strong>
-                                </div>
-                                <div className="orig-progress-track">
-                                  <div className="orig-progress-fill feasibility" style={{ width: `${Math.min(100, Math.max(0, (((rec.budgetScore ?? 0) + (rec.durationScore ?? 0)) / 2) * 100))}%` }} />
-                                </div>
-                              </div>
                             </div>
                           </div>
                         )}
@@ -460,34 +437,28 @@ export default function DecisionSupport() {
               {/* Algorithm Weights Card */}
               <div className="orig-card orig-summary-card">
                 <div className="orig-card-header-title">
-                  <span>⚖️ Multi-Criteria Weighted Formulation</span>
+                  <span>⚖️ Multi-Criteria Algorithm Formulation</span>
                 </div>
                 <p className="orig-weight-intro">
-                  Final score = (0.35 × Tree) + (0.25 × KNN) + (0.30 × 6D Vector) − (0.10 × Feasibility Penalty)
+                  Final score = (0.35 × Decision Tree) + (0.30 × 6D Preference Vector) + (0.25 × KNN Clustering)
                 </p>
                 <div className="orig-weights-list">
                   <div className="orig-weight-item">
-                    <span className="orig-weight-name">Decision Tree Suitability</span>
+                    <span className="orig-weight-name">Decision Tree Suitability Classifier</span>
                     <div className="orig-weight-bar-wrap">
-                      <div className="orig-weight-bar tree" style={{ width: '35%' }}>35%</div>
+                      <div className="orig-weight-bar tree" style={{ width: '40%' }}>35%</div>
                     </div>
                   </div>
                   <div className="orig-weight-item">
                     <span className="orig-weight-name">6D Preference Vector Cosine Match</span>
                     <div className="orig-weight-bar-wrap">
-                      <div className="orig-weight-bar preference" style={{ width: '30%' }}>30%</div>
+                      <div className="orig-weight-bar preference" style={{ width: '35%' }}>30%</div>
                     </div>
                   </div>
                   <div className="orig-weight-item">
                     <span className="orig-weight-name">KNN Historical Traveler Clustering</span>
                     <div className="orig-weight-bar-wrap">
                       <div className="orig-weight-bar knn" style={{ width: '25%' }}>25%</div>
-                    </div>
-                  </div>
-                  <div className="orig-weight-item">
-                    <span className="orig-weight-name">Budget & Duration Feasibility Penalty</span>
-                    <div className="orig-weight-bar-wrap">
-                      <div className="orig-weight-bar feasibility" style={{ width: '10%' }}>10%</div>
                     </div>
                   </div>
                 </div>
@@ -510,7 +481,6 @@ export default function DecisionSupport() {
                       <th>Decision Tree</th>
                       <th>KNN Similarity</th>
                       <th>6D Vector Match</th>
-                      <th>Feasibility</th>
                       <th>Ensemble Match</th>
                     </tr>
                   </thead>
@@ -532,9 +502,6 @@ export default function DecisionSupport() {
                         </td>
                         <td>
                           <span className="orig-cell-score preference">{((rec.preferenceScore ?? 0) * 100).toFixed(0)}%</span>
-                        </td>
-                        <td>
-                          <span className="orig-cell-score feasibility">{((((rec.budgetScore ?? 0) + (rec.durationScore ?? 0)) / 2) * 100).toFixed(0)}%</span>
                         </td>
                         <td>
                           <strong className="orig-cell-score ensemble">{rec.matchPercentage?.toFixed(1)}%</strong>
