@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Navbar from './components/common/Navbar';
 import Dashboard from './pages/Dashboard/Dashboard';
 import NetworkAnalysis from './pages/NetworkAnalysis/NetworkAnalysis';
+import NetworkMstPage from './pages/NetworkMstPage';
 import OptimizationPage from './pages/Optimization/OptimizationPage';
 import DecisionSupport from './pages/DecisionSupport/DecisionSupport';
 
@@ -16,6 +17,8 @@ function App() {
         <Route path="/route-optimization" element={<PlaceholderPage title="Route Optimization" />} />
         <Route path="/resource-allocation" element={<PlaceholderPage title="Resource Allocation" />} />
         <Route path="/network-analysis" element={<NetworkAnalysis />} />
+        <Route path="/network-analysis/mst-prim" element={<NetworkMstPage />} />
+        <Route path="/decision-support" element={<PlaceholderPage title="Decision Support" />} />
         <Route path="/decision-support" element={<DecisionSupport />} />
         <Route path="/optimization" element={<OptimizationPage />} />
       </Routes>
