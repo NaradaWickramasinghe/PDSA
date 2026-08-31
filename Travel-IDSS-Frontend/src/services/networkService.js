@@ -2,9 +2,9 @@
 // API service for Network Analysis endpoints
 // Maps to: NetworkAnalysisController (@RequestMapping("/api/network"))
 
-import api from './api';
+import api from "./api";
 
-const NETWORK_BASE = '/network';
+const NETWORK_BASE = "/network";
 
 export const networkService = {
   /**
@@ -14,7 +14,7 @@ export const networkService = {
    * @param {string} weight - Edge weight type: distance_km | travel_time_minutes | estimated_cost_lkr
    * @returns {Promise} NetworkAnalysisResponseDTO
    */
-  getFullAnalysis: (weight = 'distance_km') => {
+  getFullAnalysis: (weight = "distance_km") => {
     return api.get(`${NETWORK_BASE}/analysis`, {
       params: { weight },
     });
@@ -28,7 +28,7 @@ export const networkService = {
    * @param {number} limit  - Max results (default 10)
    * @returns {Promise} CentralityScoreDTO[]
    */
-  getBetweennessRanking: (weight = 'distance_km', limit = 10) => {
+  getBetweennessRanking: (weight = "distance_km", limit = 10) => {
     return api.get(`${NETWORK_BASE}/betweenness`, {
       params: { weight, limit },
     });
@@ -42,7 +42,7 @@ export const networkService = {
    * @param {number} limit  - Max results (default 10)
    * @returns {Promise} CentralityScoreDTO[]
    */
-  getClosenessRanking: (weight = 'distance_km', limit = 10) => {
+  getClosenessRanking: (weight = "distance_km", limit = 10) => {
     return api.get(`${NETWORK_BASE}/closeness`, {
       params: { weight, limit },
     });
@@ -56,8 +56,21 @@ export const networkService = {
    * @param {string} weight - Edge weight type
    * @returns {Promise} CentralityScoreDTO
    */
-  getLocationScore: (id, weight = 'distance_km') => {
+  getLocationScore: (id, weight = "distance_km") => {
     return api.get(`${NETWORK_BASE}/location/${id}`, {
+      params: { weight },
+    });
+  },
+
+  /**
+   * Minimum Spanning Tree / Forest computation using Prim's algorithm.
+   * GET /api/network/mst-prim?weight=distance_km
+   *
+   * @param {string} weight - Edge weight type: distance_km | travel_time_minutes | estimated_cost_lkr
+   * @returns {Promise} PrimMstResponseDTO
+   */
+  getMstPrimAnalysis: (weight = "distance_km") => {
+    return api.get(`${NETWORK_BASE}/mst-prim`, {
       params: { weight },
     });
   },
