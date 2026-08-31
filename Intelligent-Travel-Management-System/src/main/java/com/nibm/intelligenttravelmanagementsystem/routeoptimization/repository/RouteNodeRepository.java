@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface NodeRepository extends JpaRepository<Node, Long> {
+public interface RouteNodeRepository extends JpaRepository<Node, Long> {
 
     // Find by String nodeId
     Optional<Node> findByNodeId(String nodeId);

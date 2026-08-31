@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface EdgeRepository extends JpaRepository<Edge, Long> {
+public interface RouteEdgeRepository extends JpaRepository<Edge, Long> {
 
     // Find by String edgeId
     Optional<Edge> findByEdgeId(String edgeId);
