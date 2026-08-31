@@ -4,8 +4,8 @@ import com.nibm.intelligenttravelmanagementsystem.shared.db.models.Node;
 import com.nibm.intelligenttravelmanagementsystem.shared.db.models.Edge;
 import com.nibm.intelligenttravelmanagementsystem.routeoptimization.model.Location;
 import com.nibm.intelligenttravelmanagementsystem.routeoptimization.model.RouteEdge;
-import com.nibm.intelligenttravelmanagementsystem.routeoptimization.repository.NodeRepository;
-import com.nibm.intelligenttravelmanagementsystem.routeoptimization.repository.EdgeRepository;
+import com.nibm.intelligenttravelmanagementsystem.routeoptimization.repository.RouteNodeRepository;
+import com.nibm.intelligenttravelmanagementsystem.routeoptimization.repository.RouteEdgeRepository;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -18,8 +18,8 @@ import java.util.*;
 @RequiredArgsConstructor
 public class GraphService {
 
-    private final NodeRepository nodeRepository;
-    private final EdgeRepository edgeRepository;
+    private final RouteNodeRepository nodeRepository;
+    private final RouteEdgeRepository edgeRepository;
 
     // Internal graph structure - using the Long ID from the models
     private Map<Long, List<RouteEdge>> graph = new HashMap<>();
