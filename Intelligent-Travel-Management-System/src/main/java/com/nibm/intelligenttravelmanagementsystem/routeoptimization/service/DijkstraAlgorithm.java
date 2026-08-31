@@ -11,39 +11,53 @@ import java.util.*;
 public class DijkstraAlgorithm {
 
     public List<Location> findShortestPath(
-            Map<Long, List<RouteEdge>> graph,
+            Map<String, List<RouteEdge>> graph,
             Location start,
             Location end,
             TransportMode mode,
-            boolean prioritizeTime) {
+            boolean prioritizeTime,
+            boolean preferSafeRoute,
+            Integer maxRiskLevel) {
 
-        Map<Long, Double> dist = new HashMap<>();
-        Map<Long, Location> prev = new HashMap<>();
-        Set<Long> visited = new HashSet<>();
-        PriorityQueue<Long> pq = new PriorityQueue<>(Comparator.comparingDouble(dist::get));
+        Map<String, Double> dist = new HashMap<>();
+        Map<String, Location> prev = new HashMap<>();
+        Set<String> visited = new HashSet<>();
+        PriorityQueue<String> pq = new PriorityQueue<>(Comparator.comparingDouble(dist::get));
 
         // Initialize distances
-        for (Long id : graph.keySet()) {
+        for (String id : graph.keySet()) {
             dist.put(id, Double.MAX_VALUE);
         }
         dist.put(start.getId(), 0.0);
         pq.add(start.getId());
 
         while (!pq.isEmpty()) {
-            Long currentId = pq.poll();
+            String currentId = pq.poll();
             if (visited.contains(currentId)) continue;
             visited.add(currentId);
 
             if (currentId.equals(end.getId())) break;
 
             List<RouteEdge> edges = graph.getOrDefault(currentId, new ArrayList<>());
+            if (preferSafeRoute || maxRiskLevel != null) {
+                int maxRisk = maxRiskLevel != null ? maxRiskLevel : (preferSafeRoute ? 3 : 5);
+                edges = edges.stream()
+                        .filter(e -> e.getRiskLevel() <= maxRisk)
+                        .toList();
+            }
             for (RouteEdge edge : edges) {
-                Long neighborId = edge.getDestination().getId();
+                String neighborId = edge.getDestination().getId();
                 if (visited.contains(neighborId)) continue;
 
-                // 🔥 FIX: Calculate edge weight based on criteria
                 double edgeWeight;
-                if (prioritizeTime) {
+
+                if (preferSafeRoute) {
+                    double baseWeight = prioritizeTime ?
+                            edge.getEstimatedTimeMinutes() * mode.getTimeMultiplier() :
+                            edge.getDistanceKm();
+                    double riskPenalty = (edge.getRiskLevel() - 1) * 2.0;
+                    edgeWeight = baseWeight + riskPenalty;
+                } else if (prioritizeTime) {
                     // Use time as weight (in minutes, adjusted for transport mode)
                     edgeWeight = edge.getEstimatedTimeMinutes() * mode.getTimeMultiplier();
                 } else {

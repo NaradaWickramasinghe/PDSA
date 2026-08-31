@@ -16,7 +16,8 @@ public class RouteOptimizationService {
     private final GraphService graphService;
     private final AStarAlgorithm aStarAlgorithm;
 
-    public RouteResult findRoute(Long startId, Long endId, TransportMode mode, boolean prioritizeTime) {
+    public RouteResult findRoute(String startId, String endId, TransportMode mode, boolean prioritizeTime, boolean preferSafeRoute,
+                                 Integer maxRiskLevel) {
         Location start = graphService.getLocation(startId);
         Location end = graphService.getLocation(endId);
 
@@ -25,11 +26,11 @@ public class RouteOptimizationService {
         }
 
         // Use full graph (no risk filtering)
-        Map<Long, List<RouteEdge>> graph = graphService.getGraph();
+        Map<String, List<RouteEdge>> graph = graphService.getGraph();
 
         long startTime = System.nanoTime();
         List<Location> path = aStarAlgorithm.findOptimalPath(
-                graph, start, end, mode, prioritizeTime
+                graph, start, end, mode, prioritizeTime, preferSafeRoute, maxRiskLevel
         );
         long endTime = System.nanoTime();
 
@@ -44,7 +45,7 @@ public class RouteOptimizationService {
         return result;
     }
 
-    public RouteResult findMultiStopRoute(Long startLocationId, List<Long> destinationIds, TransportMode mode, boolean prioritizeTime) {
+    public RouteResult findMultiStopRoute(String startLocationId, List<String> destinationIds, TransportMode mode, boolean prioritizeTime, boolean preferSafeRoute, Integer maxRiskLevel) {
         if (destinationIds == null || destinationIds.size() < 1) {
             throw new IllegalArgumentException("Need at least 1 destination");
         }
@@ -65,7 +66,7 @@ public class RouteOptimizationService {
             throw new IllegalArgumentException("Some destinations not found");
         }
 
-        Map<Long, List<RouteEdge>> graph = graphService.getGraph();
+        Map<String, List<RouteEdge>> graph = graphService.getGraph();
 
         // Create a list with start + destinations
         List<Location> allLocations = new ArrayList<>();
@@ -82,7 +83,7 @@ public class RouteOptimizationService {
                     weightMatrix[i][j] = 0;
                 } else {
                     List<Location> path = aStarAlgorithm.findOptimalPath(
-                            graph, allLocations.get(i), allLocations.get(j), mode, prioritizeTime
+                            graph, allLocations.get(i), allLocations.get(j), mode, prioritizeTime, preferSafeRoute, maxRiskLevel
                     );
 
                     if (!path.isEmpty()) {
@@ -122,7 +123,7 @@ public class RouteOptimizationService {
             Location to = orderedLocations.get(i + 1);
 
             List<Location> segmentPath = aStarAlgorithm.findOptimalPath(
-                    graph, from, to, mode, prioritizeTime
+                    graph, from, to, mode, prioritizeTime, preferSafeRoute, maxRiskLevel
             );
 
             if (segmentPath.size() > 1) {
@@ -240,7 +241,7 @@ public class RouteOptimizationService {
         return best;
     }
 
-    private RouteResult calculateMetrics(List<Location> path, Map<Long, List<RouteEdge>> graph, TransportMode mode) {
+    private RouteResult calculateMetrics(List<Location> path, Map<String, List<RouteEdge>> graph, TransportMode mode) {
         double totalDistance = 0;
         double totalTime = 0;
         double riskSum = 0;

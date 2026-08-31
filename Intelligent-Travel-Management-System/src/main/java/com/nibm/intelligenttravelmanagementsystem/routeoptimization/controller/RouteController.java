@@ -11,11 +11,14 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/routes")
-@CrossOrigin(origins = "*")
+@CrossOrigin(originPatterns = "http://localhost:*")
 @RequiredArgsConstructor
 public class RouteController {
 
@@ -44,7 +47,9 @@ public class RouteController {
                     request.getStartLocationId(),  // Start point
                     request.getMultipleLocations(),
                     request.getTransportMode(),
-                    request.isPrioritizeTime()
+                    request.isPrioritizeTime(),
+                    request.isPreferSafeRoute(),
+                    request.getMaxRiskLevel()
             );
         } else {
             // Single route - without risk
@@ -52,7 +57,9 @@ public class RouteController {
                     request.getStartLocationId(),
                     request.getEndLocationId(),
                     request.getTransportMode(),
-                    request.isPrioritizeTime()
+                    request.isPrioritizeTime(),
+                    request.isPreferSafeRoute(),
+                    request.getMaxRiskLevel()
             );
         }
 
@@ -61,13 +68,43 @@ public class RouteController {
 
     @PostMapping("/multi-stop")
     public ResponseEntity<RouteResult> findMultiStopRoute(@RequestBody MultiStopRequest request) {
-        // Without risk
         RouteResult result = routeService.findMultiStopRoute(
                 request.getStartLocationId(),      // Start point
                 request.getDestinationIds(),
                 request.getTransportMode(),
-                request.isPrioritizeTime()
-        );
+                request.isPrioritizeTime(),
+                request.isPreferSafeRoute(),
+                request.getMaxRiskLevel()
+                );
         return ResponseEntity.ok(result);
+    }
+    @GetMapping("/debug/nodes")
+    public ResponseEntity<Map<String, Object>> debugNodes() {
+        Map<String, Object> response = new HashMap<>();
+        try {
+            List<Location> locations = graphService.getAllLocations();
+            response.put("totalLocations", locations.size());
+            response.put("sampleIds", locations.stream()
+                    .limit(10)
+                    .map(loc -> Map.of(
+                            "id", loc.getId(),
+                            "name", loc.getName(),
+                            "type", loc.getType()
+                    ))
+                    .collect(Collectors.toList()));
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            response.put("error", e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+        }
+    }
+    @GetMapping("/locations/search")
+    public ResponseEntity<List<Location>> searchLocations(@RequestParam String query) {
+        try {
+            List<Location> results = graphService.searchLocations(query);
+            return ResponseEntity.ok(results);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
 }

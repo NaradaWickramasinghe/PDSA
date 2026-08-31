@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class RouteEdge {
-    private Long id;
+    private String id;  // String ID
     private Location source;
     private Location destination;
     private double distanceKm;
@@ -17,13 +17,13 @@ public class RouteEdge {
     private String transportMode;
     private boolean isOneWay;
 
-    // Additional fields from shared Edge
     private Double estimatedCostLkr;
     private Integer roadQuality;
     private Integer trafficLevel;
     private Integer accesibility;
 
-    public RouteEdge(Long id, Location source, Location destination, double distanceKm,
+    // Constructor with String ID
+    public RouteEdge(String id, Location source, Location destination, double distanceKm,
                      int estimatedTimeMinutes, int riskLevel, String transportMode, boolean isOneWay) {
         this.id = id;
         this.source = source;
@@ -33,5 +33,10 @@ public class RouteEdge {
         this.riskLevel = riskLevel;
         this.transportMode = transportMode;
         this.isOneWay = isOneWay;
+    }
+
+    public int getEffectiveTimeMinutes(TransportMode mode) {
+        double timeWithMode = estimatedTimeMinutes * mode.getTimeMultiplier();
+        return (int) Math.round(timeWithMode);
     }
 }

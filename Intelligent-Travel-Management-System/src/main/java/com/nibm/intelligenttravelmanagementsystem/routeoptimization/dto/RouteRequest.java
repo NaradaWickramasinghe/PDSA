@@ -7,9 +7,13 @@ import java.util.List;
 
 @Data
 public class RouteRequest {
-    private Long startLocationId;
-    private Long endLocationId;
-    private List<Long> multipleLocations; // For multi-stop
+    private String startLocationId;
+    private String endLocationId;
+    private List<String> multipleLocations; // For multi-stop
     private TransportMode transportMode = TransportMode.NORMAL_VEHICLE;
     private boolean prioritizeTime = false;
+
+    // NEW: Safe route toggle
+    private boolean preferSafeRoute = false;  // If true, avoids high-risk roads
+    private Integer maxRiskLevel;
 }
