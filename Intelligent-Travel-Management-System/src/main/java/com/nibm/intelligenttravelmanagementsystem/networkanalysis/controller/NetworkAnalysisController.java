@@ -2,7 +2,9 @@ package com.nibm.intelligenttravelmanagementsystem.networkanalysis.controller;
 
 import com.nibm.intelligenttravelmanagementsystem.networkanalysis.dto.CentralityScoreDTO;
 import com.nibm.intelligenttravelmanagementsystem.networkanalysis.dto.NetworkAnalysisResponseDTO;
+import com.nibm.intelligenttravelmanagementsystem.networkanalysis.dto.PrimMstResponseDTO;
 import com.nibm.intelligenttravelmanagementsystem.networkanalysis.service.NetworkAnalysisService;
+import com.nibm.intelligenttravelmanagementsystem.networkanalysis.service.PrimMstAnalysisService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -23,9 +25,10 @@ import java.util.List;
  *   <tr><td>GET</td><td>/api/network/betweenness</td><td>Top N by betweenness</td><td>200</td><td>422, 400</td></tr>
  *   <tr><td>GET</td><td>/api/network/closeness</td><td>Top N by closeness</td><td>200</td><td>422, 400</td></tr>
  *   <tr><td>GET</td><td>/api/network/location/{id}</td><td>Single destination's scores</td><td>200</td><td>404, 400</td></tr>
+ *   <tr><td>GET</td><td>/api/network/mst-prim</td><td>Minimum Spanning Forest using Prim's algorithm</td><td>200</td><td>500, 400</td></tr>
  * </table>
  *
- * <p><b>Note on the {@code weight} parameter:</b> All endpoints accept an optional
+ * <p><b>Note on the {@code weight} parameter:</b> Centrality endpoints accept an optional
  * {@code weight} query parameter to select which edge attribute is used for centrality
  * computation. Valid values: {@code distance_km} (default), {@code travel_time_minutes},
  * {@code estimated_cost_lkr}. This allows comparative analysis — e.g., "which town is
@@ -42,6 +45,7 @@ import java.util.List;
 public class NetworkAnalysisController {
 
     private final NetworkAnalysisService networkAnalysisService;
+    private final PrimMstAnalysisService primMstAnalysisService;
 
     /**
      * Full network analysis — returns both betweenness and closeness rankings
@@ -110,5 +114,19 @@ public class NetworkAnalysisController {
             @RequestParam(defaultValue = "distance_km") String weight) {
 
         return ResponseEntity.ok(networkAnalysisService.getScoreForLocation(id, weight));
+    }
+
+    /**
+     * Computes the Minimum Spanning Tree (or Forest, if graph is disconnected)
+     * using Prim's algorithm with a binary heap PriorityQueue.
+     *
+     * @param weight which edge weight to use (default: distance_km)
+     * @return 200 OK with PrimMstResponseDTO containing the computed MST structures
+     */
+    @GetMapping("/mst-prim")
+    public ResponseEntity<PrimMstResponseDTO> getMinimumSpanningForest(
+            @RequestParam(defaultValue = "distance_km") String weight) {
+
+        return ResponseEntity.ok(primMstAnalysisService.analyzeMst(weight));
     }
 }
