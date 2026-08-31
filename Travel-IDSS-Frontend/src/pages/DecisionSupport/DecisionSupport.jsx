@@ -65,7 +65,7 @@ export default function DecisionSupport() {
     setError(null);
 
     try {
-      const res = await fetch('http://localhost:8085/api/decisions/recommend', {
+      const res = await fetch('http://localhost:8080/api/decisions/recommend', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
         body: JSON.stringify({
