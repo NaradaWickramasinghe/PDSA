@@ -3,32 +3,40 @@ package com.nibm.intelligenttravelmanagementsystem.routeoptimization.service;
 import com.nibm.intelligenttravelmanagementsystem.routeoptimization.model.RouteEdge;
 import com.nibm.intelligenttravelmanagementsystem.routeoptimization.model.Location;
 import com.nibm.intelligenttravelmanagementsystem.routeoptimization.model.TransportMode;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
 
 @Service
+@RequiredArgsConstructor
 public class AStarAlgorithm {
+
+    private final TrafficService trafficService;
 
     /**
      * Find optimal path using A* algorithm
      * @param prioritizeTime - if true, optimizes for time instead of distance
      */
     public List<Location> findOptimalPath(
-            Map<Long, List<RouteEdge>> graph,
+            Map<String, List<RouteEdge>> graph,
             Location start,
             Location end,
             TransportMode mode,
-            boolean prioritizeTime) {
+            boolean prioritizeTime,
+            boolean preferSafeRoute,
+            Integer maxRiskLevel){
+
+        // Apply traffic simulation first
+        trafficService.applyTrafficSimulation(graph);
 
         // Priority queue for open set (min-heap by f-score)
         PriorityQueue<NodeInfo> openSet = new PriorityQueue<>();
-
         // Maps to track scores
-        Map<Long, Double> gScore = new HashMap<>(); // Cost from start
-        Map<Long, Double> fScore = new HashMap<>(); // g + heuristic
-        Map<Long, Location> cameFrom = new HashMap<>();
-        Set<Long> closedSet = new HashSet<>();
+        Map<String, Double> gScore = new HashMap<>(); // Cost from start
+        Map<String, Double> fScore = new HashMap<>(); // g + heuristic
+        Map<String, Location> cameFrom = new HashMap<>();
+        Set<String> closedSet = new HashSet<>();
 
         // Initialize
         gScore.put(start.getId(), 0.0);
@@ -37,7 +45,7 @@ public class AStarAlgorithm {
 
         while (!openSet.isEmpty()) {
             NodeInfo current = openSet.poll();
-            Long currentId = current.locationId;
+            String currentId = current.locationId;
 
             // Found the goal
             if (currentId.equals(end.getId())) {
@@ -50,18 +58,37 @@ public class AStarAlgorithm {
 
             // Explore neighbors
             List<RouteEdge> edges = graph.getOrDefault(currentId, new ArrayList<>());
+
+            if (preferSafeRoute || maxRiskLevel != null) {
+                int maxRisk = maxRiskLevel != null ? maxRiskLevel : (preferSafeRoute ? 3 : 5);
+                edges = edges.stream()
+                        .filter(e -> e.getRiskLevel() <= maxRisk)
+                        .toList();
+            }
+
             for (RouteEdge edge : edges) {
-                Long neighborId = edge.getDestination().getId();
+                String neighborId = edge.getDestination().getId();
                 if (closedSet.contains(neighborId)) continue;
 
-                // 🔥 FIX: Calculate edge weight based on criteria
+                // Calculate edge weight based on criteria
                 double edgeWeight;
-                if (prioritizeTime) {
-                    // Use time as weight (in minutes, adjusted for transport mode)
-                    edgeWeight = edge.getEstimatedTimeMinutes() * mode.getTimeMultiplier();
+
+                if (preferSafeRoute) {
+                    double baseWeight = prioritizeTime ?
+                            trafficService.getEffectiveTime(edge, mode) :
+                            edge.getDistanceKm();
+                    double riskPenalty = (edge.getRiskLevel() - 1) * 2.0;
+                    edgeWeight = baseWeight + riskPenalty;
+                }
+                else if (prioritizeTime) {
+                    // USE TRAFFIC-AWARE EFFECTIVE TIME
+                    edgeWeight = trafficService.getEffectiveTime(edge, mode);
                 } else {
-                    // Use distance as weight
-                    edgeWeight = edge.getDistanceKm();
+                    // For shortest path, still use distance but with traffic consideration
+                    // Add small penalty for traffic on shortest path too
+                    int trafficLevel = trafficService.getTrafficLevel(edge.getId(), edge);
+                    double trafficPenalty = 1 + (trafficLevel - 1) * 0.05; // Up to 20% penalty
+                    edgeWeight = edge.getDistanceKm() * trafficPenalty;
                 }
 
                 double tentativeG = gScore.get(currentId) + edgeWeight;
@@ -82,7 +109,7 @@ public class AStarAlgorithm {
 
         // No path found - fallback to Dijkstra
         System.out.println("⚠️ A* found no path, falling back to Dijkstra");
-        return new DijkstraAlgorithm().findShortestPath(graph, start, end, mode, prioritizeTime);
+        return new DijkstraAlgorithm().findShortestPath(graph, start, end, mode, prioritizeTime, preferSafeRoute, maxRiskLevel);
     }
 
     /**
@@ -102,16 +129,15 @@ public class AStarAlgorithm {
         double distanceKm = Math.sqrt(dx * dx + dy * dy);
 
         if (prioritizeTime) {
-            // Estimate minimum time: assume 60 km/h average speed
-            // Return time in minutes
-            return (distanceKm / 60.0) * 60; // minutes
+            // Assume 50 km/h average with traffic (more conservative)
+            return (distanceKm / 50.0) * 60;
         } else {
             return distanceKm;
         }
     }
 
     // Reconstruct path from cameFrom map
-    private List<Location> reconstructPath(Map<Long, Location> cameFrom, Location start, Location end) {
+    private List<Location> reconstructPath(Map<String, Location> cameFrom, Location start, Location end) {
         List<Location> path = new ArrayList<>();
         Location current = end;
 
@@ -129,10 +155,10 @@ public class AStarAlgorithm {
 
     // Helper class for priority queue
     private static class NodeInfo implements Comparable<NodeInfo> {
-        Long locationId;
+        String locationId;
         double fScore;
 
-        NodeInfo(Long id, double f) {
+        NodeInfo(String id, double f) {
             this.locationId = id;
             this.fScore = f;
         }

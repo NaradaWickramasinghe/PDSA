@@ -15,8 +15,11 @@ public class RouteOptimizationService {
 
     private final GraphService graphService;
     private final AStarAlgorithm aStarAlgorithm;
+    private final TrafficService trafficService;
 
-    public RouteResult findRoute(Long startId, Long endId, TransportMode mode, boolean prioritizeTime) {
+
+    public RouteResult findRoute(String startId, String endId, TransportMode mode, boolean prioritizeTime, boolean preferSafeRoute,
+                                 Integer maxRiskLevel) {
         Location start = graphService.getLocation(startId);
         Location end = graphService.getLocation(endId);
 
@@ -25,11 +28,11 @@ public class RouteOptimizationService {
         }
 
         // Use full graph (no risk filtering)
-        Map<Long, List<RouteEdge>> graph = graphService.getGraph();
+        Map<String, List<RouteEdge>> graph = graphService.getGraph();
 
         long startTime = System.nanoTime();
         List<Location> path = aStarAlgorithm.findOptimalPath(
-                graph, start, end, mode, prioritizeTime
+                graph, start, end, mode, prioritizeTime, preferSafeRoute, maxRiskLevel
         );
         long endTime = System.nanoTime();
 
@@ -44,7 +47,7 @@ public class RouteOptimizationService {
         return result;
     }
 
-    public RouteResult findMultiStopRoute(Long startLocationId, List<Long> destinationIds, TransportMode mode, boolean prioritizeTime) {
+    public RouteResult findMultiStopRoute(String startLocationId, List<String> destinationIds, TransportMode mode, boolean prioritizeTime, boolean preferSafeRoute, Integer maxRiskLevel) {
         if (destinationIds == null || destinationIds.size() < 1) {
             throw new IllegalArgumentException("Need at least 1 destination");
         }
@@ -65,7 +68,7 @@ public class RouteOptimizationService {
             throw new IllegalArgumentException("Some destinations not found");
         }
 
-        Map<Long, List<RouteEdge>> graph = graphService.getGraph();
+        Map<String, List<RouteEdge>> graph = graphService.getGraph();
 
         // Create a list with start + destinations
         List<Location> allLocations = new ArrayList<>();
@@ -82,7 +85,7 @@ public class RouteOptimizationService {
                     weightMatrix[i][j] = 0;
                 } else {
                     List<Location> path = aStarAlgorithm.findOptimalPath(
-                            graph, allLocations.get(i), allLocations.get(j), mode, prioritizeTime
+                            graph, allLocations.get(i), allLocations.get(j), mode, prioritizeTime, preferSafeRoute, maxRiskLevel
                     );
 
                     if (!path.isEmpty()) {
@@ -122,7 +125,7 @@ public class RouteOptimizationService {
             Location to = orderedLocations.get(i + 1);
 
             List<Location> segmentPath = aStarAlgorithm.findOptimalPath(
-                    graph, from, to, mode, prioritizeTime
+                    graph, from, to, mode, prioritizeTime, preferSafeRoute, maxRiskLevel
             );
 
             if (segmentPath.size() > 1) {
@@ -240,11 +243,13 @@ public class RouteOptimizationService {
         return best;
     }
 
-    private RouteResult calculateMetrics(List<Location> path, Map<Long, List<RouteEdge>> graph, TransportMode mode) {
+    private RouteResult calculateMetrics(List<Location> path, Map<String, List<RouteEdge>> graph, TransportMode mode) {
         double totalDistance = 0;
         double totalTime = 0;
-        double riskSum = 0;
+        double totalRisk = 0;
+        double totalTraffic = 0;
         int edgeCount = 0;
+        int congestedCount = 0;
 
         for (int i = 0; i < path.size() - 1; i++) {
             Location from = path.get(i);
@@ -254,8 +259,18 @@ public class RouteOptimizationService {
             for (RouteEdge edge : edges) {
                 if (edge.getDestination().getId().equals(to.getId())) {
                     totalDistance += edge.getDistanceKm();
-                    totalTime += edge.getEstimatedTimeMinutes() * mode.getTimeMultiplier();
-                    riskSum += edge.getRiskLevel();
+
+                    // Use traffic-aware time
+                    int effectiveTime = trafficService.getEffectiveTime(edge, mode);
+                    totalTime += effectiveTime;
+
+                    totalRisk += edge.getRiskLevel();
+
+                    // Track traffic
+                    int traffic = trafficService.getTrafficLevel(edge.getId(), edge);
+                    totalTraffic += traffic;
+                    if (traffic >= 4) congestedCount++;
+
                     edgeCount++;
                     break;
                 }
@@ -266,7 +281,10 @@ public class RouteOptimizationService {
                 .path(path)
                 .totalDistanceKm(totalDistance)
                 .estimatedTimeMinutes(totalTime)
-                .riskScore(edgeCount > 0 ? riskSum / edgeCount : 0)
+                .riskScore(edgeCount > 0 ? totalRisk / edgeCount : 0)
+                .trafficScore(edgeCount > 0 ? totalTraffic / edgeCount : 0)
+                .congestedSegments(congestedCount)
                 .build();
     }
 }
+
