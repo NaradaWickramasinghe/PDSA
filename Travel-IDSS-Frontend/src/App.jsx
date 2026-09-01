@@ -6,6 +6,7 @@ import NetworkAnalysis from './pages/NetworkAnalysis/NetworkAnalysis';
 import NetworkMstPage from './pages/NetworkMstPage';
 import OptimizationPage from './pages/Optimization/OptimizationPage';
 import DecisionSupport from './pages/DecisionSupport/DecisionSupport';
+import RouteOptimization from './pages/RouteOptimization/RouteOptimization';
 
 function App() {
   return (
@@ -14,7 +15,7 @@ function App() {
       <Routes>
         <Route path="/" element={<Dashboard />} />
         {/* Module routes */}
-        <Route path="/route-optimization" element={<PlaceholderPage title="Route Optimization" />} />
+        <Route path="/route-optimization" element={<RouteOptimization />} />
         <Route path="/resource-allocation" element={<PlaceholderPage title="Resource Allocation" />} />
         <Route path="/network-analysis" element={<NetworkAnalysis />} />
         <Route path="/decision-support" element={<DecisionSupport />} />

@@ -6,30 +6,40 @@ import api from './api';
 const ROUTE_BASE = '/routes';
 
 export const routeService = {
-  // Find optimal route
-  findOptimalRoute: (routeData) => {
-    return api.post(`${ROUTE_BASE}/optimize`, routeData);
+  // Find optimal route (A to B)
+  calculateRoute: (request) => {
+    return api.post(`${ROUTE_BASE}/calculate`, request);
   },
 
-  // Get all saved routes
-  getAllRoutes: () => {
-    return api.get(ROUTE_BASE);
+  // Find optimal multi-stop route (TSP)
+  calculateMultiStopRoute: (request) => {
+    return api.post(`${ROUTE_BASE}/multi-stop`, request);
   },
 
-  // Get route by ID
-  getRouteById: (id) => {
-    return api.get(`${ROUTE_BASE}/${id}`);
+  // Search locations by name
+  searchLocations: (query) => {
+    return api.get(`${ROUTE_BASE}/locations/search`, { params: { query } });
   },
 
-  // Compare routes using different algorithms
-  compareAlgorithms: (routeData) => {
-    return api.post(`${ROUTE_BASE}/compare`, routeData);
+  // Get current traffic status
+  getTrafficStatus: () => {
+    return api.get(`${ROUTE_BASE}/traffic/status`);
   },
 
-  // Get route suggestions
-  getSuggestions: (params) => {
-    return api.get(`${ROUTE_BASE}/suggestions`, { params });
+  // Get traffic info for a specific location
+  getLocationTraffic: (id) => {
+    return api.get(`${ROUTE_BASE}/locations/traffic/${id}`);
   },
+
+  // Trigger traffic simulation across the graph
+  simulateTraffic: () => {
+    return api.get(`${ROUTE_BASE}/traffic/simulate`);
+  },
+  
+  // Debug endpoint to get sample nodes
+  getDebugNodes: () => {
+    return api.get(`${ROUTE_BASE}/debug/nodes`);
+  }
 };
 
 export default routeService;
