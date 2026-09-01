@@ -1,6 +1,4 @@
 // src/pages/NetworkAnalysis/NetworkAnalysis.jsx
-// Network Analysis page — betweenness & closeness centrality rankings
-
 import { useState, useEffect, useCallback } from 'react';
 import {
   BarChart,
@@ -9,12 +7,18 @@ import {
   YAxis,
   CartesianGrid,
   Tooltip,
-  ResponsiveContainer,
-  Cell,
+  ResponsiveContainer
 } from 'recharts';
 import { useNetworkAnalysis, WEIGHT_OPTIONS } from '../../hooks/useNetworkAnalysis';
 import NetworkMap from './NetworkMap';
+import { PrimMstSection } from '../../components/PrimMstSection';
 import './NetworkAnalysis.css';
+
+// Common dark theme style for HTML <option> dropdown items
+const darkOptionStyle = {
+  backgroundColor: '#1e293b',
+  color: '#f8fafc'
+};
 
 // ─── Custom Recharts Tooltip ───────────────────────────────────
 function CustomTooltip({ active, payload, label, metricLabel }) {
@@ -78,14 +82,7 @@ function CentralityChart({ data, dataKey, gradientId, color1, color2, metricLabe
             fill={`url(#${gradientId})`}
             radius={[4, 4, 0, 0]}
             maxBarSize={48}
-          >
-            {data.map((_, index) => (
-              <Cell
-                key={index}
-                fillOpacity={1 - index * 0.06 > 0.3 ? 1 - index * 0.06 : 0.3}
-              />
-            ))}
-          </Bar>
+          />
         </BarChart>
       </ResponsiveContainer>
     </div>
@@ -95,7 +92,7 @@ function CentralityChart({ data, dataKey, gradientId, color1, color2, metricLabe
 // ─── Data Table ─────────────────────────────────────────────────
 function RankingTable({ data, metric, barClass }) {
   if (!data?.length) return null;
-  const maxVal = Math.max(...data.map((d) => d[metric]));
+  const maxVal = Math.max(...data.map((d) => d[metric] || 0));
 
   const getRankClass = (i) => {
     if (i === 0) return 'na-table__rank--gold';
@@ -118,18 +115,18 @@ function RankingTable({ data, metric, barClass }) {
         </thead>
         <tbody>
           {data.map((item, i) => (
-            <tr key={item.nodeId}>
+            <tr key={item.nodeId || item.name}>
               <td className={`na-table__rank ${getRankClass(i)}`}>{i + 1}</td>
               <td className="na-table__name">{item.name}</td>
               <td style={{ fontFamily: 'monospace', fontSize: '0.8125rem' }}>
                 {item.nodeId}
               </td>
-              <td className="na-table__score">{item[metric].toFixed(6)}</td>
+              <td className="na-table__score">{(item[metric] || 0).toFixed(6)}</td>
               <td className="na-table__bar-cell">
                 <div className="na-table__bar-container">
                   <div
                     className={`na-table__bar ${barClass}`}
-                    style={{ width: `${maxVal ? (item[metric] / maxVal) * 100 : 0}%` }}
+                    style={{ width: `${maxVal ? ((item[metric] || 0) / maxVal) * 100 : 0}%` }}
                   />
                 </div>
               </td>
@@ -157,9 +154,10 @@ export default function NetworkAnalysis() {
   } = useNetworkAnalysis();
 
   const [lookupId, setLookupId] = useState('');
+  const [lookupError, setLookupError] = useState(null);
+  const [localLocationScore, setLocalLocationScore] = useState(null);
   const [mapMetric, setMapMetric] = useState('betweenness');
 
-  // Fetch on mount and when weight changes
   const handleAnalyze = useCallback(
     (weight) => {
       fetchFullAnalysis(weight);
@@ -176,9 +174,54 @@ export default function NetworkAnalysis() {
     handleAnalyze(weight);
   };
 
-  const handleLookup = () => {
-    if (lookupId.trim()) {
-      fetchLocationScore(lookupId.trim(), selectedWeight);
+  const handleLookup = async () => {
+    const query = lookupId.trim();
+    if (!query) return;
+
+    setLookupError(null);
+
+    // 1. Instant local lookup in already loaded analysisResult
+    if (analysisResult?.rankedByBetweenness) {
+      const qLower = query.toLowerCase();
+      const match = analysisResult.rankedByBetweenness.find(
+        (item) =>
+          item.nodeId.toLowerCase() === qLower ||
+          item.name.toLowerCase() === qLower ||
+          item.nodeId.toLowerCase().includes(qLower) ||
+          item.name.toLowerCase().includes(qLower)
+      );
+
+      if (match) {
+        const bRank =
+          analysisResult.rankedByBetweenness.findIndex((i) => i.nodeId === match.nodeId) + 1;
+        const cRank =
+          (analysisResult.rankedByCloseness || []).findIndex((i) => i.nodeId === match.nodeId) + 1;
+        setLocalLocationScore({
+          ...match,
+          betweennessRank: bRank,
+          closenessRank: cRank,
+        });
+        return;
+      }
+    }
+
+    // 2. Fallback to API if not in local memory
+    try {
+      const data = await fetchLocationScore(query, selectedWeight);
+      if (data) {
+        const bRank =
+          (analysisResult?.rankedByBetweenness || []).findIndex((i) => i.nodeId === data.nodeId) + 1;
+        const cRank =
+          (analysisResult?.rankedByCloseness || []).findIndex((i) => i.nodeId === data.nodeId) + 1;
+        setLocalLocationScore({
+          ...data,
+          betweennessRank: bRank > 0 ? bRank : null,
+          closenessRank: cRank > 0 ? cRank : null,
+        });
+      }
+    } catch (err) {
+      setLocalLocationScore(null);
+      setLookupError(`Destination "${query}" was not found in the network.`);
     }
   };
 
@@ -186,9 +229,8 @@ export default function NetworkAnalysis() {
     if (e.key === 'Enter') handleLookup();
   };
 
-  // Shorten weight label for stats display
   const weightLabel =
-    WEIGHT_OPTIONS.find((w) => w.value === analysisResult?.weightUsed)?.label ||
+    WEIGHT_OPTIONS?.find((w) => w.value === analysisResult?.weightUsed)?.label ||
     analysisResult?.weightUsed ||
     '—';
 
@@ -199,22 +241,20 @@ export default function NetworkAnalysis() {
         <header className="na-header">
           <div className="na-header__badge">
             <span className="na-header__badge-dot" />
-            Network Analysis Module
+            <span>Network Analysis Module</span>
           </div>
           <h1 className="na-header__title">
             Transport Network{' '}
             <span className="na-header__title-gradient">Centrality Analysis</span>
           </h1>
           <p className="na-header__subtitle">
-            Discover the most strategically important destinations in the travel
-            network using Brandes' algorithm. Identify gateway towns (betweenness)
-            and best-connected hubs (closeness).
+            Discover the most strategically important destinations in the travel network using Brandes&apos; algorithm. Identify gateway towns (betweenness) and best-connected hubs (closeness).
           </p>
         </header>
 
         {/* ── Controls ── */}
         <div className="na-controls">
-          <span className="na-controls__label">Edge Weight:</span>
+          <label htmlFor="weight-select" className="na-controls__label">Edge Weight:</label>
           <select
             className="na-controls__select"
             value={selectedWeight}
@@ -222,13 +262,14 @@ export default function NetworkAnalysis() {
             disabled={loading}
             id="weight-select"
           >
-            {WEIGHT_OPTIONS.map((opt) => (
-              <option key={opt.value} value={opt.value}>
+            {WEIGHT_OPTIONS?.map((opt) => (
+              <option key={opt.value} value={opt.value} style={darkOptionStyle}>
                 {opt.label}
               </option>
             ))}
           </select>
           <button
+            type="button"
             className="na-controls__btn"
             onClick={() => handleAnalyze(selectedWeight)}
             disabled={loading}
@@ -243,7 +284,7 @@ export default function NetworkAnalysis() {
           <div className="na-error">
             <span className="na-error__icon">⚠️</span>
             <span className="na-error__text">{error}</span>
-            <button className="na-error__dismiss" onClick={clearError}>
+            <button type="button" className="na-error__dismiss" onClick={clearError}>
               Dismiss
             </button>
           </div>
@@ -254,7 +295,7 @@ export default function NetworkAnalysis() {
           <div className="na-loading">
             <div className="na-spinner" />
             <span className="na-loading__text">
-              Running Brandes' algorithm on the network…
+              Running Brandes&apos; algorithm on the network…
             </span>
           </div>
         )}
@@ -295,7 +336,7 @@ export default function NetworkAnalysis() {
               </div>
               <div className="na-card">
                 <CentralityChart
-                  data={analysisResult.rankedByBetweenness.slice(0, 10)}
+                  data={analysisResult.rankedByBetweenness?.slice(0, 10) || []}
                   dataKey="betweenness"
                   gradientId="betweennessGradient"
                   color1="#06b6d4"
@@ -303,7 +344,7 @@ export default function NetworkAnalysis() {
                   metricLabel="Betweenness"
                 />
                 <RankingTable
-                  data={analysisResult.rankedByBetweenness}
+                  data={analysisResult.rankedByBetweenness || []}
                   metric="betweenness"
                   barClass="na-table__bar--cyan"
                 />
@@ -323,7 +364,7 @@ export default function NetworkAnalysis() {
               </div>
               <div className="na-card">
                 <CentralityChart
-                  data={analysisResult.rankedByCloseness.slice(0, 10)}
+                  data={analysisResult.rankedByCloseness?.slice(0, 10) || []}
                   dataKey="closeness"
                   gradientId="closenessGradient"
                   color1="#8b5cf6"
@@ -331,7 +372,7 @@ export default function NetworkAnalysis() {
                   metricLabel="Closeness"
                 />
                 <RankingTable
-                  data={analysisResult.rankedByCloseness}
+                  data={analysisResult.rankedByCloseness || []}
                   metric="closeness"
                   barClass="na-table__bar--violet"
                 />
@@ -354,6 +395,7 @@ export default function NetworkAnalysis() {
                 {/* Map Toggle Controls */}
                 <div style={{ display: 'flex', gap: '0.5rem', background: 'var(--color-bg-card)', padding: '0.25rem', borderRadius: 'var(--radius-sm)', border: '1px solid var(--color-border)' }}>
                   <button 
+                    type="button"
                     onClick={() => setMapMetric('betweenness')}
                     style={{
                       padding: '0.375rem 0.75rem', 
@@ -370,6 +412,7 @@ export default function NetworkAnalysis() {
                     Betweenness
                   </button>
                   <button 
+                    type="button"
                     onClick={() => setMapMetric('closeness')}
                     style={{
                       padding: '0.375rem 0.75rem', 
@@ -389,7 +432,7 @@ export default function NetworkAnalysis() {
               </div>
               <div className="na-card" style={{ padding: 0, border: 'none' }}>
                 <NetworkMap 
-                  data={mapMetric === 'betweenness' ? analysisResult.rankedByBetweenness : analysisResult.rankedByCloseness} 
+                  data={mapMetric === 'betweenness' ? (analysisResult.rankedByBetweenness || []) : (analysisResult.rankedByCloseness || [])} 
                   metric={mapMetric} 
                 />
               </div>
@@ -402,7 +445,7 @@ export default function NetworkAnalysis() {
                 <div>
                   <h2 className="na-section__title">Destination Lookup</h2>
                   <p className="na-section__subtitle">
-                    Look up centrality scores for a specific destination by Node ID
+                    Look up centrality scores and gateway rankings for any destination by Name or Node ID
                   </p>
                 </div>
               </div>
@@ -411,16 +454,27 @@ export default function NetworkAnalysis() {
                   <input
                     className="na-lookup__input"
                     type="text"
-                    placeholder="Enter Node ID (e.g. N001)"
+                    list="destinations-lookup-list"
+                    placeholder="Search by Node ID or Name (e.g. HMB_PORT, Kandy, Colombo...)"
                     value={lookupId}
                     onChange={(e) => {
                       setLookupId(e.target.value);
+                      if (lookupError) setLookupError(null);
+                      if (localLocationScore) setLocalLocationScore(null);
                       if (locationScore) clearLocationScore();
                     }}
                     onKeyDown={handleLookupKeyDown}
                     id="lookup-input"
                   />
+                  <datalist id="destinations-lookup-list">
+                    {(analysisResult?.rankedByBetweenness || []).map((node) => (
+                      <option key={node.nodeId} value={node.nodeId}>
+                        {node.name} ({node.nodeId})
+                      </option>
+                    ))}
+                  </datalist>
                   <button
+                    type="button"
                     className="na-lookup__btn"
                     onClick={handleLookup}
                     disabled={locationLoading || !lookupId.trim()}
@@ -430,34 +484,109 @@ export default function NetworkAnalysis() {
                   </button>
                 </div>
 
-                {locationScore && (
-                  <div className="na-location-result">
-                    <div className="na-location-result__name">{locationScore.name}</div>
-                    <div className="na-location-result__id">
-                      Node ID: {locationScore.nodeId}
-                    </div>
-                    <div className="na-location-result__scores">
-                      <div className="na-location-result__score-card">
-                        <div className="na-location-result__score-label">
-                          Betweenness Centrality
-                        </div>
-                        <div className="na-location-result__score-value na-location-result__score-value--cyan">
-                          {locationScore.betweenness.toFixed(6)}
-                        </div>
-                      </div>
-                      <div className="na-location-result__score-card">
-                        <div className="na-location-result__score-label">
-                          Closeness Centrality
-                        </div>
-                        <div className="na-location-result__score-value na-location-result__score-value--violet">
-                          {locationScore.closeness.toFixed(6)}
-                        </div>
-                      </div>
-                    </div>
+                {/* Local Inline Error for Lookup */}
+                {lookupError && (
+                  <div className="na-error" style={{ marginTop: '1.25rem', marginBottom: 0 }}>
+                    <span className="na-error__icon">⚠️</span>
+                    <span className="na-error__text">{lookupError}</span>
+                    <button
+                      type="button"
+                      className="na-error__dismiss"
+                      onClick={() => setLookupError(null)}
+                    >
+                      Dismiss
+                    </button>
                   </div>
                 )}
+
+                {/* Lookup Result Card */}
+                {(localLocationScore || locationScore) && (() => {
+                  const score = localLocationScore || locationScore;
+                  return (
+                    <div className="na-location-result">
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '0.5rem', marginBottom: '0.5rem' }}>
+                        <div>
+                          <div className="na-location-result__name" style={{ fontSize: '1.25rem', fontWeight: 700, color: '#f8fafc' }}>
+                            📍 {score.name}
+                          </div>
+                          <div className="na-location-result__id" style={{ color: '#94a3b8', fontSize: '0.8125rem' }}>
+                            Node ID: <code style={{ color: '#06b6d4', background: 'rgba(6, 182, 212, 0.1)', padding: '2px 6px', borderRadius: '4px' }}>{score.nodeId}</code>
+                            {score.latitude && score.longitude && (
+                              <span style={{ marginLeft: '0.75rem', color: '#64748b' }}>
+                                Coordinates: {score.latitude.toFixed(4)}°, {score.longitude.toFixed(4)}°
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setLocalLocationScore(null);
+                            clearLocationScore();
+                            setLookupId('');
+                          }}
+                          style={{
+                            background: 'transparent',
+                            border: '1px solid rgba(255,255,255,0.1)',
+                            borderRadius: '4px',
+                            color: '#94a3b8',
+                            fontSize: '0.75rem',
+                            padding: '4px 8px',
+                            cursor: 'pointer',
+                          }}
+                        >
+                          ✕ Clear
+                        </button>
+                      </div>
+
+                      <div className="na-location-result__scores">
+                        <div className="na-location-result__score-card">
+                          <div className="na-location-result__score-label">
+                            Betweenness Centrality
+                            {score.betweennessRank && (
+                              <span style={{ marginLeft: '0.5rem', color: '#06b6d4', fontWeight: 700 }}>
+                                (Rank #{score.betweennessRank})
+                              </span>
+                            )}
+                          </div>
+                          <div className="na-location-result__score-value na-location-result__score-value--cyan">
+                            {(score.betweenness || 0).toFixed(6)}
+                          </div>
+                          <div style={{ fontSize: '0.75rem', color: '#64748b', marginTop: '0.25rem' }}>
+                            Bridge / Gateway Score
+                          </div>
+                        </div>
+
+                        <div className="na-location-result__score-card">
+                          <div className="na-location-result__score-label">
+                            Closeness Centrality
+                            {score.closenessRank && (
+                              <span style={{ marginLeft: '0.5rem', color: '#8b5cf6', fontWeight: 700 }}>
+                                (Rank #{score.closenessRank})
+                              </span>
+                            )}
+                          </div>
+                          <div className="na-location-result__score-value na-location-result__score-value--violet">
+                            {(score.closeness || 0).toFixed(6)}
+                          </div>
+                          <div style={{ fontSize: '0.75rem', color: '#64748b', marginTop: '0.25rem' }}>
+                            Accessibility / Central Hub Score
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })()}
               </div>
             </section>
+
+            {/* ── Prim's Minimum Spanning Tree (MST) Section ── */}
+            <PrimMstSection 
+              allNodes={analysisResult.rankedByBetweenness || []} 
+              allEdges={analysisResult.edges || []} 
+              selectedWeight={selectedWeight}
+              optionStyle={darkOptionStyle}
+            />
           </>
         )}
 
@@ -467,8 +596,7 @@ export default function NetworkAnalysis() {
             <div className="na-empty__icon">🔗</div>
             <h3 className="na-empty__title">No Analysis Data</h3>
             <p className="na-empty__text">
-              Select an edge weight and click "Run Analysis" to analyze the travel
-              network.
+              Select an edge weight and click &quot;Run Analysis&quot; to analyze the travel network.
             </p>
           </div>
         )}
@@ -476,7 +604,7 @@ export default function NetworkAnalysis() {
         {/* ── Footer ── */}
         <footer className="footer" style={{ marginTop: '2rem' }}>
           <p className="footer__text">
-            © {new Date().getFullYear()} Travel IDSS — Network Analysis Module
+            © 2026 Travel IDSS — Network Analysis Module
           </p>
         </footer>
       </div>

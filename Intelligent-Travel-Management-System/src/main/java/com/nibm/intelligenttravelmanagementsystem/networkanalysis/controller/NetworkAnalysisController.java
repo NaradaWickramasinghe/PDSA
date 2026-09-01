@@ -120,13 +120,15 @@ public class NetworkAnalysisController {
      * Computes the Minimum Spanning Tree (or Forest, if graph is disconnected)
      * using Prim's algorithm with a binary heap PriorityQueue.
      *
-     * @param weight which edge weight to use (default: distance_km)
+     * @param weight      which edge weight to use (default: distance_km)
+     * @param startNodeId optional starting destination node ID to prioritize as tree root
      * @return 200 OK with PrimMstResponseDTO containing the computed MST structures
      */
     @GetMapping("/mst-prim")
     public ResponseEntity<PrimMstResponseDTO> getMinimumSpanningForest(
-            @RequestParam(defaultValue = "distance_km") String weight) {
+            @RequestParam(defaultValue = "distance_km") String weight,
+            @RequestParam(required = false) String startNodeId) {
 
-        return ResponseEntity.ok(primMstAnalysisService.analyzeMst(weight));
+        return ResponseEntity.ok(primMstAnalysisService.analyzeMst(weight, startNodeId));
     }
 }

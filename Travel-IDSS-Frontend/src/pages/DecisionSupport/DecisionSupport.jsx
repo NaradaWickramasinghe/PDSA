@@ -69,15 +69,15 @@ export default function DecisionSupport() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
         body: JSON.stringify({
-          budget: parseFloat(formData.budget),
-          durationDays: parseInt(formData.durationDays, 10),
-          groupSize: parseInt(formData.groupSize, 10),
-          beachPreference: parseInt(formData.beachPreference, 10),
-          adventurePreference: parseInt(formData.adventurePreference, 10),
-          naturePreference: parseInt(formData.naturePreference, 10),
-          culturePreference: parseInt(formData.culturePreference, 10),
-          nightlifePreference: parseInt(formData.nightlifePreference, 10),
-          relaxationPreference: parseInt(formData.relaxationPreference, 10),
+          budget: Number.parseFloat(formData.budget),
+          durationDays: Number.parseInt(formData.durationDays, 10),
+          groupSize: Number.parseInt(formData.groupSize, 10),
+          beachPreference: Number.parseInt(formData.beachPreference, 10),
+          adventurePreference: Number.parseInt(formData.adventurePreference, 10),
+          naturePreference: Number.parseInt(formData.naturePreference, 10),
+          culturePreference: Number.parseInt(formData.culturePreference, 10),
+          nightlifePreference: Number.parseInt(formData.nightlifePreference, 10),
+          relaxationPreference: Number.parseInt(formData.relaxationPreference, 10),
           topN: 5
         })
       });
@@ -110,8 +110,8 @@ export default function DecisionSupport() {
             <div className="orig-preset-section">
               <div className="orig-preset-label">Sample Presets</div>
               <div className="orig-preset-buttons">
-                {PRESETS.map((p, idx) => (
-                  <button key={idx} type="button" className="orig-btn-preset" onClick={() => applyPreset(p)}>
+                {PRESETS.map((p) => (
+                  <button key={p.label} type="button" className="orig-btn-preset" onClick={() => applyPreset(p)}>
                     {p.label}
                   </button>
                 ))}
@@ -125,8 +125,9 @@ export default function DecisionSupport() {
 
               <div className="orig-form-grid-3">
                 <div className="orig-form-group">
-                  <label className="orig-form-label">Budget (Rs)</label>
+                  <label htmlFor="ds-budget" className="orig-form-label">Budget (Rs)</label>
                   <input
+                    id="ds-budget"
                     type="number"
                     className="orig-form-control"
                     min="0"
@@ -136,8 +137,9 @@ export default function DecisionSupport() {
                   />
                 </div>
                 <div className="orig-form-group">
-                  <label className="orig-form-label">Days</label>
+                  <label htmlFor="ds-duration" className="orig-form-label">Days</label>
                   <input
+                    id="ds-duration"
                     type="number"
                     className="orig-form-control"
                     min="1"
@@ -148,8 +150,9 @@ export default function DecisionSupport() {
                   />
                 </div>
                 <div className="orig-form-group">
-                  <label className="orig-form-label">Group</label>
+                  <label htmlFor="ds-groupsize" className="orig-form-label">Group</label>
                   <input
+                    id="ds-groupsize"
                     type="number"
                     className="orig-form-control"
                     min="1"
@@ -175,10 +178,11 @@ export default function DecisionSupport() {
               ].map(item => (
                 <div className="orig-slider-item" key={item.key}>
                   <div className="orig-slider-header">
-                    <span className="orig-slider-title">{item.label}</span>
+                    <label htmlFor={`slider-${item.key}`} className="orig-slider-title">{item.label}</label>
                     <span className="orig-slider-val">{formData[item.key]}</span>
                   </div>
                   <input
+                    id={`slider-${item.key}`}
                     type="range"
                     className="orig-range-slider"
                     min="1"
@@ -222,8 +226,8 @@ export default function DecisionSupport() {
                 </div>
 
                 <div className="orig-rec-list">
-                  {response.recommendations.map((rec) => (
-                    <div key={rec.rank} className={`orig-rec-card rank-${rec.rank}`}>
+                  {response.recommendations?.map((rec) => (
+                    <div key={rec.destination || rec.rank} className={`orig-rec-card rank-${rec.rank}`}>
                       <div className="orig-rec-header">
                         <div className="orig-rec-title-wrap">
                           <span className="orig-badge-rank">#{rec.rank}</span>

@@ -1,9 +1,9 @@
-// src/App.jsx
+import 'leaflet/dist/leaflet.css';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Navbar from './components/common/Navbar';
 import Dashboard from './pages/Dashboard/Dashboard';
 import NetworkAnalysis from './pages/NetworkAnalysis/NetworkAnalysis';
-import NetworkMstPage from './pages/NetworkMstPage';
+import NetworkMstPage from './pages/NetworkAnalysis/NetworkMstPage'; // <-- CHANGE THIS LINE
 import OptimizationPage from './pages/Optimization/OptimizationPage';
 import DecisionSupport from './pages/DecisionSupport/DecisionSupport';
 
@@ -19,14 +19,13 @@ function App() {
         <Route path="/network-analysis" element={<NetworkAnalysis />} />
         <Route path="/decision-support" element={<DecisionSupport />} />
         <Route path="/network-analysis/mst-prim" element={<NetworkMstPage />} />
-        <Route path="/decision-support" element={<PlaceholderPage title="Decision Support" />} />
         <Route path="/optimization" element={<OptimizationPage />} />
       </Routes>
     </Router>
   );
 }
 
-// Temporary placeholder for module pages (will be replaced)
+// Temporary placeholder for module pages
 function PlaceholderPage({ title }) {
   return (
     <div className="page">

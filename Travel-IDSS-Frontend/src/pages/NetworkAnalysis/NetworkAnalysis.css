@@ -123,7 +123,7 @@
   font-weight: 600;
   font-family: inherit;
   color: #fff;
-  background: linear-gradient(135deg, #06b6d4, #8b5cf6);
+  background: linear-gradient(135deg, #042f2e, #2e1065);
   border: none;
   border-radius: var(--radius-sm);
   cursor: pointer;
@@ -393,7 +393,7 @@
   font-weight: 600;
   font-family: inherit;
   color: #fff;
-  background: linear-gradient(135deg, #10b981, #06b6d4);
+  background: linear-gradient(135deg, #0f172a, #1e293b);
   border: none;
   border-radius: var(--radius-sm);
   cursor: pointer;

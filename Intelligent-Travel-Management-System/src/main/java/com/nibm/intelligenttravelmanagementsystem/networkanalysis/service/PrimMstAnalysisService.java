@@ -14,12 +14,12 @@ public class PrimMstAnalysisService {
     private final GraphBuilderService graphBuilderService;
     private final PrimMstService primMstService;
 
-    public PrimMstResponseDTO analyzeMst(String weightType) {
+    public PrimMstResponseDTO analyzeMst(String weightType, String startNodeId) {
         long start = System.nanoTime();
 
         // Pass weightType (e.g., "distance_km") to match GraphBuilderService signature
         TravelGraph graph = graphBuilderService.buildGraph(weightType);
-        var forest = primMstService.computeMinimumSpanningForest(graph);
+        var forest = primMstService.computeMinimumSpanningForest(graph, startNodeId);
 
         List<MstTreeDTO> treeDtos = forest.trees().stream()
                 .map(tree -> new MstTreeDTO(
@@ -45,7 +45,11 @@ public class PrimMstAnalysisService {
     }
 
     // Default overload if called without arguments
+    public PrimMstResponseDTO analyzeMst(String weightType) {
+        return analyzeMst(weightType, null);
+    }
+
     public PrimMstResponseDTO analyzeMst() {
-        return analyzeMst("distance_km");
+        return analyzeMst("distance_km", null);
     }
 }

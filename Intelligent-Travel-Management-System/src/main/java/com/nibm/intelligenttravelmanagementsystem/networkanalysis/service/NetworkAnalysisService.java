@@ -104,18 +104,27 @@ public class NetworkAnalysisService {
      * Returns the centrality scores for a single destination.
      *
      * <p>Internally runs the full analysis (since Brandes' algorithm must process
-     * all nodes to produce any individual result) and filters for the requested node.
+     * all nodes to produce any individual result) and filters for the requested node
+     * by exact/case-insensitive Node ID or destination name.
      *
-     * @param nodeId     the node_id to look up
+     * @param nodeId     the node_id or destination name to look up
      * @param weightType which edge weight to use
      * @return centrality scores for the specified node
-     * @throws LocationNotFoundException if no node with the given ID exists in the results
+     * @throws LocationNotFoundException if no node with the given ID/name exists
      */
     public CentralityScoreDTO getScoreForLocation(String nodeId, String weightType) {
+        if (nodeId == null || nodeId.isBlank()) {
+            throw new LocationNotFoundException("Empty destination search query");
+        }
+
         NetworkAnalysisResponseDTO fullResult = analyzeNetwork(weightType);
+        String search = nodeId.trim();
 
         return fullResult.rankedByBetweenness().stream()
-                .filter(score -> score.nodeId().equals(nodeId))
+                .filter(score -> score.nodeId().equalsIgnoreCase(search)
+                        || score.name().equalsIgnoreCase(search)
+                        || score.nodeId().toLowerCase().contains(search.toLowerCase())
+                        || score.name().toLowerCase().contains(search.toLowerCase()))
                 .findFirst()
                 .orElseThrow(() -> new LocationNotFoundException(nodeId));
     }

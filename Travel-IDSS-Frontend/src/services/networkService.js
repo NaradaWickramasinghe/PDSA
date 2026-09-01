@@ -64,14 +64,19 @@ export const networkService = {
 
   /**
    * Minimum Spanning Tree / Forest computation using Prim's algorithm.
-   * GET /api/network/mst-prim?weight=distance_km
+   * GET /api/network/mst-prim?weight=distance_km&startNodeId=N001
    *
    * @param {string} weight - Edge weight type: distance_km | travel_time_minutes | estimated_cost_lkr
+   * @param {string} [startNodeId] - Optional root start node ID (e.g. "N001")
    * @returns {Promise} PrimMstResponseDTO
    */
-  getMstPrimAnalysis: (weight = "distance_km") => {
+  getMstPrimAnalysis: (weight = "distance_km", startNodeId = "") => {
+    const params = { weight };
+    if (startNodeId) {
+      params.startNodeId = startNodeId;
+    }
     return api.get(`${NETWORK_BASE}/mst-prim`, {
-      params: { weight },
+      params,
     });
   },
 };

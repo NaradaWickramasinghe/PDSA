@@ -68,16 +68,14 @@ export const useNetworkAnalysis = () => {
    */
   const fetchLocationScore = useCallback(async (nodeId, weight = 'distance_km') => {
     setLocationLoading(true);
-    setError(null);
     try {
       const response = await networkService.getLocationScore(nodeId, weight);
       setLocationScore(response.data);
       return response.data;
     } catch (err) {
-      const msg = err.response?.data?.message || 'Location not found';
-      setError(msg);
+      const msg = err.response?.data?.message || `Location "${nodeId}" not found`;
       setLocationScore(null);
-      throw err;
+      throw new Error(msg);
     } finally {
       setLocationLoading(false);
     }

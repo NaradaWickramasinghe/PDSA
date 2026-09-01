@@ -13,9 +13,19 @@ public class PrimMstService {
     public record ForestResult(List<MstTree> trees, double totalWeight) {}
 
     public ForestResult computeMinimumSpanningForest(TravelGraph graph) {
+        return computeMinimumSpanningForest(graph, null);
+    }
+
+    public ForestResult computeMinimumSpanningForest(TravelGraph graph, String preferredStartNodeId) {
         Set<String> globallyVisited = new HashSet<>();
         List<MstTree> trees = new ArrayList<>();
         double totalForestWeight = 0.0;
+
+        if (preferredStartNodeId != null && !preferredStartNodeId.isBlank() && graph.allNodeIds().contains(preferredStartNodeId)) {
+            MstTree tree = runPrimFrom(preferredStartNodeId, graph, globallyVisited);
+            trees.add(tree);
+            totalForestWeight += tree.totalWeight();
+        }
 
         for (String vertex : graph.allNodeIds()) {
             if (!globallyVisited.contains(vertex)) {
