@@ -12,7 +12,7 @@ export const NetworkMstPage = () => {
     setSelectedWeight,
   } = useNetworkAnalysis();
 
-  // Load Prim's MST data when component mounts or weight changes
+  // Load Prims MST data when component mounts or weight changes
   useEffect(() => {
     fetchMstAnalysis(selectedWeight);
   }, [fetchMstAnalysis, selectedWeight]);
