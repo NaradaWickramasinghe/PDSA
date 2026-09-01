@@ -3,12 +3,16 @@ package com.nibm.intelligenttravelmanagementsystem.routeoptimization.service;
 import com.nibm.intelligenttravelmanagementsystem.routeoptimization.model.RouteEdge;
 import com.nibm.intelligenttravelmanagementsystem.routeoptimization.model.Location;
 import com.nibm.intelligenttravelmanagementsystem.routeoptimization.model.TransportMode;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
 
 @Service
+@RequiredArgsConstructor
 public class AStarAlgorithm {
+
+    private final TrafficService trafficService;
 
     /**
      * Find optimal path using A* algorithm
@@ -20,6 +24,9 @@ public class AStarAlgorithm {
             Location end,
             TransportMode mode,
             boolean prioritizeTime) {
+
+        // Apply traffic simulation first
+        trafficService.applyTrafficSimulation(graph);
 
         // Priority queue for open set (min-heap by f-score)
         PriorityQueue<NodeInfo> openSet = new PriorityQueue<>();
@@ -54,14 +61,20 @@ public class AStarAlgorithm {
                 Long neighborId = edge.getDestination().getId();
                 if (closedSet.contains(neighborId)) continue;
 
-                // 🔥 FIX: Calculate edge weight based on criteria
+                // FIX: Calculate edge weight based on criteria
                 double edgeWeight;
                 if (prioritizeTime) {
-                    // Use time as weight (in minutes, adjusted for transport mode)
-                    edgeWeight = edge.getEstimatedTimeMinutes() * mode.getTimeMultiplier();
-                } else {
-                    // Use distance as weight
-                    edgeWeight = edge.getDistanceKm();
+
+                    // USE TRAFFIC-AWARE EFFECTIVE TIME
+                    edgeWeight = trafficService.getEffectiveTime(edge, mode);
+                }
+
+                else {
+                    // For shortest path, still use distance but with traffic consideration
+                    // Add small penalty for traffic on shortest path too
+                    int trafficLevel = trafficService.getTrafficLevel(edge.getId(), edge);
+                    double trafficPenalty = 1 + (trafficLevel - 1) * 0.05; // Up to 20% penalty
+                    edgeWeight = edge.getDistanceKm() * trafficPenalty;
                 }
 
                 double tentativeG = gScore.get(currentId) + edgeWeight;
@@ -81,7 +94,7 @@ public class AStarAlgorithm {
         }
 
         // No path found - fallback to Dijkstra
-        System.out.println("⚠️ A* found no path, falling back to Dijkstra");
+        System.out.println("A* found no path, falling back to Dijkstra");
         return new DijkstraAlgorithm().findShortestPath(graph, start, end, mode, prioritizeTime);
     }
 
@@ -102,9 +115,8 @@ public class AStarAlgorithm {
         double distanceKm = Math.sqrt(dx * dx + dy * dy);
 
         if (prioritizeTime) {
-            // Estimate minimum time: assume 60 km/h average speed
-            // Return time in minutes
-            return (distanceKm / 60.0) * 60; // minutes
+            // Assume 50 km/h average with traffic (more conservative)
+            return (distanceKm / 50.0) * 60;
         } else {
             return distanceKm;
         }
