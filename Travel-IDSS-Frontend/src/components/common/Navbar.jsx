@@ -1,4 +1,3 @@
-// src/components/common/Navbar.jsx
 import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 
@@ -13,14 +12,7 @@ const navLinks = [
 
 export default function Navbar() {
   const location = useLocation();
-  const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
-
-  useEffect(() => {
-    const handleScroll = () => setScrolled(window.scrollY > 20);
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
 
   // Close mobile menu on route change
   useEffect(() => {
@@ -28,15 +20,16 @@ export default function Navbar() {
   }, [location.pathname]);
 
   return (
-    <nav className={`navbar ${scrolled ? 'scrolled' : ''}`}>
-      <Link to="/" className="navbar__brand">
-        <div className="navbar__logo">T</div>
-        <div className="navbar__title">
-          <span>Travel IDSS</span>
+    <header className="top-header">
+      <Link to="/" className="header-brand">
+        <div className="logo-icon">🌴</div>
+        <div>
+          <div className="brand-title">Travel Planner</div>
+          <div className="brand-sub">Sri Lanka</div>
         </div>
       </Link>
 
-      <ul className={`navbar__links ${menuOpen ? 'open' : ''}`}>
+      <ul className={`navbar__links ${menuOpen ? 'open' : ''}`} style={{ display: 'flex', gap: '0.25rem', listStyle: 'none' }}>
         {navLinks.map(({ path, label }) => (
           <li key={path}>
             <Link
@@ -49,15 +42,23 @@ export default function Navbar() {
         ))}
       </ul>
 
-      <button
-        className="navbar__toggle"
-        onClick={() => setMenuOpen((prev) => !prev)}
-        aria-label="Toggle navigation"
-      >
-        <span />
-        <span />
-        <span />
-      </button>
-    </nav>
+      <div className="user-area">
+        <div className="user-greeting-badge" style={{ display: 'none' /* Hide on very small screens if needed, inline styling handled via CSS mostly */ }}>
+          <span>🍃</span> Plan Smart, Travel Better
+        </div>
+        <div className="avatar-circle">👤</div>
+        
+        <button
+          className="navbar__toggle"
+          onClick={() => setMenuOpen((prev) => !prev)}
+          aria-label="Toggle navigation"
+          style={{ background: 'none', border: 'none', marginLeft: '1rem', cursor: 'pointer' }}
+        >
+          <span style={{ display: 'block', width: '22px', height: '2px', background: '#334155', margin: '4px 0' }} />
+          <span style={{ display: 'block', width: '22px', height: '2px', background: '#334155', margin: '4px 0' }} />
+          <span style={{ display: 'block', width: '22px', height: '2px', background: '#334155', margin: '4px 0' }} />
+        </button>
+      </div>
+    </header>
   );
 }

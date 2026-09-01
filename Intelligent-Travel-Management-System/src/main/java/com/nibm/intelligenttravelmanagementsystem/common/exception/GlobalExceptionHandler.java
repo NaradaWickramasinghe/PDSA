@@ -10,10 +10,12 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import com.nibm.intelligenttravelmanagementsystem.shared.exception.InvalidAllocationRequestException;
+
 import java.util.stream.Collectors;
 
 @Slf4j
-@RestControllerAdvice
+@RestControllerAdvice("commonGlobalExceptionHandler")
 public class GlobalExceptionHandler {
 
     /**
@@ -41,9 +43,9 @@ public class GlobalExceptionHandler {
     }
 
     /**
-     * Handles custom InvalidRequestException and general IllegalArgumentExceptions.
+     * Handles custom InvalidRequestException, InvalidAllocationRequestException, and general IllegalArgumentExceptions.
      */
-    @ExceptionHandler({InvalidRequestException.class, IllegalArgumentException.class})
+    @ExceptionHandler({InvalidRequestException.class, InvalidAllocationRequestException.class, IllegalArgumentException.class})
     public ResponseEntity<ApiResponse<Object>> handleInvalidRequest(RuntimeException ex) {
         log.warn("Invalid client request: {}", ex.getMessage());
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)

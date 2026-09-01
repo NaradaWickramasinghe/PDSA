@@ -3,7 +3,7 @@ package com.nibm.intelligenttravelmanagementsystem.resourceallocation;
 import com.nibm.intelligenttravelmanagementsystem.resourceallocation.dto.ResourceAllocationRequest;
 import com.nibm.intelligenttravelmanagementsystem.resourceallocation.dto.ResourceAllocationResponse;
 import com.nibm.intelligenttravelmanagementsystem.resourceallocation.service.*;
-import com.nibm.intelligenttravelmanagementsystem.shared.exception.GlobalExceptionHandler;
+import com.nibm.intelligenttravelmanagementsystem.common.exception.GlobalExceptionHandler;
 import com.nibm.intelligenttravelmanagementsystem.shared.exception.InvalidAllocationRequestException;
 import com.nibm.intelligenttravelmanagementsystem.shared.exception.ErrorResponse;
 import org.junit.jupiter.api.BeforeEach;

@@ -2,12 +2,14 @@
 
 .route-opt-page {
   display: flex;
-  height: calc(100vh - 60px); /* Adjust based on navbar height */
+  height: calc(100vh - 68px); /* Adjust based on navbar height */
   width: 100%;
-  background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
-  color: #f8fafc;
+  background: #f8fafc;
+  color: #0f172a;
   overflow: hidden;
   font-family: 'Inter', system-ui, sans-serif;
+  margin: -2rem -2.5rem; /* Negate the content-container padding to fill space */
+  width: calc(100% + 5rem);
 }
 
 .route-opt-sidebar {
@@ -15,11 +17,9 @@
   min-width: 400px;
   height: 100%;
   padding: 1.5rem;
-  background: rgba(15, 23, 42, 0.75);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border-right: 1px solid rgba(255, 255, 255, 0.08);
-  box-shadow: 10px 0 30px rgba(0, 0, 0, 0.3);
+  background: #ffffff;
+  border-right: 1px solid #e2e8f0;
+  box-shadow: 2px 0 10px rgba(0, 0, 0, 0.05);
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
@@ -31,26 +31,24 @@
   width: 6px;
 }
 .route-opt-sidebar::-webkit-scrollbar-track {
-  background: rgba(0,0,0,0.1);
+  background: transparent;
 }
 .route-opt-sidebar::-webkit-scrollbar-thumb {
-  background: rgba(255,255,255,0.2);
+  background: rgba(0,0,0,0.1);
   border-radius: 4px;
 }
 
 .route-opt-sidebar h1 {
   font-size: 1.75rem;
   font-weight: 700;
-  background: linear-gradient(to right, #38bdf8, #818cf8);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+  color: #0f172a;
   margin-bottom: 0.5rem;
   letter-spacing: -0.5px;
 }
 
 .route-opt-sidebar p.subtitle {
   font-size: 0.9rem;
-  color: #94a3b8;
+  color: #64748b;
   margin-top: -0.5rem;
 }
 
@@ -66,20 +64,20 @@
   z-index: 1;
 }
 
-/* Glassmorphic Panel/Card style */
+/* Glassmorphic Panel/Card style -> Light Theme Card */
 .glass-panel {
-  background: rgba(30, 41, 59, 0.6);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
   border-radius: 12px;
   padding: 1.25rem;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
 }
 
 .glass-panel h3 {
   font-size: 1.1rem;
   font-weight: 600;
   margin-bottom: 1rem;
-  color: #e2e8f0;
+  color: #0f172a;
 }
 
 /* Form Elements */
@@ -90,36 +88,36 @@
 .form-group label {
   display: block;
   font-size: 0.85rem;
-  font-weight: 500;
-  color: #94a3b8;
+  font-weight: 600;
+  color: #475569;
   margin-bottom: 0.4rem;
 }
 
 .form-control {
   width: 100%;
-  background: rgba(15, 23, 42, 0.6);
-  border: 1px solid rgba(255, 255, 255, 0.15);
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
   border-radius: 8px;
   padding: 0.75rem 1rem;
-  color: #f8fafc;
+  color: #0f172a;
   font-size: 0.95rem;
   transition: all 0.2s ease;
 }
 
 .form-control:focus {
   outline: none;
-  border-color: #38bdf8;
-  box-shadow: 0 0 0 2px rgba(56, 189, 248, 0.2);
+  border-color: #16a34a;
+  box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.12);
 }
 
 .form-control::placeholder {
-  color: #64748b;
+  color: #94a3b8;
 }
 
 /* Segmented Control for Mode selection */
 .segmented-control {
   display: flex;
-  background: rgba(15, 23, 42, 0.6);
+  background: #f1f5f9;
   border-radius: 8px;
   padding: 4px;
   margin-bottom: 1.5rem;
@@ -129,29 +127,29 @@
   flex: 1;
   background: transparent;
   border: none;
-  color: #94a3b8;
+  color: #475569;
   padding: 0.6rem 0;
   font-size: 0.9rem;
-  font-weight: 500;
+  font-weight: 600;
   border-radius: 6px;
   cursor: pointer;
   transition: all 0.2s ease;
 }
 
 .segmented-control button.active {
-  background: #334155;
-  color: #fff;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  background: #ffffff;
+  color: #0f172a;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
 .segmented-control button:not(.active):hover {
-  color: #e2e8f0;
+  color: #1e293b;
 }
 
 /* Primary Button */
 .btn-primary {
   width: 100%;
-  background: linear-gradient(135deg, #2563eb 0%, #3b82f6 100%);
+  background: #16a34a;
   color: white;
   border: none;
   border-radius: 8px;
@@ -160,7 +158,7 @@
   font-weight: 600;
   cursor: pointer;
   transition: transform 0.1s ease, box-shadow 0.2s ease;
-  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+  box-shadow: 0 2px 4px rgba(22, 163, 74, 0.2);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -168,8 +166,7 @@
 }
 
 .btn-primary:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 6px 16px rgba(37, 99, 235, 0.4);
+  background: #15803d;
 }
 
 .btn-primary:active {
@@ -177,7 +174,7 @@
 }
 
 .btn-primary:disabled {
-  background: #475569;
+  background: #94a3b8;
   box-shadow: none;
   cursor: not-allowed;
   opacity: 0.7;
@@ -185,20 +182,21 @@
 
 .btn-secondary {
   width: 100%;
-  background: rgba(255, 255, 255, 0.05);
-  color: #e2e8f0;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: #ffffff;
+  color: #334155;
+  border: 1px solid #cbd5e1;
   border-radius: 8px;
   padding: 0.7rem 1rem;
   font-size: 0.95rem;
-  font-weight: 500;
+  font-weight: 600;
   cursor: pointer;
   transition: all 0.2s ease;
   margin-top: 0.5rem;
 }
 
 .btn-secondary:hover {
-  background: rgba(255, 255, 255, 0.1);
+  background: #f8fafc;
+  border-color: #94a3b8;
 }
 
 /* Metrics Card */
@@ -210,34 +208,35 @@
 }
 
 .metric-item {
-  background: rgba(15, 23, 42, 0.5);
+  background: #f8fafc;
   padding: 1rem;
   border-radius: 8px;
   display: flex;
   flex-direction: column;
   gap: 0.3rem;
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  border: 1px solid #e2e8f0;
 }
 
 .metric-label {
   font-size: 0.8rem;
-  color: #94a3b8;
+  color: #64748b;
   text-transform: uppercase;
   letter-spacing: 0.05em;
+  font-weight: 600;
 }
 
 .metric-value {
   font-size: 1.25rem;
   font-weight: 700;
-  color: #f8fafc;
+  color: #0f172a;
 }
 
 .metric-value.highlight {
-  color: #38bdf8;
+  color: #16a34a;
 }
 
 .metric-value.warning {
-  color: #fbbf24;
+  color: #d97706;
 }
 
 /* Location search dropdown */
@@ -250,20 +249,20 @@
   top: 100%;
   left: 0;
   right: 0;
-  background: #1e293b;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
   border-radius: 8px;
   margin-top: 4px;
   max-height: 200px;
   overflow-y: auto;
   z-index: 100;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
 }
 
 .autocomplete-item {
   padding: 0.75rem 1rem;
   cursor: pointer;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  border-bottom: 1px solid #f1f5f9;
   display: flex;
   flex-direction: column;
 }
@@ -273,17 +272,17 @@
 }
 
 .autocomplete-item:hover, .autocomplete-item.active {
-  background: rgba(56, 189, 248, 0.15);
+  background: #f0fdf4;
 }
 
 .item-name {
-  font-weight: 500;
-  color: #e2e8f0;
+  font-weight: 600;
+  color: #0f172a;
 }
 
 .item-desc {
   font-size: 0.8rem;
-  color: #94a3b8;
+  color: #64748b;
   margin-top: 2px;
 }
 
@@ -297,9 +296,10 @@
 
 .toggle-label {
   font-size: 0.9rem;
-  color: #e2e8f0;
+  color: #334155;
   display: flex;
   align-items: center;
+  font-weight: 600;
   gap: 0.5rem;
 }
 
@@ -323,8 +323,7 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: rgba(15, 23, 42, 0.8);
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  background-color: #cbd5e1;
   transition: .3s;
   border-radius: 24px;
 }
@@ -332,22 +331,22 @@
 .toggle-slider:before {
   position: absolute;
   content: "";
-  height: 16px;
-  width: 16px;
+  height: 18px;
+  width: 18px;
   left: 3px;
   bottom: 3px;
   background-color: white;
   transition: .3s;
   border-radius: 50%;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.2);
 }
 
 input:checked + .toggle-slider {
-  background-color: #3b82f6;
-  border-color: #3b82f6;
+  background-color: #16a34a;
 }
 
 input:focus + .toggle-slider {
-  box-shadow: 0 0 1px #3b82f6;
+  box-shadow: 0 0 0 2px rgba(22, 163, 74, 0.2);
 }
 
 input:checked + .toggle-slider:before {
@@ -369,9 +368,9 @@ input:checked + .toggle-slider:before {
 }
 
 .error-message {
-  background: rgba(239, 68, 68, 0.1);
+  background: #fef2f2;
   border-left: 4px solid #ef4444;
-  color: #fca5a5;
+  color: #991b1b;
   padding: 0.75rem 1rem;
   border-radius: 4px;
   font-size: 0.9rem;
