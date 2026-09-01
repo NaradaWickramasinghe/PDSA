@@ -3,8 +3,8 @@ package com.nibm.intelligenttravelmanagementsystem.networkanalysis.model;
 import java.util.*;
 
 public class TravelGraph {
-    private final Map<String, List<GraphEdge>> adjacency = new HashMap<>();
-    private final Set<String> nodeIds = new HashSet<>();
+    private final Map<String, List<GraphEdge>> adjacency = new HashMap<>();// one node id and that relevent all the other nodes that connected to that specific node 
+    private final Set<String> nodeIds = new HashSet<>(); // set of node ids ex kand , col , mat , nuwra eli
 
     // Inner records for graph edges
     public record GraphEdge(String targetId, double weight) {}
