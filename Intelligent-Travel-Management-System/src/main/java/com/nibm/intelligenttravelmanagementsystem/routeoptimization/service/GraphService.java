@@ -2,6 +2,8 @@ package com.nibm.intelligenttravelmanagementsystem.routeoptimization.service;
 
 import com.nibm.intelligenttravelmanagementsystem.shared.db.models.Node;
 import com.nibm.intelligenttravelmanagementsystem.shared.db.models.Edge;
+import com.nibm.intelligenttravelmanagementsystem.shared.db.repositories.NodeRepository;
+import com.nibm.intelligenttravelmanagementsystem.shared.db.repositories.EdgeRepository;
 import com.nibm.intelligenttravelmanagementsystem.routeoptimization.model.Location;
 import com.nibm.intelligenttravelmanagementsystem.routeoptimization.model.RouteEdge;
 import com.nibm.intelligenttravelmanagementsystem.routeoptimization.repository.RouteNodeRepository;
@@ -21,11 +23,9 @@ public class GraphService {
     private final RouteNodeRepository nodeRepository;
     private final RouteEdgeRepository edgeRepository;
 
-    // Internal graph structure - using the Long ID from the models
-    private Map<Long, List<RouteEdge>> graph = new HashMap<>();
-    private Map<Long, Location> locationMap = new HashMap<>();
+    private Map<String, List<RouteEdge>> graph = new HashMap<>();
+    private Map<String, Location> locationMap = new HashMap<>();
     private Map<String, Location> locationNameMap = new HashMap<>();
-    private Map<String, Long> nodeIdToIdMap = new HashMap<>(); // Maps nodeId (String) to id (Long)
 
     @PostConstruct
     public void init() {
@@ -33,13 +33,11 @@ public class GraphService {
     }
 
     public void loadGraphFromDatabase() {
-        log.info("🔄 Loading graph from database using shared models...");
+        log.info("🔄 Loading graph from database...");
 
-        // Clear existing data
         graph.clear();
         locationMap.clear();
         locationNameMap.clear();
-        nodeIdToIdMap.clear();
 
         // 1. Load all nodes
         List<Node> nodes = nodeRepository.findAll();
@@ -49,39 +47,33 @@ public class GraphService {
             return;
         }
 
-        // Convert Node to Location
+        log.info("📊 Found {} nodes in database", nodes.size());
+
+        // Convert nodes to locations
         for (Node node : nodes) {
-            // Use the Long 'id' field as our internal ID
-            Long internalId = node.getId();
-            String nodeId = node.getNodeId();
+            // ✅ The ID is already a String (varchar)
+            String nodeId = node.getNodeId();  // This is the String ID from the database
 
-            if (internalId == null) {
-                log.warn("⚠️ Node {} has null internal ID, skipping...", nodeId);
-                continue;
-            }
-
-            // Map nodeId (String) to internal ID (Long) for edge lookups
-            nodeIdToIdMap.put(nodeId, internalId);
+            log.debug("🔍 Loading node: id={}, name={}, type={}", nodeId, node.getName(), node.getNodeType());
 
             Location loc = new Location(
-                    internalId,
-                    node.getName() != null ? node.getName() : "Unknown",
+                    nodeId,  // Use the String ID
+                    node.getName(),
                     node.getLatitude() != null ? node.getLatitude() : 0.0,
                     node.getLongitude() != null ? node.getLongitude() : 0.0,
                     node.getNodeType() != null ? node.getNodeType() : "unknown"
             );
 
-            // Add additional fields
             loc.setProvince(node.getProvince());
             loc.setDistrict(node.getDistrict());
             loc.setDescription(node.getDescription());
 
-            locationMap.put(internalId, loc);
+            locationMap.put(nodeId, loc);
             locationNameMap.put(node.getName().toLowerCase(), loc);
-            graph.put(internalId, new ArrayList<>());
+            graph.put(nodeId, new ArrayList<>());
         }
 
-        log.info("✅ Loaded {} locations from shared Node model", locationMap.size());
+        log.info("✅ Loaded {} locations", locationMap.size());
 
         // 2. Load all edges
         List<Edge> sharedEdges = edgeRepository.findAll();
@@ -91,186 +83,149 @@ public class GraphService {
             return;
         }
 
+        log.info("📊 Found {} edges in database", sharedEdges.size());
+
         int edgeCount = 0;
         int skippedCount = 0;
 
         for (Edge sharedEdge : sharedEdges) {
-            // Get source and target IDs
-            // Use sourceNodeId and targetNodeId (Long) for internal mapping
-            Long sourceId = sharedEdge.getSourceNodeId();
-            Long targetId = sharedEdge.getTargetNodeId();
+            // ✅ Use the source and destination as String IDs
+            String sourceId = sharedEdge.getSource();
+            String targetId = sharedEdge.getDestination();
 
-            // If source/target are null, try using the string-based source/destination
-            if (sourceId == null || targetId == null) {
-                String sourceNodeId = sharedEdge.getSource();
-                String targetNodeId = sharedEdge.getDestination();
-
-                if (sourceNodeId != null && targetNodeId != null) {
-                    sourceId = nodeIdToIdMap.get(sourceNodeId);
-                    targetId = nodeIdToIdMap.get(targetNodeId);
-                }
+            // If source/destination are null, try the numeric fields
+            if (sourceId == null && sharedEdge.getSourceNodeId() != null) {
+                sourceId = String.valueOf(sharedEdge.getSourceNodeId());
             }
-
-            if (sourceId == null || targetId == null) {
-                log.debug("⚠️ Skipping edge {}: source or target not found", sharedEdge.getEdgeId());
-                skippedCount++;
-                continue;
+            if (targetId == null && sharedEdge.getTargetNodeId() != null) {
+                targetId = String.valueOf(sharedEdge.getTargetNodeId());
             }
 
             Location source = locationMap.get(sourceId);
             Location target = locationMap.get(targetId);
 
             if (source == null || target == null) {
-                log.debug("⚠️ Skipping edge {}: source or target location not in graph", sharedEdge.getEdgeId());
+                log.debug("⚠️ Skipping edge: source={}, target={} not found", sourceId, targetId);
                 skippedCount++;
                 continue;
             }
 
-            // Get edge properties with null safety
-            Double distance = sharedEdge.getDistanceKm() != null ? sharedEdge.getDistanceKm() :
-                    (sharedEdge.getDistance() != null ? sharedEdge.getDistance() : 10.0);
+            // Get travel time
+            int travelTime = sharedEdge.getTravelTimeMinutes() != null ?
+                    sharedEdge.getTravelTimeMinutes() : 30;
 
-            Integer travelTime = sharedEdge.getTravelTimeMinutes();
-            if (travelTime == null && sharedEdge.getTravelTime() != null) {
-                travelTime = sharedEdge.getTravelTime().intValue();
-            }
-            if (travelTime == null) {
-                travelTime = 30; // Default
-            }
+            // Get distance
+            double distance = sharedEdge.getDistanceKm() != null ?
+                    sharedEdge.getDistanceKm() : 10.0;
 
-            Short riskLevelShort = sharedEdge.getRiskLevel();
-            int riskLevel = riskLevelShort != null ? riskLevelShort.intValue() : 1;
+            // Get risk level
+            int riskLevel = sharedEdge.getRiskLevel() != null ?
+                    sharedEdge.getRiskLevel().intValue() : 1;
 
-            String transportMode = sharedEdge.getTransportMode() != null ?
-                    sharedEdge.getTransportMode() : "road";
+            // ✅ Use edgeId as String ID
+            String edgeId = sharedEdge.getEdgeId() != null ?
+                    sharedEdge.getEdgeId() : "edge_" + sourceId + "_" + targetId;
 
-            // Adjust travel time based on transport mode
-            int adjustedTime = travelTime;
-            if (transportMode != null) {
-                switch (transportMode.toLowerCase()) {
-                    case "highway":
-                        adjustedTime = (int)(travelTime * 0.8);
-                        break;
-                    case "local":
-                        adjustedTime = (int)(travelTime * 1.2);
-                        break;
-                    default:
-                        break;
-                }
-            }
-
-            // Get additional fields with null safety
-            Double estimatedCost = sharedEdge.getEstimatedCostLkr() != null ?
-                    sharedEdge.getEstimatedCostLkr().doubleValue() : null;
-
-            Integer roadQuality = sharedEdge.getRoadQuality() != null ?
-                    sharedEdge.getRoadQuality().intValue() : null;
-
-            Integer trafficLevel = sharedEdge.getTrafficLevel() != null ?
-                    sharedEdge.getTrafficLevel().intValue() : null;
-
-            Integer accessibility = sharedEdge.getAccessibility() != null ?
-                    sharedEdge.getAccessibility().intValue() : null;
-
-            // Use the internal Long ID for the edge
-            Long edgeInternalId = sharedEdge.getId();
-            if (edgeInternalId == null) {
-                edgeInternalId = System.currentTimeMillis() + edgeCount; // Fallback unique ID
-            }
-
-            // Create RouteEdge (source -> target)
+            // Create RouteEdge
             RouteEdge routeEdge = new RouteEdge(
-                    edgeInternalId,
+                    edgeId,
                     source,
                     target,
                     distance,
-                    adjustedTime,
+                    travelTime,
                     riskLevel,
-                    transportMode,
-                    false // Default to bidirectional
+                    sharedEdge.getTransportMode() != null ? sharedEdge.getTransportMode() : "road",
+                    false
             );
 
             // Add additional fields
-            routeEdge.setEstimatedCostLkr(estimatedCost);
-            routeEdge.setRoadQuality(roadQuality);
-            routeEdge.setTrafficLevel(trafficLevel);
-            routeEdge.setAccesibility(accessibility);
+            routeEdge.setEstimatedCostLkr(sharedEdge.getEstimatedCostLkr() != null ?
+                    sharedEdge.getEstimatedCostLkr().doubleValue() : null);
+            routeEdge.setRoadQuality(sharedEdge.getRoadQuality() != null ?
+                    sharedEdge.getRoadQuality().intValue() : null);
+            routeEdge.setTrafficLevel(sharedEdge.getTrafficLevel() != null ?
+                    sharedEdge.getTrafficLevel().intValue() : null);
+            routeEdge.setAccesibility(sharedEdge.getAccessibility() != null ?
+                    sharedEdge.getAccessibility().intValue() : null);
 
             // Add to graph
             graph.get(sourceId).add(routeEdge);
             edgeCount++;
 
-            // Add reverse edge (bidirectional)
+            // Add reverse edge
             RouteEdge reverseEdge = new RouteEdge(
-                    edgeInternalId,
+                    edgeId + "_rev",
                     target,
                     source,
                     distance,
-                    adjustedTime,
+                    travelTime,
                     riskLevel,
-                    transportMode,
+                    sharedEdge.getTransportMode() != null ? sharedEdge.getTransportMode() : "road",
                     false
             );
-            reverseEdge.setEstimatedCostLkr(estimatedCost);
-            reverseEdge.setRoadQuality(roadQuality);
-            reverseEdge.setTrafficLevel(trafficLevel);
-            reverseEdge.setAccesibility(accessibility);
+            reverseEdge.setEstimatedCostLkr(sharedEdge.getEstimatedCostLkr() != null ?
+                    sharedEdge.getEstimatedCostLkr().doubleValue() : null);
+            reverseEdge.setRoadQuality(sharedEdge.getRoadQuality() != null ?
+                    sharedEdge.getRoadQuality().intValue() : null);
+            reverseEdge.setTrafficLevel(sharedEdge.getTrafficLevel() != null ?
+                    sharedEdge.getTrafficLevel().intValue() : null);
+            reverseEdge.setAccesibility(sharedEdge.getAccessibility() != null ?
+                    sharedEdge.getAccessibility().intValue() : null);
 
             graph.get(targetId).add(reverseEdge);
             edgeCount++;
         }
 
-        log.info("✅ Loaded {} edges from shared Edge model", sharedEdges.size());
+        log.info("✅ Loaded {} edges, {} total connections", sharedEdges.size(), getTotalEdges());
         if (skippedCount > 0) {
             log.warn("⚠️ Skipped {} edges due to missing source/target nodes", skippedCount);
         }
-        log.info("📊 Graph summary: {} locations, {} total connections",
-                locationMap.size(), getTotalEdges());
     }
 
-    public void refreshGraph() {
-        loadGraphFromDatabase();
-    }
-
-    // Getter methods
-    public Map<Long, List<RouteEdge>> getGraph() {
+    public Map<String, List<RouteEdge>> getGraph() {
         return graph;
     }
 
-    public Location getLocation(Long id) {
+    public Location getLocation(String id) {
         return locationMap.get(id);
     }
 
     public Location getLocationByName(String name) {
-        return name != null ? locationNameMap.get(name.toLowerCase()) : null;
+        return locationNameMap.get(name.toLowerCase());
     }
 
     public List<Location> getAllLocations() {
         return new ArrayList<>(locationMap.values());
     }
 
-    public List<Location> getLocationsByProvince(String province) {
-        List<Node> nodes = nodeRepository.findByProvince(province);
-        return nodes.stream()
-                .map(node -> locationMap.get(node.getId()))
-                .filter(Objects::nonNull)
-                .toList();
-    }
+    public List<Location> searchLocations(String searchTerm) {
+        if (searchTerm == null || searchTerm.isEmpty()) {
+            return getAllLocations();
+        }
 
-    public List<Location> getLocationsByType(String type) {
-        List<Node> nodes = nodeRepository.findByNodeType(type);
-        return nodes.stream()
-                .map(node -> locationMap.get(node.getId()))
-                .filter(Objects::nonNull)
-                .toList();
+        String lowerSearch = searchTerm.toLowerCase();
+        List<Location> results = new ArrayList<>();
+
+        for (Location loc : locationMap.values()) {
+            if (loc.getName().toLowerCase().contains(lowerSearch)) {
+                results.add(loc);
+            }
+        }
+        return results;
     }
 
     public List<String> getProvinces() {
-        return nodeRepository.findAll().stream()
-                .map(Node::getProvince)
-                .filter(Objects::nonNull)
-                .distinct()
-                .toList();
+        Set<String> provinces = new HashSet<>();
+        for (Location loc : locationMap.values()) {
+            if (loc.getProvince() != null && !loc.getProvince().isEmpty()) {
+                provinces.add(loc.getProvince());
+            }
+        }
+        return new ArrayList<>(provinces);
+    }
+
+    public void refreshGraph() {
+        loadGraphFromDatabase();
     }
 
     private int getTotalEdges() {

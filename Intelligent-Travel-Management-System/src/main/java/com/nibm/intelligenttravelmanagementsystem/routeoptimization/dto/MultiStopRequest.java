@@ -7,8 +7,11 @@ import java.util.List;
 
 @Data
 public class MultiStopRequest {
-    private Long startLocationId;  // NEW: Starting point
-    private List<Long> destinationIds;  // Renamed for clarity
+    private String startLocationId;  // NEW: Starting point
+    private List<String> destinationIds;  // Renamed for clarity
     private TransportMode transportMode = TransportMode.NORMAL_VEHICLE;
     private boolean prioritizeTime = false;
+
+    private boolean preferSafeRoute = false;
+    private Integer maxRiskLevel;
 }

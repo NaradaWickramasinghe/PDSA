@@ -13,6 +13,10 @@ import java.time.LocalTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
+import com.nibm.intelligenttravelmanagementsystem.routeoptimization.dto.RouteRequest;
+import com.nibm.intelligenttravelmanagementsystem.routeoptimization.dto.MultiStopRequest;
+import org.springframework.http.HttpStatus;
 
 @RestController
 @RequestMapping("/api/routes")
@@ -37,7 +41,7 @@ public class RouteController {
 
     @PostMapping("/traffic/update/{edgeId}")
     public ResponseEntity<String> updateTraffic(
-            @PathVariable Long edgeId,
+            @PathVariable String edgeId,
             @RequestParam int level) {
         trafficService.updateTraffic(edgeId, level);
         return ResponseEntity.ok("Traffic updated for edge " + edgeId + " to level " + level);
@@ -55,8 +59,35 @@ public class RouteController {
         return ResponseEntity.ok(response);
     }
 
+    @PostMapping("/calculate")
+    public ResponseEntity<RouteResult> calculateRoute(@RequestBody RouteRequest request) {
+        RouteResult result;
+        if (request.getMultipleLocations() != null && !request.getMultipleLocations().isEmpty()) {
+            // Multi-stop - without risk
+            result = routeService.findMultiStopRoute(
+                    request.getStartLocationId(),  // Start point
+                    request.getMultipleLocations(),
+                    request.getTransportMode(),
+                    request.isPrioritizeTime(),
+                    request.isPreferSafeRoute(),
+                    request.getMaxRiskLevel()
+            );
+        } else {
+            // Single route - without risk
+            result = routeService.findRoute(
+                    request.getStartLocationId(),
+                    request.getEndLocationId(),
+                    request.getTransportMode(),
+                    request.isPrioritizeTime(),
+                    request.isPreferSafeRoute(),
+                    request.getMaxRiskLevel()
+            );
+        }
+        return ResponseEntity.ok(result);
+    }
+
     @GetMapping("/locations/traffic/{id}")
-    public ResponseEntity<Map<String, Object>> getLocationTraffic(@PathVariable Long id) {
+    public ResponseEntity<Map<String, Object>> getLocationTraffic(@PathVariable String id) {
         Location loc = graphService.getLocation(id);
         if (loc == null) {
             return ResponseEntity.notFound().build();
@@ -81,5 +112,48 @@ public class RouteController {
 
         return ResponseEntity.ok(trafficInfo);
     }
-}
 
+    @PostMapping("/multi-stop")
+    public ResponseEntity<RouteResult> findMultiStopRoute(@RequestBody MultiStopRequest request) {
+        RouteResult result = routeService.findMultiStopRoute(
+                request.getStartLocationId(),      // Start point
+                request.getDestinationIds(),
+                request.getTransportMode(),
+                request.isPrioritizeTime(),
+                request.isPreferSafeRoute(),
+                request.getMaxRiskLevel()
+                );
+        return ResponseEntity.ok(result);
+    }
+    
+    @GetMapping("/debug/nodes")
+    public ResponseEntity<Map<String, Object>> debugNodes() {
+        Map<String, Object> response = new HashMap<>();
+        try {
+            List<Location> locations = graphService.getAllLocations();
+            response.put("totalLocations", locations.size());
+            response.put("sampleIds", locations.stream()
+                    .limit(10)
+                    .map(loc -> Map.of(
+                            "id", loc.getId(),
+                            "name", loc.getName(),
+                            "type", loc.getType()
+                    ))
+                    .collect(Collectors.toList()));
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            response.put("error", e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+        }
+    }
+    
+    @GetMapping("/locations/search")
+    public ResponseEntity<List<Location>> searchLocations(@RequestParam String query) {
+        try {
+            List<Location> results = graphService.searchLocations(query);
+            return ResponseEntity.ok(results);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+}

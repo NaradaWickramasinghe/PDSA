@@ -16,8 +16,8 @@ import java.util.concurrent.ConcurrentHashMap;
 public class TrafficService {
 
     // Simulate real-time traffic data
-    private final Map<Long, Integer> realTimeTraffic = new ConcurrentHashMap<>();
-    private final Map<Long, LocalDateTime> lastUpdate = new ConcurrentHashMap<>();
+    private final Map<String, Integer> realTimeTraffic = new ConcurrentHashMap<>();
+    private final Map<String, LocalDateTime> lastUpdate = new ConcurrentHashMap<>();
 
     // Peak hour definitions
     private static final LocalTime MORNING_PEAK_START = LocalTime.of(7, 0);
@@ -28,7 +28,7 @@ public class TrafficService {
     /**
      * Get current traffic level for a specific edge
      */
-    public int getTrafficLevel(Long edgeId, RouteEdge edge) {
+    public int getTrafficLevel(String edgeId, RouteEdge edge) {
         // Check if we have real-time data
         if (realTimeTraffic.containsKey(edgeId)) {
             return realTimeTraffic.get(edgeId);
@@ -70,7 +70,7 @@ public class TrafficService {
     /**
      * Update traffic data for an edge (simulating real-time updates)
      */
-    public void updateTraffic(Long edgeId, int trafficLevel) {
+    public void updateTraffic(String edgeId, int trafficLevel) {
         realTimeTraffic.put(edgeId, Math.min(Math.max(trafficLevel, 1), 5));
         lastUpdate.put(edgeId, LocalDateTime.now());
         log.info("Traffic updated for edge {}: Level {}", edgeId, trafficLevel);
@@ -79,7 +79,7 @@ public class TrafficService {
     /**
      * Apply traffic simulation to all edges
      */
-    public void applyTrafficSimulation(Map<Long, List<RouteEdge>> graph) {
+    public void applyTrafficSimulation(Map<String, List<RouteEdge>> graph) {
         log.info("Applying traffic simulation...");
 
         for (List<RouteEdge> edges : graph.values()) {
