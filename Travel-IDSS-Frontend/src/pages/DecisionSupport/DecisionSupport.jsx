@@ -1,7 +1,7 @@
 // src/pages/DecisionSupport/DecisionSupport.jsx
-// Exact Original Module 4 (Intelligent Decision Engine & Travel Recommendation System) Component
+// Module 4: Intelligent Decision Support System with Multi-Algorithm Analytics
 
-import { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import './DecisionSupport.css';
 
 const PRESETS = [
@@ -23,6 +23,13 @@ const PRESETS = [
   }
 ];
 
+const ALGORITHM_MODES = [
+  { id: 'ensemble', label: 'Hybrid Ensemble (Decision Tree + KNN + 6D Vector)', badge: '⚖️ Ensemble', desc: 'Combines all algorithms with multi-criteria weighted scoring for optimal destination recommendation.' },
+  { id: 'tree', label: 'Decision Tree Classifier', badge: '🌳 Decision Tree', desc: 'Evaluates categorical suitability tiers using hierarchical decision rules (35% weight).' },
+  { id: 'knn', label: 'K-Nearest Neighbors (KNN)', badge: '👥 KNN Similarity', desc: 'Finds destinations favored by similar historical traveler clusters via Cosine Similarity (25% weight).' },
+  { id: 'preference', label: '6D Preference Matching', badge: '🎯 Vector Cosine', desc: 'Direct cosine similarity matching across 6 travel dimension preference vectors (30% weight).' }
+];
+
 export default function DecisionSupport() {
   const [formData, setFormData] = useState({
     budget: 800,
@@ -39,6 +46,8 @@ export default function DecisionSupport() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [response, setResponse] = useState(null);
+  const [selectedAlgorithm, setSelectedAlgorithm] = useState('ensemble');
+  const [showScoreDetails, setShowScoreDetails] = useState(true);
 
   const handleChange = (field, value) => {
     setFormData(prev => ({ ...prev, [field]: value }));
@@ -96,12 +105,64 @@ export default function DecisionSupport() {
     }
   };
 
+  // Re-rank items dynamically based on the selected algorithm mode
+  const displayedRecommendations = useMemo(() => {
+    if (!response || !response.recommendations) return [];
+
+    const items = [...response.recommendations];
+
+    switch (selectedAlgorithm) {
+      case 'tree':
+        items.sort((a, b) => (b.treeScore ?? 0) - (a.treeScore ?? 0) || (b.score ?? 0) - (a.score ?? 0));
+        break;
+      case 'knn':
+        items.sort((a, b) => (b.knnEvidenceScore ?? 0) - (a.knnEvidenceScore ?? 0) || (b.score ?? 0) - (a.score ?? 0));
+        break;
+      case 'preference':
+        items.sort((a, b) => (b.preferenceScore ?? 0) - (a.preferenceScore ?? 0) || (b.score ?? 0) - (a.score ?? 0));
+        break;
+      case 'ensemble':
+      default:
+        items.sort((a, b) => (b.score ?? 0) - (a.score ?? 0));
+        break;
+    }
+
+    return items;
+  }, [response, selectedAlgorithm]);
+
+  // Helper to compute active algorithm score to display
+  const getActiveScore = (rec) => {
+    switch (selectedAlgorithm) {
+      case 'tree':
+        return { score: ((rec.treeScore ?? 0) * 100).toFixed(1), label: 'Tree Score' };
+      case 'knn':
+        return { score: ((rec.knnEvidenceScore ?? 0) * 100).toFixed(1), label: 'KNN Match' };
+      case 'preference':
+        return { score: ((rec.preferenceScore ?? 0) * 100).toFixed(1), label: 'Vector Match' };
+      case 'ensemble':
+      default:
+        return { score: rec.matchPercentage?.toFixed(1) || ((rec.score ?? 0) * 100).toFixed(1), label: 'Ensemble Match' };
+    }
+  };
+
   return (
     <div className="orig-ds-root">
       <div className="orig-ds-container">
         <header className="orig-app-header">
-          <h1 className="orig-app-title">Travel Recommendation System</h1>
-          <p className="orig-app-subtitle">Task 4 — Personalized Destination Decision Engine</p>
+          <div className="orig-header-flex">
+            <div>
+              <div className="orig-topic-tag">
+                <span className="orig-topic-dot" /> Module 4
+              </div>
+              <h1 className="orig-app-title">Decision Support</h1>
+              <p className="orig-app-subtitle">Personalized Travel Recommendations via Multi-Algorithm Decision Engine</p>
+            </div>
+            <div className="orig-header-badges">
+              <span className="orig-engine-badge">🌳 Decision Tree (35%)</span>
+              <span className="orig-engine-badge">👥 KNN Cosine (25%)</span>
+              <span className="orig-engine-badge">🎯 6D Preferences (30%)</span>
+            </div>
+          </div>
         </header>
 
         <div className="orig-layout-grid">
@@ -125,7 +186,7 @@ export default function DecisionSupport() {
 
               <div className="orig-form-grid-3">
                 <div className="orig-form-group">
-                  <label htmlFor="ds-budget" className="orig-form-label">Budget (Rs)</label>
+                  <label className="orig-form-label">Budget ($)</label>
                   <input
                     id="ds-budget"
                     type="number"
@@ -194,7 +255,7 @@ export default function DecisionSupport() {
               ))}
 
               <button type="submit" className="orig-btn-primary" disabled={loading}>
-                {loading ? 'Finding Recommendations...' : 'Find Recommendations'}
+                {loading ? 'Executing Multi-Algorithm Evaluation...' : 'Find Recommendations'}
               </button>
             </form>
           </div>
@@ -211,68 +272,257 @@ export default function DecisionSupport() {
               <div className="orig-card orig-empty-box">
                 <h3>No Recommendations Requested Yet</h3>
                 <p>Select a sample preset or enter your trip details and click <strong>Find Recommendations</strong>.</p>
+                <div className="orig-algo-preview-pills">
+                  <span>Evaluates Decision Tree Suitability</span>
+                  <span>Calculates KNN Traveler Similarity</span>
+                  <span>Performs 6D Cosine Vector Ranking</span>
+                </div>
               </div>
             )}
 
             {response && (
               <div>
+                {/* Algorithm Selector Bar */}
+                <div className="orig-algo-selector-card">
+                  <div className="orig-algo-selector-header">
+                    <div>
+                      <span className="orig-algo-selector-title">🔍 Algorithm Perspective</span>
+                      <span className="orig-algo-selector-sub">Select an algorithm to inspect how it ranks destinations:</span>
+                    </div>
+                    <button
+                      type="button"
+                      className="orig-toggle-details-btn"
+                      onClick={() => setShowScoreDetails(!showScoreDetails)}
+                    >
+                      {showScoreDetails ? 'Hide Score Breakdown' : 'Show Score Breakdown'}
+                    </button>
+                  </div>
+
+                  <div className="orig-algo-tabs">
+                    {ALGORITHM_MODES.map((algo) => (
+                      <button
+                        key={algo.id}
+                        type="button"
+                        className={`orig-algo-tab ${selectedAlgorithm === algo.id ? 'active' : ''}`}
+                        onClick={() => setSelectedAlgorithm(algo.id)}
+                      >
+                        <span className="orig-algo-tab-badge">{algo.badge}</span>
+                      </button>
+                    ))}
+                  </div>
+                  <p className="orig-algo-desc-text">
+                    {ALGORITHM_MODES.find(m => m.id === selectedAlgorithm)?.desc}
+                  </p>
+                </div>
+
                 <div className="orig-results-header">
                   <div>
-                    <h2 className="orig-results-heading">Top Recommendations</h2>
+                    <h2 className="orig-results-heading">
+                      {selectedAlgorithm === 'ensemble' ? 'Top Recommendations' : `Ranked by ${ALGORITHM_MODES.find(m => m.id === selectedAlgorithm)?.label}`}
+                    </h2>
                     <div className="orig-results-sub">
-                      Evaluated {response.totalCandidatesEvaluated} destinations • Category: <strong>{response.decisionTreePrimaryPrediction}</strong>
+                      Evaluated {response.totalCandidatesEvaluated} candidate destinations • Decision Tree Primary Class: <strong>{response.decisionTreePrimaryPrediction}</strong>
                     </div>
                   </div>
                 </div>
 
                 <div className="orig-rec-list">
-                  {response.recommendations?.map((rec) => (
-                    <div key={rec.destination || rec.rank} className={`orig-rec-card rank-${rec.rank}`}>
-                      <div className="orig-rec-header">
-                        <div className="orig-rec-title-wrap">
-                          <span className="orig-badge-rank">#{rec.rank}</span>
-                          <div>
-                            <span className="orig-rec-name">{rec.destination}</span>
-                            <span className="orig-rec-province"> — {rec.province} Province</span>
+                  {displayedRecommendations.map((rec, index) => {
+                    const activeScoreInfo = getActiveScore(rec);
+                    const currentRank = index + 1;
+
+                    return (
+                      <div key={rec.destinationId || rec.destination} className={`orig-rec-card rank-${currentRank}`}>
+                        <div className="orig-rec-header">
+                          <div className="orig-rec-title-wrap">
+                            <span className="orig-badge-rank">#{currentRank}</span>
+                            <div>
+                              <span className="orig-rec-name">{rec.destination}</span>
+                              <span className="orig-rec-province"> — {rec.province} Province</span>
+                            </div>
+                          </div>
+                          <div className="orig-match-badge">
+                            <span className="orig-match-score">{activeScoreInfo.score}%</span>
+                            <div className="orig-match-text">{activeScoreInfo.label}</div>
                           </div>
                         </div>
-                        <div className="orig-match-badge">
-                          <span className="orig-match-score">{rec.matchPercentage}%</span>
-                          <div className="orig-match-text">Match</div>
-                        </div>
-                      </div>
 
-                      {rec.suitabilityLabel && (
-                        <span className={`orig-suitability-tag ${rec.suitabilityLabel}`}>
-                          {rec.suitabilityLabel.replace('_', ' ')}
-                        </span>
-                      )}
+                        {rec.suitabilityLabel && (
+                          <span className={`orig-suitability-tag ${rec.suitabilityLabel}`}>
+                            {rec.suitabilityLabel.replace('_', ' ')}
+                          </span>
+                        )}
 
-                      <div className="orig-reason-text">
-                        {rec.reason}
-                      </div>
+                        <div className="orig-reason-text">
+                          {rec.reason}
+                        </div>
 
-                      <div className="orig-specs-row">
-                        <div className="orig-spec-cell">
-                          Avg: <strong>${rec.averageDailyCost}/day</strong>
-                        </div>
-                        <div className="orig-spec-cell">
-                          Stay: <strong>{rec.minimumDays}-{rec.maximumDays} days</strong>
-                        </div>
-                        {rec.difficultyLevel && (
-                          <div className="orig-spec-cell">
-                            Difficulty: <strong>Lvl {rec.difficultyLevel}</strong>
+                        {/* Multi-Algorithm Score Breakdown Bars */}
+                        {showScoreDetails && (
+                          <div className="orig-algo-breakdown-box">
+                            <div className="orig-algo-breakdown-title">Algorithm Contributions:</div>
+                            <div className="orig-algo-bars-grid">
+                              <div className="orig-algo-bar-item">
+                                <div className="orig-algo-bar-label">
+                                  <span>🌳 Decision Tree</span>
+                                  <strong>{((rec.treeScore ?? 0) * 100).toFixed(0)}%</strong>
+                                </div>
+                                <div className="orig-progress-track">
+                                  <div className="orig-progress-fill tree" style={{ width: `${Math.min(100, Math.max(0, (rec.treeScore ?? 0) * 100))}%` }} />
+                                </div>
+                              </div>
+
+                              <div className="orig-algo-bar-item">
+                                <div className="orig-algo-bar-label">
+                                  <span>👥 KNN Neighbors</span>
+                                  <strong>{((rec.knnEvidenceScore ?? 0) * 100).toFixed(0)}%</strong>
+                                </div>
+                                <div className="orig-progress-track">
+                                  <div className="orig-progress-fill knn" style={{ width: `${Math.min(100, Math.max(0, (rec.knnEvidenceScore ?? 0) * 100))}%` }} />
+                                </div>
+                              </div>
+
+                              <div className="orig-algo-bar-item">
+                                <div className="orig-algo-bar-label">
+                                  <span>🎯 6D Preferences</span>
+                                  <strong>{((rec.preferenceScore ?? 0) * 100).toFixed(0)}%</strong>
+                                </div>
+                                <div className="orig-progress-track">
+                                  <div className="orig-progress-fill preference" style={{ width: `${Math.min(100, Math.max(0, (rec.preferenceScore ?? 0) * 100))}%` }} />
+                                </div>
+                              </div>
+                            </div>
                           </div>
                         )}
+
+                        <div className="orig-specs-row">
+                          <div className="orig-spec-cell">
+                            Avg Cost: <strong>${rec.averageDailyCost}/day</strong>
+                          </div>
+                          <div className="orig-spec-cell">
+                            Duration: <strong>{rec.minimumDays}-{rec.maximumDays} days</strong>
+                          </div>
+                          {rec.difficultyLevel && (
+                            <div className="orig-spec-cell">
+                              Difficulty: <strong>Level {rec.difficultyLevel}</strong>
+                            </div>
+                          )}
+                        </div>
                       </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               </div>
             )}
           </div>
         </div>
+
+        {/* Algorithm Summary & Comparative Insights under the page */}
+        {response && (
+          <section className="orig-summary-section">
+            <h2 className="orig-summary-heading">📊 Intelligent Decision Engine Summary & Algorithm Analysis</h2>
+            <p className="orig-summary-sub">
+              Cross-algorithm evaluation and scoring breakdown generated by the Subsystem Decision Pipeline
+            </p>
+
+            <div className="orig-summary-grid">
+              {/* Rationale & Explainability Card */}
+              <div className="orig-card orig-summary-card">
+                <div className="orig-card-header-title">
+                  <span>🧠 Machine Learning Rationale</span>
+                  <span className="orig-badge-pill">C4.5 + KNN + MCDM</span>
+                </div>
+                <div className="orig-rationale-box">
+                  {response.summaryRationale}
+                </div>
+                <div className="orig-rationale-meta">
+                  <div>Primary Classification: <strong>{response.decisionTreePrimaryPrediction}</strong></div>
+                  <div>Evaluated Pool: <strong>{response.totalCandidatesEvaluated} Destinations</strong></div>
+                </div>
+              </div>
+
+              {/* Algorithm Weights Card */}
+              <div className="orig-card orig-summary-card">
+                <div className="orig-card-header-title">
+                  <span>⚖️ Multi-Criteria Algorithm Formulation</span>
+                </div>
+                <p className="orig-weight-intro">
+                  Final score = (0.35 × Decision Tree) + (0.30 × 6D Preference Vector) + (0.25 × KNN Clustering)
+                </p>
+                <div className="orig-weights-list">
+                  <div className="orig-weight-item">
+                    <span className="orig-weight-name">Decision Tree Suitability Classifier</span>
+                    <div className="orig-weight-bar-wrap">
+                      <div className="orig-weight-bar tree" style={{ width: '40%' }}>35%</div>
+                    </div>
+                  </div>
+                  <div className="orig-weight-item">
+                    <span className="orig-weight-name">6D Preference Vector Cosine Match</span>
+                    <div className="orig-weight-bar-wrap">
+                      <div className="orig-weight-bar preference" style={{ width: '35%' }}>30%</div>
+                    </div>
+                  </div>
+                  <div className="orig-weight-item">
+                    <span className="orig-weight-name">KNN Historical Traveler Clustering</span>
+                    <div className="orig-weight-bar-wrap">
+                      <div className="orig-weight-bar knn" style={{ width: '25%' }}>25%</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Algorithm Comparative Matrix Table */}
+            <div className="orig-card orig-matrix-card">
+              <div className="orig-card-header-title">
+                <span>📋 Algorithm Comparison Matrix</span>
+                <span className="orig-matrix-badge">{response.recommendations?.length} Top Candidates</span>
+              </div>
+              <div className="orig-table-responsive">
+                <table className="orig-matrix-table">
+                  <thead>
+                    <tr>
+                      <th>Rank</th>
+                      <th>Destination</th>
+                      <th>Province</th>
+                      <th>Decision Tree</th>
+                      <th>KNN Similarity</th>
+                      <th>6D Vector Match</th>
+                      <th>Ensemble Match</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {response.recommendations?.map((rec) => (
+                      <tr key={rec.destinationId || rec.destination}>
+                        <td>
+                          <span className="orig-table-rank">#{rec.rank}</span>
+                        </td>
+                        <td className="orig-table-dest">
+                          <strong>{rec.destination}</strong>
+                        </td>
+                        <td>{rec.province}</td>
+                        <td>
+                          <span className="orig-cell-score tree">{((rec.treeScore ?? 0) * 100).toFixed(0)}%</span>
+                        </td>
+                        <td>
+                          <span className="orig-cell-score knn">{((rec.knnEvidenceScore ?? 0) * 100).toFixed(0)}%</span>
+                        </td>
+                        <td>
+                          <span className="orig-cell-score preference">{((rec.preferenceScore ?? 0) * 100).toFixed(0)}%</span>
+                        </td>
+                        <td>
+                          <strong className="orig-cell-score ensemble">{rec.matchPercentage?.toFixed(1)}%</strong>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </section>
+        )}
       </div>
     </div>
   );
 }
+

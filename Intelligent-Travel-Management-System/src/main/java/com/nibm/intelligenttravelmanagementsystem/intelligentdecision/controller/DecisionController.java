@@ -20,7 +20,6 @@ import org.springframework.web.bind.annotation.RestController;
 @Slf4j
 @RestController
 @RequestMapping(path = "/api/decisions", produces = MediaType.APPLICATION_JSON_VALUE)
-@CrossOrigin(origins = "*")
 @RequiredArgsConstructor
 public class DecisionController {
 
