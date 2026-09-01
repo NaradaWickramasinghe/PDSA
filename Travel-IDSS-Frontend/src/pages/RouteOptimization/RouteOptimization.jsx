@@ -1,5 +1,5 @@
 // src/pages/RouteOptimization/RouteOptimization.jsx
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import LocationSearchInput from './components/LocationSearchInput';
 import RouteMap from './components/RouteMap';
 import RouteMetrics from './components/RouteMetrics';
@@ -38,6 +38,10 @@ export default function RouteOptimization() {
 
   // Traffic info
   const [trafficStatus, setTrafficStatus] = useState(null);
+  
+  // Live Traffic toggle and data
+  const [showLiveTraffic, setShowLiveTraffic] = useState(false);
+  const [liveTrafficData, setLiveTrafficData] = useState([]);
 
   const handleCalculateRoute = useCallback(async () => {
     setError(null);
@@ -116,10 +120,35 @@ export default function RouteOptimization() {
     try {
       const res = await routeService.simulateTraffic();
       setTrafficStatus(res.data);
+      if (showLiveTraffic) {
+        fetchLiveTraffic(); // Refresh live traffic data immediately after simulation
+      }
     } catch {
       // Silently ignore traffic simulation errors
     }
   };
+
+  const fetchLiveTraffic = async () => {
+    try {
+      const res = await routeService.getAllTraffic();
+      setLiveTrafficData(res.data || []);
+    } catch (err) {
+      console.error("Failed to fetch live traffic:", err);
+    }
+  };
+
+  useEffect(() => {
+    let intervalId;
+    if (showLiveTraffic) {
+      fetchLiveTraffic();
+      intervalId = setInterval(fetchLiveTraffic, 30000); // Poll every 30s
+    } else {
+      setLiveTrafficData([]);
+    }
+    return () => {
+      if (intervalId) clearInterval(intervalId);
+    };
+  }, [showLiveTraffic]);
 
   const addDestination = () => {
     if (tempDestination && !destinations.find((d) => d.id === tempDestination.id)) {
@@ -315,6 +344,21 @@ export default function RouteOptimization() {
           )}
         </div>
 
+        <div className="glass-panel">
+          <h3>🚦 Live Network Status</h3>
+          <div className="toggle-wrapper" style={{ marginBottom: 0 }}>
+            <span className="toggle-label">🔴 Show Live Traffic</span>
+            <label className="toggle-switch">
+              <input
+                type="checkbox"
+                checked={showLiveTraffic}
+                onChange={(e) => setShowLiveTraffic(e.target.checked)}
+              />
+              <span className="toggle-slider" />
+            </label>
+          </div>
+        </div>
+
         {/* Actions */}
         <button
           className="btn-primary"
@@ -361,7 +405,7 @@ export default function RouteOptimization() {
 
       {/* ─── Right: Map ─── */}
       <div className="route-opt-map-container">
-        <RouteMap routeResult={routeResult} />
+        <RouteMap routeResult={routeResult} liveTrafficData={liveTrafficData} />
       </div>
     </div>
   );

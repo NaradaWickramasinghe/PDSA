@@ -1,5 +1,5 @@
 // src/pages/RouteOptimization/components/RouteMap.jsx
-import { MapContainer, TileLayer, Marker, Popup, Polyline, useMap } from 'react-leaflet';
+import { MapContainer, TileLayer, Marker, Popup, Polyline, CircleMarker, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import { useEffect } from 'react';
 import 'leaflet/dist/leaflet.css';
@@ -74,7 +74,7 @@ function FitBounds({ path }) {
   return null;
 }
 
-export default function RouteMap({ routeResult }) {
+export default function RouteMap({ routeResult, liveTrafficData = [] }) {
   // Center of Sri Lanka as the default
   const defaultCenter = [7.8731, 80.7718];
   const defaultZoom = 8;
@@ -172,6 +172,33 @@ export default function RouteMap({ routeResult }) {
           </Marker>
         )
       ))}
+
+      {/* Live Traffic Congestion Points (Red Dots) */}
+      {liveTrafficData.map((edge) => {
+        if (!edge.latitude || !edge.longitude) return null;
+        // Traffic Level 3: Orange, 4: Red, 5: Dark Red
+        const color = edge.trafficLevel >= 5 ? '#7f1d1d' : edge.trafficLevel === 4 ? '#ef4444' : '#f97316';
+        
+        return (
+          <CircleMarker
+            key={edge.edgeId}
+            center={[edge.latitude, edge.longitude]}
+            radius={6}
+            pathOptions={{
+              color: 'white',
+              weight: 1.5,
+              fillColor: color,
+              fillOpacity: 0.9,
+            }}
+          >
+            <Popup>
+              <strong>🚦 Congestion</strong><br />
+              Between {edge.startName} and {edge.endName}<br />
+              Traffic Level: {edge.trafficLevel}/5
+            </Popup>
+          </CircleMarker>
+        );
+      })}
     </MapContainer>
   );
 }

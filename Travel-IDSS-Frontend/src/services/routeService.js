@@ -36,6 +36,11 @@ export const routeService = {
     return api.get(`${ROUTE_BASE}/traffic/simulate`);
   },
   
+  // Get all congested traffic across the map
+  getAllTraffic: () => {
+    return api.get(`${ROUTE_BASE}/traffic/all`);
+  },
+  
   // Debug endpoint to get sample nodes
   getDebugNodes: () => {
     return api.get(`${ROUTE_BASE}/debug/nodes`);

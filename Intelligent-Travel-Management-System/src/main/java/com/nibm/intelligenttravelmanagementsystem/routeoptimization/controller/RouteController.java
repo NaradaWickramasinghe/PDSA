@@ -156,4 +156,29 @@ public class RouteController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
+    @GetMapping("/traffic/all")
+    public ResponseEntity<List<Map<String, Object>>> getAllTraffic() {
+        List<Map<String, Object>> congestedTraffic = graphService.getGraph().values().stream()
+                .flatMap(List::stream)
+                .map(edge -> {
+                    int trafficLevel = trafficService.getTrafficLevel(edge.getId(), edge);
+                    if (trafficLevel >= 3) {
+                        Map<String, Object> data = new HashMap<>();
+                        data.put("edgeId", edge.getId());
+                        data.put("trafficLevel", trafficLevel);
+                        // Using midpoint for the red dot
+                        double midLat = (edge.getSource().getLatitude() + edge.getDestination().getLatitude()) / 2.0;
+                        double midLon = (edge.getSource().getLongitude() + edge.getDestination().getLongitude()) / 2.0;
+                        data.put("latitude", midLat);
+                        data.put("longitude", midLon);
+                        data.put("startName", edge.getSource().getName());
+                        data.put("endName", edge.getDestination().getName());
+                        return data;
+                    }
+                    return null;
+                })
+                .filter(data -> data != null)
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(congestedTraffic);
+    }
 }
