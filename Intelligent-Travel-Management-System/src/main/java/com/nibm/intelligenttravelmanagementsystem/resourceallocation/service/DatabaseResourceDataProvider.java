@@ -8,7 +8,6 @@ import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Component
 @Primary
@@ -31,42 +30,31 @@ public class DatabaseResourceDataProvider implements ResourceDataProvider {
     public List<ResourceOption> getCandidateOptions(String destination) {
         List<ResourceOptionEntity> entities;
         try {
-            entities = repository.findByAvailableTrue();
+            if (destination == null || destination.trim().isEmpty()) {
+                entities = repository.findByAvailableTrue();
+            } else {
+                entities = repository.findCandidateOptionsForDestination(destination.trim());
+            }
         } catch (Exception e) {
-            // Fallback to JSON dataset if DB is unreachable
+            // Graceful fallback to JSON dataset if database query fails or DB is unreachable
             return jsonDataProvider.getCandidateOptions(destination);
         }
 
         if (entities == null || entities.isEmpty()) {
-            // Seed initial dataset from JSON into database
-            List<ResourceOption> jsonOptions = jsonDataProvider.getCandidateOptions(null);
-            for (ResourceOption option : jsonOptions) {
-                try {
-                    repository.save(toEntity(option));
-                } catch (Exception ignored) {}
-            }
+            // Fallback to JSON dataset if database is not yet populated
             return jsonDataProvider.getCandidateOptions(destination);
         }
 
-        List<ResourceOption> domainList = new ArrayList<>();
+        List<ResourceOption> domainList = new ArrayList<>(entities.size());
         for (ResourceOptionEntity entity : entities) {
             domainList.add(toDomain(entity));
         }
 
-        if (destination == null || destination.trim().isEmpty()) {
-            return domainList;
-        }
-
-        String target = destination.trim().toLowerCase();
-        return domainList.stream()
-                .filter(opt -> opt.getDestination() == null 
-                        || opt.getDestination().equalsIgnoreCase("ALL")
-                        || opt.getDestination().toLowerCase().contains(target)
-                        || target.contains(opt.getDestination().toLowerCase()))
-                .collect(Collectors.toList());
+        return domainList;
     }
 
-    private ResourceOption toDomain(ResourceOptionEntity entity) {
+    public ResourceOption toDomain(ResourceOptionEntity entity) {
+        if (entity == null) return null;
         return ResourceOption.builder()
                 .id(entity.getId())
                 .destination(entity.getDestination())
@@ -83,7 +71,8 @@ public class DatabaseResourceDataProvider implements ResourceDataProvider {
                 .build();
     }
 
-    private ResourceOptionEntity toEntity(ResourceOption domain) {
+    public ResourceOptionEntity toEntity(ResourceOption domain) {
+        if (domain == null) return null;
         return ResourceOptionEntity.builder()
                 .id(domain.getId())
                 .destination(domain.getDestination())

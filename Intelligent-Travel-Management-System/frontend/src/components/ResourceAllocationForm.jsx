@@ -2,6 +2,23 @@ import React, { useState } from 'react';
 
 const API_BASE_URL = 'http://localhost:8080/api/resource-allocation';
 
+const destImages = {
+  'Ella': { src: '/images/destinations/ella.jpg', title: 'Nine Arch Bridge, Ella' },
+  'Kandy': { src: '/images/destinations/kandy.jpg', title: 'Temple of the Tooth (Sri Dalada Maligawa), Kandy' },
+  'Nuwara Eliya': { src: '/images/destinations/nuwara-eliya.jpg', title: 'Historic Post Office & Tea Country, Nuwara Eliya' },
+  'Sigiriya': { src: '/images/destinations/sigiriya.jpg', title: 'Sigiriya Ancient Rock Fortress' },
+  'Galle': { src: '/images/destinations/galle.jpg', title: 'Galle Fort Lighthouse & Ramparts' },
+  'Mirissa': { src: '/images/destinations/mirissa.jpg', title: 'Coconut Tree Hill, Mirissa' },
+  'Colombo': { src: '/images/destinations/colombo.jpg', title: 'Lotus Tower, Colombo' }
+};
+
+const strategyNames = {
+  'PIPELINE': 'Smart Multi-Tier Optimization',
+  'DYNAMIC_PROGRAMMING': 'Maximum Value Optimization',
+  'GREEDY': 'Budget-First Optimization',
+  'GENETIC': 'Flexible Discovery Optimization'
+};
+
 export default function ResourceAllocationForm() {
   const [formData, setFormData] = useState({
     destination: 'Ella',
@@ -149,9 +166,9 @@ export default function ResourceAllocationForm() {
       ]);
 
       setComparisonResults([
-        { name: 'Greedy Algorithm', data: greedyData },
-        { name: 'Dynamic Programming', data: dpData },
-        { name: 'Genetic Algorithm', data: geneticData }
+        { name: 'Budget-First Strategy', data: greedyData },
+        { name: 'Optimal Value Strategy', data: dpData },
+        { name: 'Balanced Discovery Strategy', data: geneticData }
       ]);
     } catch (err) {
       console.error('Benchmark execution error:', err);
@@ -172,6 +189,7 @@ export default function ResourceAllocationForm() {
     if (res.name.includes('First Aid')) return 'Basic medical supplies';
     if (res.name.includes('Power Bank')) return 'Portable charger';
     return res.category === 'TRANSPORTATION' ? 'Transportation' : 'Travel Option';
+  };
   const getDisplayCategory = (res) => {
     if (!res) return '';
     if (res.category === 'ACCOMMODATION' || res.name.includes('Hotel') || res.name.includes('Resort') || res.name.includes('Villa') || res.name.includes('Lodge') || res.name.includes('Inn') || res.name.includes('Guesthouse') || res.name.includes('Hostel') || res.name.includes('Chalet') || res.name.includes('Suites')) {
@@ -225,31 +243,20 @@ export default function ResourceAllocationForm() {
 
         .reference-app-layout {
           display: flex;
+          flex-direction: column;
           min-height: 100vh;
           background-color: #f8fafc;
           color: #1e293b;
         }
 
-        /* SIDEBAR STYLING */
-        .app-sidebar {
-          width: 240px;
-          background: #ffffff;
-          border-right: 1px solid #e2e8f0;
-          display: flex;
-          flex-direction: column;
-          padding: 1.5rem 1rem;
-          flex-shrink: 0;
-        }
-        .sidebar-brand {
+        .header-brand {
           display: flex;
           align-items: center;
-          gap: 0.6rem;
-          margin-bottom: 2rem;
-          padding-left: 0.5rem;
+          gap: 0.75rem;
         }
-        .sidebar-brand .logo-icon {
-          width: 32px;
-          height: 32px;
+        .header-brand .logo-icon {
+          width: 36px;
+          height: 36px;
           background: #16a34a;
           color: #ffffff;
           border-radius: 0.5rem;
@@ -257,46 +264,19 @@ export default function ResourceAllocationForm() {
           align-items: center;
           justify-content: center;
           font-weight: 700;
-          font-size: 1.1rem;
+          font-size: 1.2rem;
+          box-shadow: 0 2px 4px rgba(22, 163, 74, 0.2);
         }
-        .sidebar-brand .brand-title {
-          font-size: 1.05rem;
+        .header-brand .brand-title {
+          font-size: 1.12rem;
           font-weight: 700;
           color: #0f172a;
+          line-height: 1.2;
         }
-        .sidebar-brand .brand-sub {
-          font-size: 0.72rem;
-          color: #64748b;
-        }
-
-        .nav-list { list-style: none; display: flex; flex-direction: column; gap: 0.35rem; }
-        .nav-item {
-          display: flex;
-          align-items: center;
-          gap: 0.75rem;
-          padding: 0.65rem 0.85rem;
-          border-radius: 0.5rem;
-          color: #475569;
-          font-size: 0.88rem;
-          font-weight: 500;
-          cursor: pointer;
-          transition: all 0.15s ease;
-        }
-        .nav-item:hover { background: #f1f5f9; color: #0f172a; }
-        .nav-item.active {
-          background: #e6f4ea;
-          color: #137333;
-          font-weight: 600;
-        }
-        .nav-item .icon { font-size: 1rem; width: 20px; text-align: center; }
-
-        .sidebar-footer {
-          margin-top: auto;
-          padding-top: 1.5rem;
-          border-top: 1px solid #f1f5f9;
+        .header-brand .brand-sub {
           font-size: 0.75rem;
-          color: #94a3b8;
-          text-align: center;
+          color: #64748b;
+          font-weight: 500;
         }
 
         /* MAIN WRAPPER STYLING */
@@ -591,33 +571,122 @@ export default function ResourceAllocationForm() {
           font-weight: 600;
         }
 
-        /* RESOURCE LIST TABLE */
-        .res-table-header {
-          display: grid;
-          grid-template-columns: 1fr 90px 70px 70px;
-          padding: 0.4rem 0.75rem;
-          font-size: 0.72rem;
-          font-weight: 600;
-          color: #94a3b8;
-          border-bottom: 1px solid #f1f5f9;
+        /* CATEGORY CARDS STYLING */
+        .res-cards-list {
+          display: flex;
+          flex-direction: column;
+          gap: 0.75rem;
+          margin-top: 0.5rem;
         }
-        .res-item-row {
-          display: grid;
-          grid-template-columns: 1fr 90px 70px 70px;
+        .res-card-item {
+          background: #ffffff;
+          border: 1px solid #e2e8f0;
+          border-radius: 0.65rem;
+          padding: 0.9rem 1rem;
+          display: flex;
+          justify-content: space-between;
+          align-items: flex-start;
+          gap: 1rem;
+          transition: all 0.15s ease;
+          box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
+        }
+        .res-card-item:hover {
+          border-color: #cbd5e1;
+          box-shadow: 0 3px 6px rgba(0, 0, 0, 0.04);
+          background: #fbfcfd;
+        }
+        .res-card-left {
+          display: flex;
+          gap: 0.85rem;
+          align-items: flex-start;
+          flex: 1;
+          min-width: 0;
+        }
+        .res-cat-icon-box {
+          width: 42px;
+          height: 42px;
+          border-radius: 0.55rem;
+          display: flex;
           align-items: center;
-          padding: 0.65rem 0.75rem;
-          border-bottom: 1px solid #f8fafc;
+          justify-content: center;
+          font-size: 1.25rem;
+          flex-shrink: 0;
         }
-        .res-item-row:last-child { border-bottom: none; }
-        .res-info { display: flex; align-items: center; gap: 0.65rem; }
-        .res-icon-thumb {
-          width: 36px; height: 36px; border-radius: 0.4rem; object-fit: cover; background: #e2e8f0;
-          display: flex; align-items: center; justify-content: center; font-size: 1rem; flex-shrink: 0;
+        .icon-trans { background: #eff6ff; border: 1px solid #bfdbfe; color: #1d4ed8; }
+        .icon-stay { background: #fdf2f8; border: 1px solid #fbcfe8; color: #be185d; }
+        .icon-act { background: #f0fdf4; border: 1px solid #bbf7d0; color: #15803d; }
+        .icon-gear { background: #fff7ed; border: 1px solid #fed7aa; color: #c2410c; }
+
+        .res-card-details {
+          flex: 1;
+          min-width: 0;
         }
-        .res-title-text { font-size: 0.85rem; font-weight: 600; color: #0f172a; }
-        .res-sub-text { font-size: 0.72rem; color: #64748b; }
-        .res-cat-tag { font-size: 0.68rem; font-weight: 700; color: #16a34a; text-transform: uppercase; margin-bottom: 0.1rem; display: block; }
-        .res-val-col { font-size: 0.82rem; font-weight: 600; color: #334155; }
+        .res-tag-row {
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+          margin-bottom: 0.25rem;
+          flex-wrap: wrap;
+        }
+        .badge-cat-tag {
+          font-size: 0.68rem;
+          font-weight: 700;
+          padding: 0.15rem 0.5rem;
+          border-radius: 0.3rem;
+          text-transform: uppercase;
+          letter-spacing: 0.03em;
+        }
+        .tag-trans { background: #dbeafe; color: #1e40af; }
+        .tag-stay { background: #fce7f3; color: #9d174d; }
+        .tag-act { background: #dcfce7; color: #166534; }
+        .tag-gear { background: #ffedd5; color: #9a3412; }
+
+        .res-card-title {
+          font-size: 0.95rem;
+          font-weight: 700;
+          color: #0f172a;
+          line-height: 1.3;
+          margin-bottom: 0.25rem;
+        }
+        .res-card-desc {
+          font-size: 0.78rem;
+          color: #475569;
+          line-height: 1.4;
+          margin-bottom: 0.45rem;
+        }
+        .res-attributes-chips {
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+          flex-wrap: wrap;
+        }
+        .attr-chip {
+          background: #f1f5f9;
+          border: 1px solid #e2e8f0;
+          color: #334155;
+          font-size: 0.75rem;
+          font-weight: 500;
+          padding: 0.2rem 0.55rem;
+          border-radius: 0.35rem;
+          display: inline-flex;
+          align-items: center;
+          gap: 0.3rem;
+        }
+        .res-card-right {
+          text-align: right;
+          flex-shrink: 0;
+          padding-top: 0.1rem;
+        }
+        .res-price-main {
+          font-size: 1.05rem;
+          font-weight: 700;
+          color: #0f172a;
+        }
+        .res-price-sub {
+          font-size: 0.72rem;
+          color: #64748b;
+          margin-top: 0.15rem;
+        }
 
         /* BOTTOM PILLS ROW */
         .bottom-pills-grid {
@@ -663,40 +732,17 @@ export default function ResourceAllocationForm() {
         .comp-table-ref th { background: #f1f5f9; color: #334155; font-weight: 600; }
       `}</style>
 
-      {/* LEFT SIDEBAR */}
-      <aside className="app-sidebar">
-        <div className="sidebar-brand">
-          <div className="logo-icon">🌴</div>
-          <div>
-            <div className="brand-title">Travel Planner</div>
-            <div className="brand-sub">Sri Lanka</div>
-          </div>
-        </div>
-
-        <ul className="nav-list">
-          <li className="nav-item"><span className="icon">🏠</span> Dashboard</li>
-          <li className="nav-item"><span className="icon">📍</span> Destinations</li>
-          <li className="nav-item"><span className="icon">🗺️</span> Trip Planning</li>
-          <li className="nav-item"><span className="icon">🎒</span> Resources</li>
-          <li className="nav-item active"><span className="icon">🟩</span> Resource Allocation</li>
-          <li className="nav-item"><span className="icon">📑</span> My Plans</li>
-          <li className="nav-item"><span className="icon">🎫</span> Bookings</li>
-          <li className="nav-item"><span className="icon">👤</span> Profile</li>
-          <li className="nav-item"><span className="icon">⚙️</span> Settings</li>
-        </ul>
-
-        <div className="sidebar-footer">
-          <div style={{ fontWeight: 600, color: '#475569', marginBottom: '0.2rem' }}>Sri Lanka</div>
-          <div>Wonder of Asia</div>
-          <div style={{ marginTop: '0.5rem' }}>© 2025 Travel Planner</div>
-        </div>
-      </aside>
-
       {/* MAIN WRAPPER */}
       <div className="main-wrapper">
-        {/* TOP HEADER */}
+        {/* TOP HEADER NAVBAR */}
         <header className="top-header">
-          <span className="menu-icon">☰</span>
+          <div className="header-brand">
+            <div className="logo-icon">🌴</div>
+            <div>
+              <div className="brand-title">Travel Planner</div>
+              <div className="brand-sub">Sri Lanka</div>
+            </div>
+          </div>
           <div className="user-area">
             <div className="user-greeting-badge">
               <span>🍃</span> Plan Smart, Travel Better
@@ -718,17 +764,17 @@ export default function ResourceAllocationForm() {
             </div>
 
             <button type="button" className="btn-outline-comp" onClick={() => setShowComparison(!showComparison)}>
-              📊 Compare Algorithms
+              📊 Compare Planning Options
             </button>
           </div>
 
-          {/* ALGORITHM COMPARISON DRAWER */}
+          {/* PLANNING STRATEGY COMPARISON DRAWER */}
           {showComparison && (
             <div className="comp-container" style={{ marginBottom: '1.5rem' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
-                <h4 style={{ fontSize: '0.9rem', color: '#0f172a', fontWeight: 700 }}>Algorithm Experimental Benchmark Comparison</h4>
-                <button type="button" onClick={handleRunComparison} disabled={comparing} style={{ background: '#16a34a', color: '#fff', border: 'none', padding: '0.4rem 0.75rem', borderRadius: '0.4rem', fontSize: '0.78rem', cursor: 'pointer' }}>
-                  {comparing ? 'Executing...' : '⚡ Run API Benchmark'}
+                <h4 style={{ fontSize: '0.92rem', color: '#0f172a', fontWeight: 700 }}>Planning Strategy Comparison</h4>
+                <button type="button" onClick={handleRunComparison} disabled={comparing} style={{ background: '#16a34a', color: '#fff', border: 'none', padding: '0.45rem 0.85rem', borderRadius: '0.45rem', fontSize: '0.8rem', fontWeight: 600, cursor: 'pointer' }}>
+                  {comparing ? 'Evaluating...' : '⚡ Compare Options'}
                 </button>
               </div>
 
@@ -736,13 +782,13 @@ export default function ResourceAllocationForm() {
                 <table className="comp-table-ref">
                   <thead>
                     <tr>
-                      <th>Algorithm Strategy</th>
-                      <th>Feasible</th>
-                      <th>Score (pts)</th>
+                      <th>Strategy</th>
+                      <th>Feasibility</th>
+                      <th>Experience Score</th>
                       <th>Total Cost (LKR)</th>
                       <th>Time Used</th>
                       <th>Weight Used</th>
-                      <th>Latency</th>
+                      <th>Response Speed</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -760,7 +806,7 @@ export default function ResourceAllocationForm() {
                   </tbody>
                 </table>
               ) : (
-                <p style={{ fontSize: '0.8rem', color: '#64748b' }}>Click "Run API Benchmark" to execute Greedy, Dynamic Programming, and Genetic Algorithm in real-time.</p>
+                <p style={{ fontSize: '0.8rem', color: '#64748b' }}>Click "Compare Options" to evaluate different planning strategies in real-time.</p>
               )}
             </div>
           )}
@@ -791,8 +837,9 @@ export default function ResourceAllocationForm() {
                         <option value="Colombo">📍 Colombo</option>
                       </select>
                       <img 
-                        src="https://images.unsplash.com/photo-1546708973-b339540b5162?auto=format&fit=crop&w=200&q=80" 
-                        alt="Sri Lanka Destination" 
+                        src={(destImages[formData.destination] || destImages['Ella']).src} 
+                        alt={(destImages[formData.destination] || destImages['Ella']).title} 
+                        title={(destImages[formData.destination] || destImages['Ella']).title}
                         className="dest-thumb" 
                       />
                     </div>
@@ -898,21 +945,21 @@ export default function ResourceAllocationForm() {
                   </div>
                 </div>
 
-                {/* Advanced Algorithm Option */}
+                {/* Advanced Preferences */}
                 <div>
                   <button type="button" onClick={() => setShowAdvanced(!showAdvanced)} style={{ background: 'none', border: 'none', color: '#16a34a', fontSize: '0.78rem', fontWeight: 600, cursor: 'pointer' }}>
-                    {showAdvanced ? '▲ Hide Advanced Algorithm Settings' : '⚙️ Advanced Algorithm Selection'}
+                    {showAdvanced ? '▲ Hide Advanced Preferences' : '⚙️ Advanced Planning Preferences'}
                   </button>
                 </div>
 
                 {showAdvanced && (
                   <div style={{ background: '#f8fafc', padding: '0.65rem', borderRadius: '0.4rem', border: '1px solid #e2e8f0', marginTop: '0.35rem' }}>
-                    <label style={{ fontSize: '0.75rem', fontWeight: 600, color: '#334155' }}>Optimization Strategy</label>
+                    <label style={{ fontSize: '0.75rem', fontWeight: 600, color: '#334155' }}>Planning Optimization Mode</label>
                     <select name="selectedAlgorithm" value={formData.selectedAlgorithm} onChange={handleChange} className="ref-input no-icon" style={{ marginTop: '0.2rem', padding: '0.45rem' }}>
-                      <option value="PIPELINE">Multi-Stage Pipeline (Greedy + DP + Genetic) - Recommended</option>
-                      <option value="DYNAMIC_PROGRAMMING">Dynamic Programming Algorithm (Exact Optimal)</option>
-                      <option value="GREEDY">Greedy Algorithm (Fast Heuristic Ratio)</option>
-                      <option value="GENETIC">Genetic Algorithm (Evolutionary Optimization)</option>
+                      <option value="PIPELINE">Smart Multi-Tier Optimizer (Recommended - Best Balance)</option>
+                      <option value="DYNAMIC_PROGRAMMING">Maximum Value Focus (Best Resource Utilization)</option>
+                      <option value="GREEDY">Budget-First Focus (High Value-to-Cost Priority)</option>
+                      <option value="GENETIC">Flexible Discovery Focus (Diverse Experience Mix)</option>
                     </select>
                   </div>
                 )}
@@ -943,14 +990,9 @@ export default function ResourceAllocationForm() {
               <div className="result-header-row">
                 <div>
                   <h2>🛡️ Your Travel Resource Plan</h2>
-                  <p>
-                    Strategy: <strong style={{ color: '#16a34a' }}>
-                      {response?.algorithmUsed === 'PIPELINE' || (!response && formData.selectedAlgorithm === 'PIPELINE')
-                        ? 'Multi-Stage Pipeline (Greedy + DP + GA)'
-                        : (response?.algorithmUsed || formData.selectedAlgorithm)}
-                    </strong>
-                    {response?.overallScore ? ` • Utility Score: ${response.overallScore.toFixed(1)} pts` : ''}
-                  </p>
+                  <div style={{ marginTop: '0.35rem', display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
+                    <span style={{ background: '#e0f2fe', color: '#0369a1', fontSize: '0.74rem', fontWeight: 700, padding: '0.2rem 0.55rem', borderRadius: '0.3rem' }}>Allocation Pipeline</span>
+                  </div>
                 </div>
                 {response && (
                   <span className={response.feasible ? 'feasible-badge' : 'alert-danger-box'} style={{ margin: 0, padding: '0.35rem 0.75rem', borderRadius: '2rem' }}>
@@ -1049,7 +1091,7 @@ export default function ResourceAllocationForm() {
                     <div className="pill-stat-box pill-blue">
                       <span>🎒</span>
                       <div>
-                        <strong>Luggage Used:</strong> {response.totalWeight.toFixed(1)} kg / {formData.luggageCapacity} kg
+                        <strong>Equipment Weight:</strong> {response.totalWeight.toFixed(1)} kg / {formData.luggageCapacity} kg
                         {response.physicalResourceSummary && (
                           <span style={{ fontSize: '0.72rem', display: 'block', color: '#475569' }}>
                             Rem. Capacity: {response.remainingCapacity.toFixed(1)} kg
@@ -1071,34 +1113,108 @@ export default function ResourceAllocationForm() {
                     </div>
                   </div>
 
-                  {/* RESOURCE LIST TABLE */}
-                  <div className="res-table-header">
-                    <span>ITEM & DETAILS</span>
-                    <span style={{ textAlign: 'right' }}>COST (LKR)</span>
-                    <span style={{ textAlign: 'right' }}>TIME</span>
-                    <span style={{ textAlign: 'right' }}>WEIGHT</span>
-                  </div>
-
+                  {/* RESOURCE LIST CARDS */}
                   {filteredResources.length > 0 ? (
-                    <div>
+                    <div className="res-cards-list">
                       {filteredResources.map((res) => {
                         const cat = getDisplayCategory(res);
+                        const nights = response.tripInformation?.tripDurationDays || formData.tripDurationDays || 3;
+                        const travellers = response.tripInformation?.travellerCount || formData.travellerCount || 2;
+
+                        let icon = '🎒';
+                        let iconClass = 'icon-gear';
+                        let tagClass = 'tag-gear';
+                        let catLabel = 'Equipment';
+                        let chips = null;
+                        let priceMain = `LKR ${res.cost.toLocaleString()}`;
+                        let priceSub = '';
+
+                        if (cat === 'TRANSPORTATION') {
+                          catLabel = 'Transportation';
+                          tagClass = 'tag-trans';
+                          iconClass = 'icon-trans';
+                          icon = res.name.toLowerCase().includes('tuk') ? '🛺' 
+                               : res.name.toLowerCase().includes('bus') ? '🚌' 
+                               : res.name.toLowerCase().includes('train') ? '🚆' : '🚗';
+                          chips = (
+                            <>
+                              <span className="attr-chip">⏱️ {res.durationHours > 0 ? `${res.durationHours.toFixed(1)} hours` : 'Direct'}</span>
+                              <span className="attr-chip">👥 Capacity: {res.capacity ? `${res.capacity} people` : 'Standard'}</span>
+                              <span className="attr-chip">🚗 {res.transportType || 'Transit'}</span>
+                            </>
+                          );
+                          priceSub = 'Allocated transit fare';
+                        } else if (cat === 'ACCOMMODATION') {
+                          catLabel = 'Accommodation';
+                          tagClass = 'tag-stay';
+                          iconClass = 'icon-stay';
+                          icon = '🏨';
+                          const ratePerNight = Math.round(res.cost / Math.max(1, nights));
+                          chips = (
+                            <>
+                              <span className="attr-chip">📅 {nights} nights</span>
+                              <span className="attr-chip">👥 Capacity: {res.capacity ? `${res.capacity} guests` : 'Room'}</span>
+                              <span className="attr-chip">💵 LKR {ratePerNight.toLocaleString()} / night</span>
+                            </>
+                          );
+                          priceMain = `LKR ${res.cost.toLocaleString()} total`;
+                          priceSub = `Total for ${nights} nights`;
+                        } else if (cat === 'ACTIVITY') {
+                          catLabel = 'Activity';
+                          tagClass = 'tag-act';
+                          iconClass = 'icon-act';
+                          icon = res.name.toLowerCase().includes('water') || res.name.toLowerCase().includes('falls') || res.name.toLowerCase().includes('beach') || res.name.toLowerCase().includes('surf') ? '🌊'
+                               : res.name.toLowerCase().includes('temple') || res.name.toLowerCase().includes('heritage') || res.name.toLowerCase().includes('fort') ? '🏛️' : '⛰️';
+                          chips = (
+                            <>
+                              <span className="attr-chip">⏱️ {res.durationHours.toFixed(1)} hours</span>
+                              <span className="attr-chip">👥 {travellers > 1 ? `For ${travellers} travellers` : 'Per ticket'}</span>
+                            </>
+                          );
+                          priceMain = `LKR ${res.cost.toLocaleString()}`;
+                          priceSub = travellers > 1 ? 'Total group cost' : 'Activity fee';
+                        } else if (cat === 'PHYSICAL_ITEM') {
+                          catLabel = 'Equipment';
+                          tagClass = 'tag-gear';
+                          iconClass = 'icon-gear';
+                          icon = res.name.toLowerCase().includes('shoe') || res.name.toLowerCase().includes('pole') ? '🥾'
+                               : res.name.toLowerCase().includes('medical') || res.name.toLowerCase().includes('first aid') ? '🩹'
+                               : res.name.toLowerCase().includes('power') || res.name.toLowerCase().includes('torch') || res.name.toLowerCase().includes('lamp') ? '🔦' : '🎒';
+                          const qualityBadge = (res.usefulness && res.usefulness >= 90) ? '⭐ Highly Recommended' : 'Essential Gear';
+                          chips = (
+                            <>
+                              <span className="attr-chip">🎒 {res.weightKg > 0 ? `${res.weightKg.toFixed(1)} kg` : '0.2 kg'}</span>
+                              <span className="attr-chip">{qualityBadge}</span>
+                            </>
+                          );
+                          priceSub = 'Item cost / rental';
+                        }
+
+                        const isHighlight = (res.usefulness && res.usefulness >= 92);
+
                         return (
-                          <div key={res.id} className="res-item-row">
-                            <div className="res-info">
-                              <div className="res-icon-thumb">
-                                {cat === 'TRANSPORTATION' ? (res.name.includes('Tuk') ? '🛺' : res.name.includes('Bus') || res.name.includes('Coach') ? '🚌' : '🚆') : cat === 'ACCOMMODATION' ? '🏨' : cat === 'ACTIVITY' ? '⛰️' : '🎒'}
-                              </div>
-                              <div>
-                                <span className="res-cat-tag">{cat === 'PHYSICAL_ITEM' ? 'EQUIPMENT' : cat}</span>
-                                <div className="res-title-text">{res.name}</div>
-                                <div className="res-sub-text">{getSubLabel(res)}</div>
+                          <div key={res.id} className="res-card-item">
+                            <div className="res-card-left">
+                              <div className={`res-cat-icon-box ${iconClass}`}>{icon}</div>
+                              <div className="res-card-details">
+                                <div className="res-tag-row">
+                                  <span className={`badge-cat-tag ${tagClass}`}>{catLabel}</span>
+                                  {isHighlight && (
+                                    <span style={{ background: '#fef3c7', color: '#92400e', fontSize: '0.68rem', fontWeight: 700, padding: '1px 6px', borderRadius: '4px' }}>⭐ Top Pick</span>
+                                  )}
+                                </div>
+                                <div className="res-card-title">{res.name}</div>
+                                <div className="res-card-desc">{getSubLabel(res)}</div>
+                                <div className="res-attributes-chips">
+                                  {chips}
+                                </div>
                               </div>
                             </div>
 
-                            <div className="res-val-col" style={{ textAlign: 'right' }}>{res.cost.toLocaleString()}</div>
-                            <div className="res-val-col" style={{ textAlign: 'right' }}>{res.durationHours > 0 ? `${res.durationHours.toFixed(1)} h` : '-'}</div>
-                            <div className="res-val-col" style={{ textAlign: 'right' }}>{res.weightKg > 0 ? `${res.weightKg.toFixed(1)} kg` : '0.0 kg'}</div>
+                            <div className="res-card-right">
+                              <div className="res-price-main">{priceMain}</div>
+                              <div className="res-price-sub">{priceSub}</div>
+                            </div>
                           </div>
                         );
                       })}

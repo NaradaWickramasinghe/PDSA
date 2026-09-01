@@ -18,76 +18,8 @@
 
     .reference-app-layout {
       display: flex;
-      min-height: 100vh;
-    }
-
-    /* SIDEBAR STYLING */
-    .app-sidebar {
-      width: 240px;
-      background: #ffffff;
-      border-right: 1px solid #e2e8f0;
-      display: flex;
       flex-direction: column;
-      padding: 1.5rem 1rem;
-      flex-shrink: 0;
-    }
-    .sidebar-brand {
-      display: flex;
-      align-items: center;
-      gap: 0.6rem;
-      margin-bottom: 2rem;
-      padding-left: 0.5rem;
-    }
-    .sidebar-brand .logo-icon {
-      width: 32px;
-      height: 32px;
-      background: #16a34a;
-      color: #ffffff;
-      border-radius: 0.5rem;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: 700;
-      font-size: 1.1rem;
-    }
-    .sidebar-brand .brand-title {
-      font-size: 1.05rem;
-      font-weight: 700;
-      color: #0f172a;
-    }
-    .sidebar-brand .brand-sub {
-      font-size: 0.72rem;
-      color: #64748b;
-    }
-
-    .nav-list { list-style: none; display: flex; flex-direction: column; gap: 0.35rem; }
-    .nav-item {
-      display: flex;
-      align-items: center;
-      gap: 0.75rem;
-      padding: 0.65rem 0.85rem;
-      border-radius: 0.5rem;
-      color: #475569;
-      font-size: 0.88rem;
-      font-weight: 500;
-      cursor: pointer;
-      transition: all 0.15s ease;
-    }
-    .nav-item:hover { background: #f1f5f9; color: #0f172a; }
-    .nav-item.active {
-      background: #e6f4ea;
-      color: #137333;
-      font-weight: 600;
-    }
-    .nav-item .icon { font-size: 1rem; width: 20px; text-align: center; }
-
-    .sidebar-footer {
-      margin-top: auto;
-      padding-top: 1.5rem;
-      border-top: 1px solid #f1f5f9;
-      font-size: 0.75rem;
-      color: #94a3b8;
-      text-align: center;
+      min-height: 100vh;
     }
 
     /* MAIN WRAPPER */
@@ -100,15 +32,47 @@
 
     /* TOP HEADER */
     .top-header {
-      height: 64px;
+      height: 68px;
       background: #ffffff;
       border-bottom: 1px solid #e2e8f0;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 0 2rem;
+      padding: 0 2.5rem;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
     }
-    .top-header .menu-icon { font-size: 1.2rem; color: #64748b; cursor: pointer; }
+    
+    .header-brand {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      text-decoration: none;
+    }
+    .header-brand .logo-icon {
+      width: 36px;
+      height: 36px;
+      background: #16a34a;
+      color: #ffffff;
+      border-radius: 0.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 1.2rem;
+      box-shadow: 0 2px 4px rgba(22, 163, 74, 0.2);
+    }
+    .header-brand .brand-title {
+      font-size: 1.12rem;
+      font-weight: 700;
+      color: #0f172a;
+      line-height: 1.2;
+    }
+    .header-brand .brand-sub {
+      font-size: 0.75rem;
+      color: #64748b;
+      font-weight: 500;
+    }
+
     .top-header .user-area {
       display: flex;
       align-items: center;
@@ -118,23 +82,23 @@
       background: #f0fdf4;
       border: 1px solid #bbf7d0;
       color: #166534;
-      font-size: 0.78rem;
+      font-size: 0.8rem;
       font-weight: 600;
-      padding: 0.3rem 0.75rem;
+      padding: 0.35rem 0.85rem;
       border-radius: 2rem;
       display: flex;
       align-items: center;
-      gap: 0.35rem;
+      gap: 0.4rem;
     }
     .avatar-circle {
-      width: 34px; height: 34px; border-radius: 50%; background: #e2e8f0; color: #475569;
-      display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 0.9rem;
+      width: 36px; height: 36px; border-radius: 50%; background: #e2e8f0; color: #475569;
+      display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 0.95rem;
     }
 
     /* CONTENT CONTAINER */
     .content-container {
-      padding: 2rem;
-      max-width: 1280px;
+      padding: 2rem 2.5rem;
+      max-width: 1400px;
       margin: 0 auto;
       width: 100%;
     }
@@ -146,12 +110,12 @@
       margin-bottom: 1.75rem;
     }
     .title-header-row h1 {
-      font-size: 1.65rem;
+      font-size: 1.75rem;
       font-weight: 700;
       color: #0f172a;
-      margin-bottom: 0.2rem;
+      margin-bottom: 0.25rem;
     }
-    .title-header-row p { color: #64748b; font-size: 0.9rem; display: flex; align-items: center; gap: 0.5rem; }
+    .title-header-row p { color: #64748b; font-size: 0.92rem; display: flex; align-items: center; gap: 0.5rem; }
     .module-badge {
       background: #e6f4ea;
       color: #137333;
@@ -165,171 +129,342 @@
       background: #ffffff;
       border: 1px solid #cbd5e1;
       color: #334155;
-      padding: 0.5rem 0.9rem;
-      border-radius: 0.45rem;
-      font-size: 0.84rem;
+      padding: 0.55rem 1rem;
+      border-radius: 0.5rem;
+      font-size: 0.85rem;
       font-weight: 600;
       cursor: pointer;
       display: flex;
       align-items: center;
-      gap: 0.4rem;
+      gap: 0.45rem;
+      transition: all 0.15s ease;
     }
     .btn-outline-comp:hover { background: #f8fafc; border-color: #94a3b8; }
 
     /* TWO COLUMN GRID */
     .two-col-grid {
       display: grid;
-      grid-template-columns: 440px 1fr;
-      gap: 1.5rem;
+      grid-template-columns: 460px 1fr;
+      gap: 1.75rem;
     }
     @media (max-width: 1100px) {
       .two-col-grid { grid-template-columns: 1fr; }
     }
 
-    /* CARD PANEL STYLING */
+    /* CARD PANELS */
     .panel-card {
       background: #ffffff;
       border: 1px solid #e2e8f0;
       border-radius: 0.75rem;
       padding: 1.5rem;
-      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
     }
 
-    .panel-header-title {
-      font-size: 1.1rem;
-      font-weight: 700;
-      color: #0f172a;
+    /* FORM SECTION NUMBER HEADERS */
+    .form-num-section {
       margin-bottom: 1.25rem;
     }
-
-    /* FORM SECTION STYLING */
-    .form-num-section { margin-bottom: 1.15rem; }
     .form-num-title {
-      font-size: 0.85rem;
+      font-size: 0.82rem;
       font-weight: 700;
       color: #0f172a;
-      margin-bottom: 0.65rem;
       display: flex;
       align-items: center;
       gap: 0.45rem;
+      margin-bottom: 0.6rem;
+      text-transform: uppercase;
+      letter-spacing: 0.02em;
     }
     .num-circle {
-      width: 20px; height: 20px; border-radius: 50%; background: #16a34a; color: #ffffff;
-      font-size: 0.72rem; font-weight: 700; display: flex; align-items: center; justify-content: center;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: #16a34a;
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.7rem;
+      font-weight: 700;
     }
 
-    .dest-row { display: flex; gap: 0.75rem; align-items: center; }
-    .dest-thumb {
-      width: 100px; height: 64px; border-radius: 0.45rem; object-fit: cover; border: 1px solid #e2e8f0;
+    /* INPUT STYLING */
+    .input-box-wrapper {
+      position: relative;
+      display: flex;
+      align-items: center;
     }
-
-    .input-box-wrapper { position: relative; }
-    .input-box-wrapper .input-icon { position: absolute; left: 0.75rem; top: 50%; transform: translateY(-50%); color: #64748b; font-size: 0.88rem; }
-    .input-box-wrapper .input-suffix { position: absolute; right: 0.75rem; top: 50%; transform: translateY(-50%); color: #64748b; font-size: 0.8rem; }
+    .input-icon {
+      position: absolute;
+      left: 0.75rem;
+      color: #94a3b8;
+      font-size: 0.95rem;
+      pointer-events: none;
+    }
+    .input-suffix {
+      position: absolute;
+      right: 0.75rem;
+      color: #64748b;
+      font-size: 0.78rem;
+      font-weight: 500;
+      pointer-events: none;
+    }
     .ref-input {
-      width: 100%; padding: 0.6rem 0.75rem 0.6rem 2.2rem; border: 1px solid #cbd5e1; border-radius: 0.45rem; font-size: 0.88rem; color: #0f172a; background: #ffffff;
+      width: 100%;
+      height: 38px;
+      border: 1px solid #cbd5e1;
+      border-radius: 0.5rem;
+      padding: 0 2rem 0 2.2rem;
+      font-size: 0.88rem;
+      color: #0f172a;
+      background: #ffffff;
+      outline: none;
+      transition: all 0.15s ease;
     }
-    .ref-input:focus { outline: none; border-color: #16a34a; box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.12); }
+    .ref-input:focus {
+      border-color: #16a34a;
+      box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.12);
+    }
     .ref-input.no-icon { padding-left: 0.75rem; }
 
-    .spendable-banner {
-      background: #e6f4ea; border: 1px solid #c6e7ce; color: #137333; font-size: 0.82rem; font-weight: 600; padding: 0.5rem 0.75rem; border-radius: 0.45rem; margin-top: 0.6rem; display: flex; align-items: center; gap: 0.4rem;
+    .dest-row {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+    .dest-thumb {
+      width: 96px;
+      height: 60px;
+      border-radius: 0.5rem;
+      object-fit: cover;
+      border: 1px solid #cbd5e1;
+      flex-shrink: 0;
+      transition: opacity 0.2s ease;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
     }
 
-    .checkbox-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; margin-top: 0.4rem; }
-    .checkbox-label { display: flex; align-items: center; gap: 0.4rem; font-size: 0.82rem; color: #334155; cursor: pointer; }
+    .spendable-banner {
+      background: #f8fafc;
+      border: 1px dashed #cbd5e1;
+      border-radius: 0.4rem;
+      padding: 0.45rem 0.75rem;
+      font-size: 0.78rem;
+      color: #475569;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      margin-top: 0.4rem;
+    }
+
+    .checkbox-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.5rem;
+      margin-top: 0.4rem;
+    }
+    .checkbox-label {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-size: 0.82rem;
+      color: #334155;
+      cursor: pointer;
+    }
     .checkbox-label input { accent-color: #16a34a; }
 
     .btn-green-submit {
-      width: 100%; padding: 0.85rem; background: #16a34a; color: #ffffff; border: none; border-radius: 0.5rem; font-size: 0.95rem; font-weight: 600; cursor: pointer; margin-top: 1rem; display: flex; align-items: center; justify-content: center; gap: 0.45rem;
+      width: 100%;
+      height: 42px;
+      background: #16a34a;
+      color: #ffffff;
+      border: none;
+      border-radius: 0.5rem;
+      font-size: 0.92rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      margin-top: 1rem;
+      box-shadow: 0 2px 4px rgba(22, 163, 74, 0.2);
+      transition: all 0.15s ease;
     }
     .btn-green-submit:hover { background: #15803d; }
     .btn-green-submit:disabled { background: #94a3b8; cursor: not-allowed; }
 
-    /* RIGHT RESULT PANEL STYLING */
-    .result-header-row { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1.25rem; }
-    .result-header-row h2 { font-size: 1.15rem; font-weight: 700; color: #0f172a; display: flex; align-items: center; gap: 0.45rem; }
-    .result-header-row p { font-size: 0.78rem; color: #64748b; margin-top: 0.15rem; }
+    /* RIGHT COLUMN — RESULTS STYLES */
+    .result-header-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 1.25rem;
+    }
+    .result-header-row h2 { font-size: 1.2rem; font-weight: 700; color: #0f172a; display: flex; align-items: center; gap: 0.45rem; }
     .feasible-badge { background: #dcfce7; border: 1px solid #bbf7d0; color: #15803d; font-size: 0.76rem; font-weight: 600; padding: 0.25rem 0.65rem; border-radius: 2rem; }
 
     /* 4 METRIC CARDS ROW */
     .metrics-4-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.75rem; margin-bottom: 1.25rem; }
     @media (max-width: 768px) { .metrics-4-grid { grid-template-columns: 1fr 1fr; } }
-    .metric-mini-card { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 0.5rem; padding: 0.65rem 0.75rem; display: flex; align-items: center; gap: 0.6rem; }
-    .metric-mini-card .card-icon { width: 32px; height: 32px; border-radius: 0.4rem; background: #ffffff; border: 1px solid #e2e8f0; display: flex; align-items: center; justify-content: center; font-size: 0.95rem; flex-shrink: 0; }
-    .metric-mini-card label { font-size: 0.7rem; color: #64748b; display: block; font-weight: 500; }
-    .metric-mini-card .val { font-size: 0.92rem; font-weight: 700; color: #0f172a; margin-top: 0.1rem; }
+    .metric-mini-card { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 0.55rem; padding: 0.7rem 0.8rem; display: flex; align-items: center; gap: 0.65rem; }
+    .metric-mini-card .card-icon { width: 34px; height: 34px; border-radius: 0.45rem; background: #ffffff; border: 1px solid #e2e8f0; display: flex; align-items: center; justify-content: center; font-size: 1rem; flex-shrink: 0; }
+    .metric-mini-card label { font-size: 0.72rem; color: #64748b; display: block; font-weight: 500; }
+    .metric-mini-card .val { font-size: 0.95rem; font-weight: 700; color: #0f172a; margin-top: 0.15rem; }
 
     /* TABS STYLING */
     .tabs-header-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.85rem; }
-    .tabs-header-row h3 { font-size: 0.92rem; font-weight: 700; color: #0f172a; }
-    .tab-pills { display: flex; gap: 0.4rem; }
-    .tab-pill { background: #f1f5f9; border: 1px solid transparent; color: #475569; font-size: 0.76rem; font-weight: 500; padding: 0.25rem 0.65rem; border-radius: 2rem; cursor: pointer; }
+    .tabs-header-row h3 { font-size: 0.95rem; font-weight: 700; color: #0f172a; }
+    .tab-pills { display: flex; gap: 0.4rem; flex-wrap: wrap; }
+    .tab-pill { background: #f1f5f9; border: 1px solid transparent; color: #475569; font-size: 0.76rem; font-weight: 500; padding: 0.28rem 0.7rem; border-radius: 2rem; cursor: pointer; transition: all 0.15s ease; }
     .tab-pill.active { background: #16a34a; color: #ffffff; font-weight: 600; }
 
-    /* RESOURCE LIST TABLE */
-    .res-table-header { display: grid; grid-template-columns: 1fr 90px 70px 70px; padding: 0.4rem 0.75rem; font-size: 0.72rem; font-weight: 600; color: #94a3b8; border-bottom: 1px solid #f1f5f9; }
-    .res-item-row { display: grid; grid-template-columns: 1fr 90px 70px 70px; align-items: center; padding: 0.65rem 0.75rem; border-bottom: 1px solid #f8fafc; }
-    .res-item-row:last-child { border-bottom: none; }
-    .res-info { display: flex; align-items: center; gap: 0.65rem; }
-    .res-icon-thumb { width: 36px; height: 36px; border-radius: 0.4rem; background: #e2e8f0; display: flex; align-items: center; justify-content: center; font-size: 1rem; flex-shrink: 0; }
-    .res-title-text { font-size: 0.85rem; font-weight: 600; color: #0f172a; }
-    .res-sub-text { font-size: 0.72rem; color: #64748b; }
-    .res-cat-tag { font-size: 0.68rem; font-weight: 700; color: #16a34a; text-transform: uppercase; margin-bottom: 0.1rem; display: block; }
-    .res-val-col { font-size: 0.82rem; font-weight: 600; color: #334155; }
+    /* CATEGORY CARDS STYLING */
+    .res-cards-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      margin-top: 0.5rem;
+    }
+    .res-card-item {
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 0.65rem;
+      padding: 0.9rem 1rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 1rem;
+      transition: all 0.15s ease;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
+    }
+    .res-card-item:hover {
+      border-color: #cbd5e1;
+      box-shadow: 0 3px 6px rgba(0, 0, 0, 0.04);
+      background: #fbfcfd;
+    }
+    .res-card-left {
+      display: flex;
+      gap: 0.85rem;
+      align-items: flex-start;
+      flex: 1;
+      min-width: 0;
+    }
+    .res-cat-icon-box {
+      width: 42px;
+      height: 42px;
+      border-radius: 0.55rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.25rem;
+      flex-shrink: 0;
+    }
+    .icon-trans { background: #eff6ff; border: 1px solid #bfdbfe; color: #1d4ed8; }
+    .icon-stay { background: #fdf2f8; border: 1px solid #fbcfe8; color: #be185d; }
+    .icon-act { background: #f0fdf4; border: 1px solid #bbf7d0; color: #15803d; }
+    .icon-gear { background: #fff7ed; border: 1px solid #fed7aa; color: #c2410c; }
+
+    .res-card-details {
+      flex: 1;
+      min-width: 0;
+    }
+    .res-tag-row {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 0.25rem;
+      flex-wrap: wrap;
+    }
+    .badge-cat-tag {
+      font-size: 0.68rem;
+      font-weight: 700;
+      padding: 0.15rem 0.5rem;
+      border-radius: 0.3rem;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+    }
+    .tag-trans { background: #dbeafe; color: #1e40af; }
+    .tag-stay { background: #fce7f3; color: #9d174d; }
+    .tag-act { background: #dcfce7; color: #166534; }
+    .tag-gear { background: #ffedd5; color: #9a3412; }
+
+    .res-card-title {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: #0f172a;
+      line-height: 1.3;
+      margin-bottom: 0.25rem;
+    }
+    .res-card-desc {
+      font-size: 0.78rem;
+      color: #475569;
+      line-height: 1.4;
+      margin-bottom: 0.45rem;
+    }
+    .res-attributes-chips {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+    .attr-chip {
+      background: #f1f5f9;
+      border: 1px solid #e2e8f0;
+      color: #334155;
+      font-size: 0.75rem;
+      font-weight: 500;
+      padding: 0.2rem 0.55rem;
+      border-radius: 0.35rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+    }
+    .res-card-right {
+      text-align: right;
+      flex-shrink: 0;
+      padding-top: 0.1rem;
+    }
+    .res-price-main {
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: #0f172a;
+    }
+    .res-price-sub {
+      font-size: 0.72rem;
+      color: #64748b;
+      margin-top: 0.15rem;
+    }
 
     /* BOTTOM PILLS ROW */
     .bottom-pills-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-top: 1.25rem; }
-    .pill-stat-box { padding: 0.55rem 0.85rem; border-radius: 0.45rem; font-size: 0.8rem; font-weight: 600; display: flex; align-items: center; gap: 0.4rem; }
+    .pill-stat-box { padding: 0.6rem 0.9rem; border-radius: 0.5rem; font-size: 0.82rem; font-weight: 600; display: flex; align-items: center; gap: 0.45rem; }
     .pill-blue { background: #f0f9ff; border: 1px solid #bae6fd; color: #0369a1; }
     .pill-orange { background: #fff7ed; border: 1px solid #ffedd5; color: #c2410c; }
-    .pill-green-note { background: #f0fdf4; border: 1px solid #bbf7d0; color: #15803d; font-size: 0.8rem; font-weight: 500; text-align: center; padding: 0.55rem; border-radius: 0.45rem; margin-top: 0.75rem; }
+    .pill-green-note { background: #f0fdf4; border: 1px solid #bbf7d0; color: #15803d; font-size: 0.82rem; font-weight: 500; text-align: center; padding: 0.6rem; border-radius: 0.5rem; margin-top: 0.85rem; }
 
-    .alert-danger-box { background: #fef2f2; border: 1px solid #fecaca; color: #991b1b; padding: 0.75rem; border-radius: 0.45rem; font-size: 0.82rem; margin-bottom: 1rem; }
-    .alert-danger-box ul { margin-left: 1.2rem; margin-top: 0.2rem; }
+    .alert-danger-box { background: #fef2f2; border: 1px solid #fecaca; color: #991b1b; padding: 0.8rem; border-radius: 0.5rem; font-size: 0.84rem; margin-bottom: 1rem; }
+    .alert-danger-box ul { margin-left: 1.2rem; margin-top: 0.25rem; }
 
-    .comp-container { background: #ffffff; border: 1px solid #cbd5e1; border-radius: 0.65rem; padding: 1rem; margin-top: 1rem; }
-    .comp-table-ref { width: 100%; border-collapse: collapse; font-size: 0.78rem; margin-top: 0.5rem; }
-    .comp-table-ref th, .comp-table-ref td { padding: 0.5rem 0.6rem; border: 1px solid #cbd5e1; text-align: left; }
+    .comp-container { background: #ffffff; border: 1px solid #cbd5e1; border-radius: 0.75rem; padding: 1.2rem; margin-top: 1rem; box-shadow: 0 1px 3px rgba(0,0,0,0.04); }
+    .comp-table-ref { width: 100%; border-collapse: collapse; font-size: 0.8rem; margin-top: 0.6rem; }
+    .comp-table-ref th, .comp-table-ref td { padding: 0.55rem 0.7rem; border: 1px solid #cbd5e1; text-align: left; }
     .comp-table-ref th { background: #f1f5f9; color: #334155; font-weight: 600; }
   </style>
 </head>
 <body>
   <div class="reference-app-layout">
-    <!-- LEFT SIDEBAR -->
-    <aside className="app-sidebar" style="width: 240px; background: #ffffff; border-right: 1px solid #e2e8f0; display: flex; flex-direction: column; padding: 1.5rem 1rem; flex-shrink: 0;">
-      <div class="sidebar-brand">
-        <div class="logo-icon">🌴</div>
-        <div>
-          <div class="brand-title">Travel Planner</div>
-          <div class="brand-sub">Sri Lanka</div>
-        </div>
-      </div>
-
-      <ul class="nav-list">
-        <li class="nav-item"><span class="icon">🏠</span> Dashboard</li>
-        <li class="nav-item"><span class="icon">📍</span> Destinations</li>
-        <li class="nav-item"><span class="icon">🗺️</span> Trip Planning</li>
-        <li class="nav-item"><span class="icon">🎒</span> Resources</li>
-        <li class="nav-item active"><span class="icon">🟩</span> Resource Allocation</li>
-        <li class="nav-item"><span class="icon">📑</span> My Plans</li>
-        <li class="nav-item"><span class="icon">🎫</span> Bookings</li>
-        <li class="nav-item"><span class="icon">👤</span> Profile</li>
-        <li class="nav-item"><span class="icon">⚙️</span> Settings</li>
-      </ul>
-
-      <div class="sidebar-footer">
-        <div style="font-weight: 600; color: #475569; margin-bottom: 0.2rem;">Sri Lanka</div>
-        <div>Wonder of Asia</div>
-        <div style="margin-top: 0.5rem;">© 2025 Travel Planner</div>
-      </div>
-    </aside>
-
     <!-- MAIN WRAPPER -->
     <div class="main-wrapper">
-      <!-- TOP HEADER -->
+      <!-- TOP HEADER NAVBAR -->
       <header class="top-header">
-        <span class="menu-icon">☰</span>
+        <div class="header-brand">
+          <div class="logo-icon">🌴</div>
+          <div>
+            <div class="brand-title">Travel Planner</div>
+            <div class="brand-sub">Sri Lanka</div>
+          </div>
+        </div>
+
         <div class="user-area">
           <div class="user-greeting-badge">
             <span>🍃</span> Plan Smart, Travel Better
@@ -344,61 +479,60 @@
         <div class="title-header-row">
           <div>
             <h1>Intelligent Resource Allocation</h1>
-            <p>
-              Get the best travel resource plan within your budget, time and capacity
-              <span class="module-badge">Module 2</span>
-            </p>
+            <p>Smart, multi-constraint travel resource optimization for Sri Lanka <span class="module-badge">Module 2</span></p>
           </div>
 
           <button type="button" class="btn-outline-comp" onclick="toggleComparison()">
-            📊 Compare Algorithms
+            <span>⚡</span> Compare Planning Options
           </button>
         </div>
 
-        <!-- ALGORITHM COMPARISON DRAWER -->
-        <div id="compDrawer" class="comp-container" style="display: none; margin-bottom: 1.5rem;">
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
-            <h4 style="font-size: 0.9rem; color: #0f172a; font-weight: 700;">Algorithm Experimental Benchmark Comparison</h4>
-            <button type="button" id="compBtn" onclick="runBenchmark()" style="background: #16a34a; color: #fff; border: none; padding: 0.4rem 0.75rem; border-radius: 0.4rem; font-size: 0.78rem; cursor: pointer;">
-              ⚡ Run API Benchmark
-            </button>
-          </div>
+        <!-- COMPARISON DRAWER -->
+        <div id="compDrawer" style="display: none; margin-bottom: 1.5rem;">
+          <div class="comp-container">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.65rem;">
+              <div>
+                <h3 style="font-size: 0.95rem; font-weight: 700; color: #0f172a;">Compare Planning Strategies</h3>
+                <p style="font-size: 0.78rem; color: #64748b;">Evaluate trade-offs between Budget-First, Maximum Value, and Balanced Discovery approaches.</p>
+              </div>
+              <button type="button" id="compBtn" class="btn-outline-comp" onclick="runBenchmark()">
+                <span>⚡</span> Compare Options
+              </button>
+            </div>
 
-          <div id="compTableBox" style="display: none;">
-            <table class="comp-table-ref">
-              <thead>
-                <tr>
-                  <th>Algorithm Strategy</th>
-                  <th>Feasible</th>
-                  <th>Score (pts)</th>
-                  <th>Total Cost (LKR)</th>
-                  <th>Time Used</th>
-                  <th>Weight Used</th>
-                  <th>Latency</th>
-                </tr>
-              </thead>
-              <tbody id="compTbody"></tbody>
-            </table>
+            <div id="compTableBox" style="display: none; overflow-x: auto;">
+              <table class="comp-table-ref">
+                <thead>
+                  <tr>
+                    <th>Strategy</th>
+                    <th>Status</th>
+                    <th>Total Cost</th>
+                    <th>Travel Time</th>
+                    <th>Equipment Weight</th>
+                    <th>Execution Time</th>
+                  </tr>
+                </thead>
+                <tbody id="compTbody"></tbody>
+              </table>
+            </div>
           </div>
         </div>
 
-        <!-- TWO COLUMN MAIN LAYOUT -->
+        <!-- MAIN 2-COLUMN WORKSPACE -->
         <div class="two-col-grid">
-          <!-- LEFT COLUMN — Allocation Request -->
+          <!-- LEFT COLUMN — Form Configuration -->
           <div class="panel-card">
-            <h2 class="panel-header-title">Allocation Request</h2>
-
             <div id="errorAlert" class="alert-danger-box" style="display: none;"></div>
 
-            <form id="travelForm" onsubmit="submitForm(event)">
-              <!-- 1. Trip Information -->
+            <form id="resourceForm" onsubmit="submitForm(event)">
+              <!-- 1. Trip & Destination Context -->
               <div class="form-num-section">
                 <div class="form-num-title">
-                  <span class="num-circle">1</span> Trip Information
+                  <span class="num-circle">1</span> Trip & Destination Context
                 </div>
 
                 <div style="margin-bottom: 0.65rem;">
-                  <label style="font-size: 0.78rem; color: #475569; display: block; margin-bottom: 0.3rem; font-weight: 500;">Destination</label>
+                  <label style="font-size: 0.78rem; color: #475569; display: block; margin-bottom: 0.3rem; font-weight: 500;">Destination City</label>
                   <div class="dest-row">
                     <select id="destination" class="ref-input no-icon" style="flex: 1;" onchange="updateDestImage()">
                       <option value="Ella">📍 Ella</option>
@@ -411,9 +545,10 @@
                     </select>
                     <img 
                       id="destImg"
-                      src="https://images.unsplash.com/photo-1546708973-b339540b5162?auto=format&fit=crop&w=200&q=80" 
-                      alt="Sri Lanka Destination" 
+                      src="/images/destinations/ella.jpg" 
+                      alt="Nine Arch Bridge, Ella, Sri Lanka" 
                       class="dest-thumb" 
+                      title="Nine Arch Bridge, Ella"
                     />
                   </div>
                 </div>
@@ -503,35 +638,35 @@
                     <input type="checkbox" id="transportTrain" checked />
                     Train
                   </label>
-                  <label className="checkbox-label">
+                  <label class="checkbox-label">
                     <input type="checkbox" id="transportBus" checked />
                     Bus
                   </label>
-                  <label className="checkbox-label">
+                  <label class="checkbox-label">
                     <input type="checkbox" id="transportTukTuk" />
                     Tuk Tuk
                   </label>
-                  <label className="checkbox-label">
+                  <label class="checkbox-label">
                     <input type="checkbox" id="transportTaxi" />
                     Private Vehicle
                   </label>
                 </div>
               </div>
 
-              <!-- Advanced Option -->
+              <!-- Advanced Preferences -->
               <div>
                 <button type="button" onclick="toggleAdvanced()" style="background: none; border: none; color: #16a34a; font-size: 0.78rem; font-weight: 600; cursor: pointer;">
-                  <span id="advText">⚙️ Advanced Algorithm Selection</span>
+                  <span id="advText">⚙️ Advanced Planning Preferences</span>
                 </button>
               </div>
 
               <div id="advancedBox" style="display: none; background: #f8fafc; padding: 0.65rem; border-radius: 0.4rem; border: 1px solid #e2e8f0; margin-top: 0.35rem;">
-                <label style="font-size: 0.75rem; font-weight: 600; color: #334155;">Optimization Strategy</label>
+                <label style="font-size: 0.75rem; font-weight: 600; color: #334155;">Planning Optimization Mode</label>
                 <select id="selectedAlgorithm" class="ref-input no-icon" style="margin-top: 0.2rem; padding: 0.45rem;">
-                  <option value="PIPELINE" selected>Multi-Stage Pipeline (Greedy + DP + Genetic) - Recommended</option>
-                  <option value="DYNAMIC_PROGRAMMING">Dynamic Programming Algorithm (Exact Optimal)</option>
-                  <option value="GREEDY">Greedy Algorithm (Fast Heuristic Ratio)</option>
-                  <option value="GENETIC">Genetic Algorithm (Evolutionary Optimization)</option>
+                  <option value="PIPELINE" selected>Smart Multi-Tier Optimizer (Recommended - Best Balance)</option>
+                  <option value="DYNAMIC_PROGRAMMING">Maximum Value Focus (Best Resource Utilization)</option>
+                  <option value="GREEDY">Budget-First Focus (High Value-to-Cost Priority)</option>
+                  <option value="GENETIC">Flexible Discovery Focus (Diverse Experience Mix)</option>
                 </select>
               </div>
 
@@ -547,9 +682,11 @@
             <div class="result-header-row">
               <div>
                 <h2 id="planTitle">🛡️ Your Travel Resource Plan</h2>
-                <p>Generated using <strong id="algoSubText" style="color: #16a34a;">Dynamic Programming Algorithm</strong></p>
+                <div style="margin-top: 0.35rem; display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+                  <span style="background: #e0f2fe; color: #0369a1; font-size: 0.74rem; font-weight: 700; padding: 0.2rem 0.55rem; border-radius: 0.3rem;">Allocation Pipeline</span>
+                </div>
               </div>
-              <span id="feasibleBadge" class="feasible-badge" style="display: none;">Feasible Plan Found</span>
+              <span id="feasibleBadge" class="feasible-badge" style="display: none;">✅ Feasible Plan Found</span>
             </div>
 
             <div id="placeholderView" style="text-align: center; color: #94a3b8; padding: 4rem 1rem;">
@@ -607,7 +744,7 @@
 
               <!-- SELECTED RESOURCES HEADER & CATEGORY TABS -->
               <div class="tabs-header-row">
-                <h3>Selected Resources</h3>
+                <h3>Selected Resources (<span id="totalResCount">0</span>)</h3>
                 <div class="tab-pills">
                   <button type="button" id="tabALL" class="tab-pill active" onclick="setTab('ALL')">All (0)</button>
                   <button type="button" id="tabTRANSPORTATION" class="tab-pill" onclick="setTab('TRANSPORTATION')">Transportation (0)</button>
@@ -617,20 +754,13 @@
                 </div>
               </div>
 
-              <!-- RESOURCE LIST TABLE -->
-              <div class="res-table-header">
-                <span>ITEM & DETAILS</span>
-                <span style="text-align: right;">COST (LKR)</span>
-                <span style="text-align: right;">TIME</span>
-                <span style="text-align: right;">WEIGHT</span>
-              </div>
-
-              <div id="resListContainer"></div>
+              <!-- RESOURCE CARDS LIST -->
+              <div id="resListContainer" class="res-cards-list"></div>
 
               <!-- BOTTOM PILLS ROW -->
               <div class="bottom-pills-grid">
                 <div id="weightPill" class="pill-stat-box pill-blue">
-                  <span>🎒</span> Total Weight Used: 0.0 kg / 15 kg
+                  <span>🎒</span> Equipment Weight: 0.0 kg / 15 kg
                 </div>
 
                 <div id="timePill" class="pill-stat-box pill-blue">
@@ -656,22 +786,32 @@
     let inputReserve = 5000;
     let inputHours = 12;
     let inputWeight = 15;
+    let currentTripDays = 3;
+    let currentTravellers = 2;
 
     const destImages = {
-      'Ella': 'https://images.unsplash.com/photo-1546708973-b339540b5162?auto=format&fit=crop&w=200&q=80',
-      'Kandy': 'https://images.unsplash.com/photo-1586861635167-e5223aadc9fe?auto=format&fit=crop&w=200&q=80',
-      'Nuwara Eliya': 'https://images.unsplash.com/photo-1588258524675-c6191b920bf8?auto=format&fit=crop&w=200&q=80',
-      'Sigiriya': 'https://images.unsplash.com/photo-1588598198321-9735fd52455b?auto=format&fit=crop&w=200&q=80',
-      'Galle': 'https://images.unsplash.com/photo-1552465011-b4e21bf6e79a?auto=format&fit=crop&w=200&q=80',
-      'Mirissa': 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=200&q=80',
-      'Colombo': 'https://images.unsplash.com/photo-1578662996442-48f60103fc96?auto=format&fit=crop&w=200&q=80'
+      'Ella': { src: '/images/destinations/ella.jpg', title: 'Nine Arch Bridge, Ella' },
+      'Kandy': { src: '/images/destinations/kandy.jpg', title: 'Temple of the Tooth (Sri Dalada Maligawa), Kandy' },
+      'Nuwara Eliya': { src: '/images/destinations/nuwara-eliya.jpg', title: 'Historic Post Office & Tea Country, Nuwara Eliya' },
+      'Sigiriya': { src: '/images/destinations/sigiriya.jpg', title: 'Sigiriya Ancient Rock Fortress' },
+      'Galle': { src: '/images/destinations/galle.jpg', title: 'Galle Fort Lighthouse & Ramparts' },
+      'Mirissa': { src: '/images/destinations/mirissa.jpg', title: 'Coconut Tree Hill, Mirissa' },
+      'Colombo': { src: '/images/destinations/colombo.jpg', title: 'Lotus Tower, Colombo' }
     };
 
     function updateDestImage() {
-      const dest = document.getElementById('destination').value;
+      const destSelect = document.getElementById('destination');
+      if (!destSelect) return;
+      const dest = destSelect.value;
       const img = document.getElementById('destImg');
       if (img && destImages[dest]) {
-        img.src = destImages[dest];
+        img.style.opacity = '0.3';
+        setTimeout(() => {
+          img.src = destImages[dest].src;
+          img.alt = destImages[dest].title;
+          img.title = destImages[dest].title;
+          img.style.opacity = '1';
+        }, 120);
       }
     }
 
@@ -731,6 +871,8 @@
       inputReserve = emergencyReserve;
       inputHours = availableHours;
       inputWeight = luggageCapacity;
+      currentTripDays = tripDurationDays;
+      currentTravellers = travellerCount;
 
       submitBtn.disabled = true;
       submitBtn.innerHTML = '<span>🎯</span> Generating Travel Plan...';
@@ -772,7 +914,7 @@
       const compTbody = document.getElementById('compTbody');
 
       compBtn.disabled = true;
-      compBtn.innerText = 'Running Benchmark...';
+      compBtn.innerText = 'Evaluating Options...';
       compBox.style.display = 'none';
 
       const destination = document.getElementById('destination').value;
@@ -804,9 +946,9 @@
         ]);
 
         const results = [
-          { name: 'Greedy Algorithm', data: greedyData },
-          { name: 'Dynamic Programming', data: dpData },
-          { name: 'Genetic Algorithm', data: geneticData }
+          { name: 'Budget-First Strategy (Greedy)', data: greedyData },
+          { name: 'Optimal Value Strategy (DP)', data: dpData },
+          { name: 'Balanced Discovery Strategy (GA)', data: geneticData }
         ];
 
         compTbody.innerHTML = '';
@@ -815,7 +957,6 @@
           tr.innerHTML = `
             <td><strong>${item.name}</strong></td>
             <td>${item.data.feasible ? '✅ Feasible' : '❌ Infeasible'}</td>
-            <td><strong style="color: #16a34a;">${item.data.overallScore ? item.data.overallScore.toFixed(1) : 0}</strong></td>
             <td>LKR ${item.data.totalCost ? item.data.totalCost.toLocaleString() : 0}</td>
             <td>${item.data.totalTimeUsed ? item.data.totalTimeUsed.toFixed(1) : 0} h</td>
             <td>${item.data.totalWeight ? item.data.totalWeight.toFixed(1) : 0} kg</td>
@@ -829,20 +970,20 @@
         console.error(err);
       } finally {
         compBtn.disabled = false;
-        compBtn.innerText = '⚡ Run API Benchmark';
+        compBtn.innerText = '⚡ Compare Options';
       }
     }
 
     function getSubLabel(res) {
       if (res.description && res.description.trim().length > 0) return res.description;
-      if (res.name.includes('Scenic Train')) return 'First Class Reserved Seats';
-      if (res.name.includes('Local Tuk Tuk') || res.name.includes('Tuk-Tuk')) return 'Transport for local travel';
-      if (res.name.includes('Hotel') || res.name.includes('Resort') || res.name.includes('Villa')) return 'Comfortable Room Accommodation';
-      if (res.name.includes('Hiking') || res.name.includes('Hike') || res.name.includes('Trek')) return 'Guided hiking experience';
-      if (res.name.includes('Falls') || res.name.includes('Safari')) return 'Scenic nature experience';
-      if (res.name.includes('Backpack')) return 'High quality travel backpack';
-      if (res.name.includes('First Aid')) return 'Basic medical supplies';
-      if (res.name.includes('Power Bank')) return 'Portable charger';
+      if (res.name.includes('Scenic Train')) return 'First class reserved observation seats';
+      if (res.name.includes('Local Tuk Tuk') || res.name.includes('Tuk-Tuk')) return 'Unlimited transport around local attractions';
+      if (res.name.includes('Hotel') || res.name.includes('Resort') || res.name.includes('Villa')) return 'Comfortable room accommodation';
+      if (res.name.includes('Hiking') || res.name.includes('Hike') || res.name.includes('Trek')) return 'Scenic guided trekking experience';
+      if (res.name.includes('Falls') || res.name.includes('Safari')) return 'Natural wildlife and scenic expedition';
+      if (res.name.includes('Backpack')) return 'High-capacity durable travel backpack';
+      if (res.name.includes('First Aid')) return 'Emergency medical supplies';
+      if (res.name.includes('Power Bank')) return 'Portable fast charger';
       return res.category === 'TRANSPORTATION' ? 'Transportation' : 'Travel Option';
     }
 
@@ -856,8 +997,11 @@
       document.getElementById('resultView').style.display = 'block';
 
       const destName = (data.tripInformation && data.tripInformation.destination) ? data.tripInformation.destination : document.getElementById('destination').value;
-      const durationDays = (data.tripInformation && data.tripInformation.tripDurationDays) ? data.tripInformation.tripDurationDays : (document.getElementById('tripDurationDays') ? document.getElementById('tripDurationDays').value : 3);
-      const travellers = (data.tripInformation && data.tripInformation.travellerCount) ? data.tripInformation.travellerCount : (document.getElementById('travellerCount') ? document.getElementById('travellerCount').value : 2);
+      const durationDays = (data.tripInformation && data.tripInformation.tripDurationDays) ? data.tripInformation.tripDurationDays : (document.getElementById('tripDurationDays') ? parseInt(document.getElementById('tripDurationDays').value) : 3);
+      const travellers = (data.tripInformation && data.tripInformation.travellerCount) ? data.tripInformation.travellerCount : (document.getElementById('travellerCount') ? parseInt(document.getElementById('travellerCount').value) : 2);
+
+      currentTripDays = durationDays;
+      currentTravellers = travellers;
 
       const titleElem = document.getElementById('planTitle');
       if (titleElem) {
@@ -869,11 +1013,6 @@
       document.getElementById('bannerDuration').innerHTML = `<strong>📅 Duration:</strong> ${durationDays} Days (${data.timeSummary ? data.timeSummary.totalAvailableTime : inputHours}h)`;
       document.getElementById('bannerTravellers').innerHTML = `<strong>👥 Travellers:</strong> ${travellers} Persons`;
 
-      const algoLabel = (data.algorithmUsed === 'PIPELINE' || selectedAlgorithm === 'PIPELINE')
-        ? 'Multi-Stage Pipeline (Greedy + DP + GA)'
-        : (data.algorithmUsed || selectedAlgorithm);
-      const scoreText = data.overallScore ? ` • Utility Score: ${data.overallScore.toFixed(1)} pts` : '';
-      document.getElementById('algoSubText').innerText = `${algoLabel}${scoreText}`;
       document.getElementById('feasibleBadge').style.display = data.feasible ? 'inline-block' : 'none';
 
       document.getElementById('totalBudgetVal').innerText = `LKR ${inputBudget.toLocaleString()}`;
@@ -881,19 +1020,25 @@
       document.getElementById('reserveVal').innerText = `LKR ${inputReserve.toLocaleString()}`;
       document.getElementById('remBudgetVal').innerText = `LKR ${data.remainingBudget.toLocaleString()}`;
 
-      // Tab Counts
+      // Tab Counts calculated from actual API response
       const list = data.selectedResources || [];
+      const transCount = list.filter(r => getDisplayCategory(r) === 'TRANSPORTATION').length;
+      const accCount = list.filter(r => getDisplayCategory(r) === 'ACCOMMODATION').length;
+      const actCount = list.filter(r => getDisplayCategory(r) === 'ACTIVITY').length;
+      const eqCount = list.filter(r => getDisplayCategory(r) === 'PHYSICAL_ITEM').length;
+
+      document.getElementById('totalResCount').innerText = list.length;
       document.getElementById('tabALL').innerText = `All (${list.length})`;
-      document.getElementById('tabTRANSPORTATION').innerText = `Transportation (${list.filter(r => getDisplayCategory(r) === 'TRANSPORTATION').length})`;
-      document.getElementById('tabACCOMMODATION').innerText = `Accommodation (${list.filter(r => getDisplayCategory(r) === 'ACCOMMODATION').length})`;
-      document.getElementById('tabACTIVITIES').innerText = `Activities (${list.filter(r => getDisplayCategory(r) === 'ACTIVITY').length})`;
-      document.getElementById('tabEQUIPMENT').innerText = `Equipment (${list.filter(r => getDisplayCategory(r) === 'PHYSICAL_ITEM').length})`;
+      document.getElementById('tabTRANSPORTATION').innerText = `Transportation (${transCount})`;
+      document.getElementById('tabACCOMMODATION').innerText = `Accommodation (${accCount})`;
+      document.getElementById('tabACTIVITIES').innerText = `Activities (${actCount})`;
+      document.getElementById('tabEQUIPMENT').innerText = `Equipment (${eqCount})`;
 
       renderResources(list);
 
-      // Bottom Pills
+      // Bottom Pills - Equipment Weight display (Req 8)
       const remCapText = data.physicalResourceSummary ? ` (Rem: ${data.physicalResourceSummary.remainingCapacity.toFixed(1)} kg)` : '';
-      document.getElementById('weightPill').innerHTML = `<span>🎒</span> Total Weight Used: ${data.totalWeight.toFixed(1)} kg / ${inputWeight} kg${remCapText}`;
+      document.getElementById('weightPill').innerHTML = `<span>🎒</span> Equipment Weight: ${data.totalWeight.toFixed(1)} kg / ${inputWeight} kg${remCapText}`;
 
       const timePill = document.getElementById('timePill');
       const timeBreakdown = data.timeSummary ? ` (Transit: ${data.timeSummary.transportationTime.toFixed(1)}h, Activities: ${data.timeSummary.activityTime.toFixed(1)}h)` : '';
@@ -932,32 +1077,110 @@
 
       filtered.forEach(res => {
         const cat = getDisplayCategory(res);
-        const icon = cat === 'TRANSPORTATION' ? (res.name.includes('Tuk') ? '🛺' : res.name.includes('Bus') || res.name.includes('Coach') ? '🚌' : '🚆') : cat === 'ACCOMMODATION' ? '🏨' : cat === 'ACTIVITY' ? '⛰️' : '🎒';
-        const isHighlight = (res.usefulness && res.usefulness >= 92) ? '<span style="background:#fef3c7; color:#92400e; font-size:0.68rem; font-weight:700; padding:1px 6px; border-radius:4px; margin-left:6px;">⭐ Top Highlight</span>' : '';
+        const nights = currentTripDays || 3;
+        const travellers = currentTravellers || 2;
 
-        const row = document.createElement('div');
-        row.className = 'res-item-row';
-        row.innerHTML = `
-          <div class="res-info">
-            <div class="res-icon-thumb">${icon}</div>
-            <div>
-              <div style="display:flex; align-items:center;">
-                <span class="res-cat-tag">${cat === 'PHYSICAL_ITEM' ? 'EQUIPMENT' : cat}</span>
+        let icon = '🎒';
+        let iconClass = 'icon-gear';
+        let tagClass = 'tag-gear';
+        let catLabel = 'Equipment';
+        let chipsHtml = '';
+        let priceMain = `LKR ${res.cost.toLocaleString()}`;
+        let priceSub = '';
+
+        if (cat === 'TRANSPORTATION') {
+          catLabel = 'Transportation';
+          tagClass = 'tag-trans';
+          iconClass = 'icon-trans';
+          icon = res.name.toLowerCase().includes('tuk') ? '🛺' 
+               : res.name.toLowerCase().includes('bus') ? '🚌' 
+               : res.name.toLowerCase().includes('train') ? '🚆' : '🚗';
+
+          chipsHtml = `
+            <span class="attr-chip">⏱️ ${res.durationHours > 0 ? `${res.durationHours.toFixed(1)} hours` : 'Direct'}</span>
+            <span class="attr-chip">👥 Capacity: ${res.capacity ? `${res.capacity} people` : 'Standard'}</span>
+            <span class="attr-chip">🚗 ${res.transportType || 'Transit'}</span>
+          `;
+          priceSub = 'Allocated transit fare';
+        } 
+        else if (cat === 'ACCOMMODATION') {
+          catLabel = 'Accommodation';
+          tagClass = 'tag-stay';
+          iconClass = 'icon-stay';
+          icon = '🏨';
+
+          const ratePerNight = Math.round(res.cost / Math.max(1, nights));
+          chipsHtml = `
+            <span class="attr-chip">📅 ${nights} nights</span>
+            <span class="attr-chip">👥 Capacity: ${res.capacity ? `${res.capacity} guests` : 'Room capacity'}</span>
+            <span class="attr-chip">💵 LKR ${ratePerNight.toLocaleString()} / night</span>
+          `;
+          priceMain = `LKR ${res.cost.toLocaleString()} total`;
+          priceSub = `Total for ${nights} nights`;
+        } 
+        else if (cat === 'ACTIVITY') {
+          catLabel = 'Activity';
+          tagClass = 'tag-act';
+          iconClass = 'icon-act';
+          icon = res.name.toLowerCase().includes('water') || res.name.toLowerCase().includes('falls') || res.name.toLowerCase().includes('beach') || res.name.toLowerCase().includes('surf') ? '🌊'
+               : res.name.toLowerCase().includes('temple') || res.name.toLowerCase().includes('heritage') || res.name.toLowerCase().includes('fort') ? '🏛️' : '⛰️';
+
+          const perPersonText = travellers > 1 ? ` (${travellers} travellers • LKR ${Math.round(res.cost / travellers).toLocaleString()}/person)` : '';
+          chipsHtml = `
+            <span class="attr-chip">⏱️ ${res.durationHours.toFixed(1)} hours</span>
+            <span class="attr-chip">👥 ${travellers > 1 ? `For ${travellers} travellers` : 'Per ticket'}</span>
+          `;
+          priceMain = `LKR ${res.cost.toLocaleString()}`;
+          priceSub = travellers > 1 ? `Total group cost` : 'Activity fee';
+        } 
+        else if (cat === 'PHYSICAL_ITEM') {
+          catLabel = 'Equipment';
+          tagClass = 'tag-gear';
+          iconClass = 'icon-gear';
+          icon = res.name.toLowerCase().includes('shoe') || res.name.toLowerCase().includes('pole') ? '🥾'
+               : res.name.toLowerCase().includes('medical') || res.name.toLowerCase().includes('first aid') ? '🩹'
+               : res.name.toLowerCase().includes('power') || res.name.toLowerCase().includes('torch') || res.name.toLowerCase().includes('lamp') ? '🔦' : '🎒';
+
+          const qualityBadge = (res.usefulness && res.usefulness >= 90) ? '⭐ Highly Recommended' : 'Essential Gear';
+          chipsHtml = `
+            <span class="attr-chip">🎒 ${res.weightKg > 0 ? `${res.weightKg.toFixed(1)} kg` : '0.2 kg'}</span>
+            <span class="attr-chip">${qualityBadge}</span>
+          `;
+          priceSub = 'Item cost / rental';
+        }
+
+        const isHighlight = (res.usefulness && res.usefulness >= 92) ? '<span style="background:#fef3c7; color:#92400e; font-size:0.68rem; font-weight:700; padding:1px 6px; border-radius:4px; margin-left:6px;">⭐ Top Pick</span>' : '';
+
+        const card = document.createElement('div');
+        card.className = 'res-card-item';
+        card.innerHTML = `
+          <div class="res-card-left">
+            <div class="res-cat-icon-box ${iconClass}">${icon}</div>
+            <div class="res-card-details">
+              <div class="res-tag-row">
+                <span class="badge-cat-tag ${tagClass}">${catLabel}</span>
                 ${isHighlight}
               </div>
-              <div class="res-title-text">${res.name}</div>
-              <div class="res-sub-text" style="line-height: 1.35; margin-top: 3px; color: #475569;">${getSubLabel(res)}</div>
+              <div class="res-card-title">${res.name}</div>
+              <div class="res-card-desc">${getSubLabel(res)}</div>
+              <div class="res-attributes-chips">
+                ${chipsHtml}
+              </div>
             </div>
           </div>
-          <div class="res-val-col" style="text-align: right;">${res.cost.toLocaleString()}</div>
-          <div class="res-val-col" style="text-align: right;">${res.durationHours > 0 ? `${res.durationHours.toFixed(1)} h` : '-'}</div>
-          <div class="res-val-col" style="text-align: right;">${res.weightKg > 0 ? `${res.weightKg.toFixed(1)} kg` : '0.0 kg'}</div>
+          <div class="res-card-right">
+            <div class="res-price-main">${priceMain}</div>
+            <div class="res-price-sub">${priceSub}</div>
+          </div>
         `;
-        container.appendChild(row);
+        container.appendChild(card);
       });
     }
+
+    // Initialize initial destination image on load
+    document.addEventListener('DOMContentLoaded', () => {
+      updateDestImage();
+    });
   </script>
 </body>
 </html>
-
-
