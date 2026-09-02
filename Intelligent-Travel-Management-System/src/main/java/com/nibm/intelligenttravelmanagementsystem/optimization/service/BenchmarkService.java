@@ -13,15 +13,21 @@ public class BenchmarkService {
     private final BranchAndBoundOptimizer branchAndBoundOptimizer;
     private final ParetoFrontierOptimizer paretoFrontierOptimizer;
     private final GeneticRouteOptimizer geneticRouteOptimizer;
+    private final KnapsackOptimizer knapsackOptimizer;
+    private final ModuleIntegrationService moduleIntegrationService;
     private final OptimizationService optimizationService;
 
     public BenchmarkService(BranchAndBoundOptimizer branchAndBoundOptimizer,
                             ParetoFrontierOptimizer paretoFrontierOptimizer,
                             GeneticRouteOptimizer geneticRouteOptimizer,
+                            KnapsackOptimizer knapsackOptimizer,
+                            ModuleIntegrationService moduleIntegrationService,
                             OptimizationService optimizationService) {
         this.branchAndBoundOptimizer = branchAndBoundOptimizer;
         this.paretoFrontierOptimizer = paretoFrontierOptimizer;
         this.geneticRouteOptimizer = geneticRouteOptimizer;
+        this.knapsackOptimizer = knapsackOptimizer;
+        this.moduleIntegrationService = moduleIntegrationService;
         this.optimizationService = optimizationService;
     }
 
@@ -114,64 +120,85 @@ public class BenchmarkService {
             metricsMap.put(algo.getName(), dto);
         }
 
+        // Also evaluate Knapsack Dynamic Programming on integrated candidate set
+        if (knapsackOptimizer != null && moduleIntegrationService != null) {
+            List<IntegratedCandidate> candidates = moduleIntegrationService.collectIntegratedCandidates(req, graph);
+            KnapsackOptimizer.KnapsackResult knapRes = knapsackOptimizer.solve(candidates, req);
+            BenchmarkResponse.AlgorithmMetricDTO knapDTO = BenchmarkResponse.AlgorithmMetricDTO.builder()
+                    .algorithmName(knapsackOptimizer.getName())
+                    .executionTimeMs(knapRes.getExecutionTimeMs())
+                    .memoryUsedKb(knapRes.getMemoryUsedKb())
+                    .bestCompositeScore(knapRes.getTotalUtility())
+                    .totalDurationMinutes(knapRes.getTotalDurationMinutes())
+                    .totalCostLkr((int) knapRes.getTotalCost())
+                    .nodesExplored(knapRes.getStatesEvaluated())
+                    .foundValidPath(!knapRes.getSelectedCandidates().isEmpty())
+                    .build();
+            metricsMap.put(knapsackOptimizer.getName(), knapDTO);
+        }
+
         return BenchmarkResponse.builder()
                 .scenarioName(scenarioName)
                 .networkNodesCount(graph.getNodeCount())
                 .networkEdgesCount(graph.getEdgeCount())
-                .sourceNodeId(req.getSourceNodeId())
-                .destinationNodeId(req.getDestinationNodeId())
                 .algorithmMetrics(metricsMap)
                 .build();
     }
 
-    private TravelGraph generateSyntheticNetwork(int numNodes, int numEdges) {
+    private TravelGraph generateSyntheticNetwork(int nodeCount, int edgeCount) {
         TravelGraph graph = new TravelGraph();
-        Random rng = new Random(100);
+        Random rng = new Random(42);
 
-        for (int i = 0; i < numNodes; i++) {
+        for (int i = 0; i < nodeCount; i++) {
             graph.addNode(TravelNode.builder()
                     .nodeId("N_" + i)
-                    .name("Station " + i)
-                    .latitude(6.0 + rng.nextDouble() * 3.0)
-                    .longitude(79.5 + rng.nextDouble() * 2.0)
+                    .name("Waypoint " + i)
+                    .nodeType("SYNTHETIC")
+                    .province("Province_" + (i % 5))
+                    .latitude(6.0 + rng.nextDouble() * 3.5)
+                    .longitude(79.5 + rng.nextDouble() * 2.5)
                     .build());
         }
 
-        for (int i = 0; i < numNodes - 1; i++) {
-            addEdge(graph, "N_" + i, "N_" + (i + 1), rng);
+        for (int i = 0; i < nodeCount - 1; i++) {
+            addSyntheticEdge(graph, "E_SPINE_" + i, "N_" + i, "N_" + (i + 1), rng);
         }
 
-        for (int i = 0; i < numEdges - (numNodes - 1); i++) {
-            int u = rng.nextInt(numNodes);
-            int v = rng.nextInt(numNodes);
+        int remainingEdges = edgeCount - (nodeCount - 1);
+        for (int e = 0; e < remainingEdges; e++) {
+            int u = rng.nextInt(nodeCount);
+            int v = rng.nextInt(nodeCount);
             if (u != v) {
-                addEdge(graph, "N_" + u, "N_" + v, rng);
+                addSyntheticEdge(graph, "E_RAND_" + e, "N_" + u, "N_" + v, rng);
             }
         }
 
         return graph;
     }
 
-    private void addEdge(TravelGraph g, String u, String v, Random rng) {
-        double dist = 10.0 + rng.nextDouble() * 50.0;
-        int time = (int) (dist * (0.8 + rng.nextDouble() * 0.8));
-        int cost = (int) (dist * (15.0 + rng.nextDouble() * 20.0));
-        int quality = 1 + rng.nextInt(5);
-        int traffic = 1 + rng.nextInt(5);
-        int risk = 1 + rng.nextInt(4);
+    private void addSyntheticEdge(TravelGraph g, String id, String u, String v, Random rng) {
+        double dist = Math.round((10.0 + rng.nextDouble() * 120.0) * 10.0) / 10.0;
+        int time = (int) (dist * (1.2 + rng.nextDouble() * 0.8));
+        int cost = (int) (dist * 40.0 + rng.nextInt(500));
+        int qual = 1 + rng.nextInt(5);
+        int traf = 1 + rng.nextInt(4);
+        int acc = 1 + rng.nextInt(5);
+        int risk = 1 + rng.nextInt(3);
 
         g.addEdge(TravelEdge.builder()
-                .edgeId("E_" + u + "_" + v + "_" + rng.nextInt(1000))
-                .source(u)
-                .destination(v)
-                .distanceKm(dist)
-                .travelTimeMinutes(time)
-                .estimatedCostLkr(cost)
-                .roadQuality(quality)
-                .trafficLevel(traffic)
-                .transportMode("ROAD")
-                .accessibility(3)
-                .riskLevel(risk)
+                .edgeId(id + "_F")
+                .source(u).destination(v)
+                .distanceKm(dist).travelTimeMinutes(time).estimatedCostLkr(cost)
+                .roadQuality(qual).trafficLevel(traf).transportMode("ROAD")
+                .accessibility(acc).riskLevel(risk)
+                .build());
+
+        g.addEdge(TravelEdge.builder()
+                .edgeId(id + "_R")
+                .source(v).destination(u)
+                .distanceKm(dist).travelTimeMinutes(time).estimatedCostLkr(cost)
+                .roadQuality(qual).trafficLevel(traf).transportMode("ROAD")
+                .accessibility(acc).riskLevel(risk)
                 .build());
     }
 }

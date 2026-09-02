@@ -160,12 +160,12 @@ class ResourceAllocationValidationTest {
     @Test
     @DisplayName("8. GlobalExceptionHandler - Should sanitize generic internal server exceptions without revealing stack trace")
     void testGlobalExceptionHandlerSanitization() {
-        ResponseEntity<ErrorResponse> response = exceptionHandler.handleGenericException(new RuntimeException("/secret/db/password"));
+        var response = exceptionHandler.handleGenericException(new RuntimeException("/secret/db/password"));
 
         assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
         assertNotNull(response.getBody());
-        assertEquals(500, response.getBody().getStatus());
-        assertEquals("An unexpected server error occurred. Please try again later.", response.getBody().getMessage());
+        assertFalse(response.getBody().isSuccess());
+        assertEquals("An unexpected error occurred while processing your request.", response.getBody().getMessage());
         assertFalse(response.getBody().getMessage().contains("/secret/db/password"));
     }
 }

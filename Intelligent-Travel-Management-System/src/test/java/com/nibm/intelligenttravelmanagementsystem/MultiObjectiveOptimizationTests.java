@@ -5,6 +5,7 @@ import com.nibm.intelligenttravelmanagementsystem.optimization.dto.OptimizationR
 import com.nibm.intelligenttravelmanagementsystem.optimization.dto.OptimizationResponse;
 import com.nibm.intelligenttravelmanagementsystem.optimization.model.*;
 import com.nibm.intelligenttravelmanagementsystem.optimization.service.OptimizationService;
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -108,18 +109,82 @@ class MultiObjectiveOptimizationTests {
         assertEquals("GLL", result.getBestRoute().getCurrentNodeId());
     }
 
+    @Autowired
+    private KnapsackOptimizer knapsackOptimizer;
+
     @Test
-    void testOptimizationService_EndToEndPlan() {
+    void testDoublyLinkedList_AddAndRemove() {
+        DoublyLinkedList<String> list = new DoublyLinkedList<>();
+        assertTrue(list.isEmpty());
+
+        var n1 = list.add("CMB");
+        var n2 = list.add("KDY");
+        var n3 = list.add("ELL");
+        assertEquals(3, list.size());
+
+        // Remove middle node in O(1)
+        boolean removed = list.remove(n2);
+        assertTrue(removed);
+        assertEquals(2, list.size());
+        assertEquals(List.of("CMB", "ELL"), list.toList());
+
+        // Remove head
+        list.remove(n1);
+        assertEquals(1, list.size());
+        assertEquals(List.of("ELL"), list.toList());
+    }
+
+    @Test
+    void testKnapsackOptimizer_DynamicProgrammingSelection() {
+        OptimizationRequest request = OptimizationRequest.builder()
+                .maxBudgetLkr(25000)
+                .maxTimeMinutes(480)
+                .build();
+
+        List<IntegratedCandidate> candidates = List.of(
+                IntegratedCandidate.builder()
+                        .nodeId("ELL").name("Ella Town")
+                        .compositeCost(8000).compositeTimeMinutes(150).compositeValue(0.92)
+                        .build(),
+                IntegratedCandidate.builder()
+                        .nodeId("NUE").name("Nuwara Eliya")
+                        .compositeCost(7000).compositeTimeMinutes(120).compositeValue(0.85)
+                        .build(),
+                IntegratedCandidate.builder()
+                        .nodeId("SIG").name("Sigiriya Rock")
+                        .compositeCost(6000).compositeTimeMinutes(140).compositeValue(0.88)
+                        .build(),
+                IntegratedCandidate.builder()
+                        .nodeId("JAF").name("Jaffna Fort")
+                        .compositeCost(30000).compositeTimeMinutes(500).compositeValue(0.70)
+                        .build()
+        );
+
+        KnapsackOptimizer.KnapsackResult result = knapsackOptimizer.solve(candidates, request);
+
+        assertNotNull(result);
+        assertTrue(result.getSelectedCandidates().size() >= 2);
+        assertTrue(result.getTotalCost() <= 25000, "Should strictly satisfy budget");
+        assertTrue(result.getTotalDurationMinutes() <= 480, "Should satisfy duration limit");
+        assertTrue(result.getStatesEvaluated() > 0);
+    }
+
+    @Test
+    void testOptimizationService_PlanWithKnapsackDynamicProgramming() {
         OptimizationRequest request = OptimizationRequest.builder()
                 .sourceNodeId("CMB")
-                .destinationNodeId("NUE")
-                .algorithm(AlgorithmType.BRANCH_AND_BOUND)
+                .algorithm(AlgorithmType.KNAPSACK_DYNAMIC_PROGRAMMING)
+                .travelStyle("ADVENTURE")
+                .maxBudgetLkr(30000)
+                .maxTimeMinutes(600)
                 .build();
 
         OptimizationResponse response = optimizationService.planOptimalRoute(request);
 
         assertTrue(response.isSuccess());
+        assertEquals("KNAPSACK_DYNAMIC_PROGRAMMING", response.getSelectedAlgorithm());
         assertNotNull(response.getBestRoute());
-        assertTrue(response.getBestRoute().getPathNodeIds().contains("CMB"));
+        assertNotNull(response.getModuleContributions());
+        assertNotNull(response.getIntegrationSummary());
     }
 }

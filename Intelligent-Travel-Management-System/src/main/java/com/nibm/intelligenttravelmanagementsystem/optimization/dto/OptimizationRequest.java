@@ -18,6 +18,18 @@ public class OptimizationRequest {
 
     private AlgorithmType algorithm = AlgorithmType.BRANCH_AND_BOUND;
 
+    // Multi-Module synthesis fields (takes inputs for Modules 1, 2, 3, 4 automatically)
+    private String travelStyle = "ADVENTURE";
+    private Integer beachPreference = 7;
+    private Integer adventurePreference = 8;
+    private Integer naturePreference = 9;
+    private Integer culturePreference = 6;
+    private Integer nightlifePreference = 4;
+    private Integer relaxationPreference = 8;
+    private Integer groupSize = 2;
+    private Integer durationDays = 3;
+    private boolean autoFetchFromModules = true;
+
     public OptimizationRequest() {}
 
     public static OptimizationRequestBuilder builder() { return new OptimizationRequestBuilder(); }
@@ -35,6 +47,17 @@ public class OptimizationRequest {
         private double qualityWeight = 0.10;
         private AlgorithmType algorithm = AlgorithmType.BRANCH_AND_BOUND;
 
+        private String travelStyle = "ADVENTURE";
+        private Integer beachPreference = 7;
+        private Integer adventurePreference = 8;
+        private Integer naturePreference = 9;
+        private Integer culturePreference = 6;
+        private Integer nightlifePreference = 4;
+        private Integer relaxationPreference = 8;
+        private Integer groupSize = 2;
+        private Integer durationDays = 3;
+        private boolean autoFetchFromModules = true;
+
         public OptimizationRequestBuilder sourceNodeId(String src) { this.sourceNodeId = src; return this; }
         public OptimizationRequestBuilder destinationNodeId(String dst) { this.destinationNodeId = dst; return this; }
         public OptimizationRequestBuilder maxBudgetLkr(Integer b) { this.maxBudgetLkr = b; return this; }
@@ -46,6 +69,17 @@ public class OptimizationRequest {
         public OptimizationRequestBuilder safetyWeight(double sw) { this.safetyWeight = sw; return this; }
         public OptimizationRequestBuilder qualityWeight(double qw) { this.qualityWeight = qw; return this; }
         public OptimizationRequestBuilder algorithm(AlgorithmType algo) { this.algorithm = algo; return this; }
+
+        public OptimizationRequestBuilder travelStyle(String style) { this.travelStyle = style; return this; }
+        public OptimizationRequestBuilder beachPreference(Integer b) { this.beachPreference = b; return this; }
+        public OptimizationRequestBuilder adventurePreference(Integer a) { this.adventurePreference = a; return this; }
+        public OptimizationRequestBuilder naturePreference(Integer n) { this.naturePreference = n; return this; }
+        public OptimizationRequestBuilder culturePreference(Integer c) { this.culturePreference = c; return this; }
+        public OptimizationRequestBuilder nightlifePreference(Integer nl) { this.nightlifePreference = nl; return this; }
+        public OptimizationRequestBuilder relaxationPreference(Integer r) { this.relaxationPreference = r; return this; }
+        public OptimizationRequestBuilder groupSize(Integer g) { this.groupSize = g; return this; }
+        public OptimizationRequestBuilder durationDays(Integer d) { this.durationDays = d; return this; }
+        public OptimizationRequestBuilder autoFetchFromModules(boolean af) { this.autoFetchFromModules = af; return this; }
 
         public OptimizationRequest build() {
             OptimizationRequest req = new OptimizationRequest();
@@ -60,6 +94,16 @@ public class OptimizationRequest {
             req.safetyWeight = this.safetyWeight;
             req.qualityWeight = this.qualityWeight;
             req.algorithm = this.algorithm;
+            req.travelStyle = this.travelStyle;
+            req.beachPreference = this.beachPreference;
+            req.adventurePreference = this.adventurePreference;
+            req.naturePreference = this.naturePreference;
+            req.culturePreference = this.culturePreference;
+            req.nightlifePreference = this.nightlifePreference;
+            req.relaxationPreference = this.relaxationPreference;
+            req.groupSize = this.groupSize;
+            req.durationDays = this.durationDays;
+            req.autoFetchFromModules = this.autoFetchFromModules;
             return req;
         }
     }
@@ -112,4 +156,34 @@ public class OptimizationRequest {
 
     public AlgorithmType getAlgorithm() { return algorithm; }
     public void setAlgorithm(AlgorithmType algorithm) { this.algorithm = algorithm; }
+
+    public String getTravelStyle() { return travelStyle; }
+    public void setTravelStyle(String travelStyle) { this.travelStyle = travelStyle; }
+
+    public Integer getBeachPreference() { return beachPreference; }
+    public void setBeachPreference(Integer beachPreference) { this.beachPreference = beachPreference; }
+
+    public Integer getAdventurePreference() { return adventurePreference; }
+    public void setAdventurePreference(Integer adventurePreference) { this.adventurePreference = adventurePreference; }
+
+    public Integer getNaturePreference() { return naturePreference; }
+    public void setNaturePreference(Integer naturePreference) { this.naturePreference = naturePreference; }
+
+    public Integer getCulturePreference() { return culturePreference; }
+    public void setCulturePreference(Integer culturePreference) { this.culturePreference = culturePreference; }
+
+    public Integer getNightlifePreference() { return nightlifePreference; }
+    public void setNightlifePreference(Integer nightlifePreference) { this.nightlifePreference = nightlifePreference; }
+
+    public Integer getRelaxationPreference() { return relaxationPreference; }
+    public void setRelaxationPreference(Integer relaxationPreference) { this.relaxationPreference = relaxationPreference; }
+
+    public Integer getGroupSize() { return groupSize; }
+    public void setGroupSize(Integer groupSize) { this.groupSize = groupSize; }
+
+    public Integer getDurationDays() { return durationDays; }
+    public void setDurationDays(Integer durationDays) { this.durationDays = durationDays; }
+
+    public boolean isAutoFetchFromModules() { return autoFetchFromModules; }
+    public void setAutoFetchFromModules(boolean autoFetchFromModules) { this.autoFetchFromModules = autoFetchFromModules; }
 }

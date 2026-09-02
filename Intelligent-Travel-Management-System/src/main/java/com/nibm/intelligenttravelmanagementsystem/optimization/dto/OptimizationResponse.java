@@ -11,6 +11,8 @@ public class OptimizationResponse {
 
     private RouteSummaryDTO bestRoute;
     private List<RouteSummaryDTO> paretoAlternatives;
+    private List<ModuleContributionDTO> moduleContributions;
+    private String integrationSummary;
 
     private double executionTimeMs;
     private double memoryUsedKb;
@@ -28,6 +30,8 @@ public class OptimizationResponse {
         private String destinationNodeId;
         private RouteSummaryDTO bestRoute;
         private List<RouteSummaryDTO> paretoAlternatives;
+        private List<ModuleContributionDTO> moduleContributions;
+        private String integrationSummary;
         private double executionTimeMs;
         private double memoryUsedKb;
         private int nodesExploredCount;
@@ -39,6 +43,8 @@ public class OptimizationResponse {
         public OptimizationResponseBuilder destinationNodeId(String dst) { this.destinationNodeId = dst; return this; }
         public OptimizationResponseBuilder bestRoute(RouteSummaryDTO r) { this.bestRoute = r; return this; }
         public OptimizationResponseBuilder paretoAlternatives(List<RouteSummaryDTO> p) { this.paretoAlternatives = p; return this; }
+        public OptimizationResponseBuilder moduleContributions(List<ModuleContributionDTO> mc) { this.moduleContributions = mc; return this; }
+        public OptimizationResponseBuilder integrationSummary(String is) { this.integrationSummary = is; return this; }
         public OptimizationResponseBuilder executionTimeMs(double t) { this.executionTimeMs = t; return this; }
         public OptimizationResponseBuilder memoryUsedKb(double m) { this.memoryUsedKb = m; return this; }
         public OptimizationResponseBuilder nodesExploredCount(int n) { this.nodesExploredCount = n; return this; }
@@ -52,6 +58,8 @@ public class OptimizationResponse {
             res.destinationNodeId = this.destinationNodeId;
             res.bestRoute = this.bestRoute;
             res.paretoAlternatives = this.paretoAlternatives;
+            res.moduleContributions = this.moduleContributions;
+            res.integrationSummary = this.integrationSummary;
             res.executionTimeMs = this.executionTimeMs;
             res.memoryUsedKb = this.memoryUsedKb;
             res.nodesExploredCount = this.nodesExploredCount;
@@ -66,6 +74,8 @@ public class OptimizationResponse {
     public String getDestinationNodeId() { return destinationNodeId; }
     public RouteSummaryDTO getBestRoute() { return bestRoute; }
     public List<RouteSummaryDTO> getParetoAlternatives() { return paretoAlternatives; }
+    public List<ModuleContributionDTO> getModuleContributions() { return moduleContributions; }
+    public String getIntegrationSummary() { return integrationSummary; }
     public double getExecutionTimeMs() { return executionTimeMs; }
     public double getMemoryUsedKb() { return memoryUsedKb; }
     public int getNodesExploredCount() { return nodesExploredCount; }

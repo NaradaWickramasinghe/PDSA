@@ -120,18 +120,44 @@ public class ParetoFrontierOptimizer implements OptimizationAlgorithm {
                 .memoryUsedKb(memoryUsedKb)
                 .nodesExplored(nodesExplored)
                 .success(true)
-                .message("Pareto Frontier computed with " + destinationParetoSet.size() + " non-dominated solutions.")
+                .message("Pareto Frontier computed with " + destinationParetoSet.size() + " non-dominated solutions using DoublyLinkedList.")
                 .build();
     }
 
+    /**
+     * Updates the Pareto non-dominated set using DoublyLinkedList.
+     * When a candidate dominates an existing solution, it performs O(1) removal of the node.
+     * Syllabus topic: "Doubly linked list remove"
+     */
     private boolean updateParetoSet(List<RouteCandidate> paretoSet, RouteCandidate candidate) {
-        for (RouteCandidate existing : paretoSet) {
-            if (existing.dominates(candidate)) {
+        DoublyLinkedList<RouteCandidate> dll = new DoublyLinkedList<>();
+        for (RouteCandidate c : paretoSet) {
+            dll.add(c);
+        }
+
+        // Check if candidate is dominated by any existing solution
+        DoublyLinkedList.Node<RouteCandidate> curr = dll.getHead();
+        while (curr != null) {
+            if (curr.data.dominates(candidate)) {
                 return false;
             }
+            curr = curr.next;
         }
-        paretoSet.removeIf(candidate::dominates);
-        paretoSet.add(candidate);
+
+        // Remove existing solutions dominated by candidate using DoublyLinkedList remove
+        curr = dll.getHead();
+        while (curr != null) {
+            DoublyLinkedList.Node<RouteCandidate> next = curr.next;
+            if (candidate.dominates(curr.data)) {
+                dll.remove(curr);
+            }
+            curr = next;
+        }
+
+        dll.add(candidate);
+
+        paretoSet.clear();
+        paretoSet.addAll(dll.toList());
         return true;
     }
 }
