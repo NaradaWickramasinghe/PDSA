@@ -129,8 +129,8 @@ public class AStarAlgorithm {
         double distanceKm = Math.sqrt(dx * dx + dy * dy);
 
         if (prioritizeTime) {
-            // Assume 50 km/h average with traffic (more conservative)
-            return (distanceKm / 50.0) * 60;
+            // Assume 60 km/h average with traffic (more conservative)
+            return (distanceKm / 60.0) * 60;
         } else {
             return distanceKm;
         }
