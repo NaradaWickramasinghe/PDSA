@@ -91,8 +91,9 @@ public class TravelOptimizationService {
         if (method == null || method.isBlank()) {
             return BRANCH_AND_BOUND;
         }
-        String normalized = method.trim().toUpperCase();
-        if (normalized.equals("GA") || normalized.equals("GENETIC")) {
+        String normalized = method.trim().toUpperCase().replace("-", "_").replace(" ", "_");
+
+        if (normalized.equals("GA") || normalized.equals("GENETIC") || normalized.equals("GENETIC_ALGORITHM")) {
             return GENETIC_ALGORITHM;
         }
         if (normalized.equals("PARETO") || normalized.equals("PARETO_DYNAMIC_PROGRAMMING")

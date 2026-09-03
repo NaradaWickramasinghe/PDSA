@@ -37,6 +37,38 @@ class OptimizationServiceTest {
     }
 
     @Test
+    void shouldRecognizeGeneticAlgorithmName() {
+        OptimizationRequest request = new OptimizationRequest(
+                "A",
+                "F",
+                220.0,
+                140.0,
+                "GENETIC_ALGORITHM",
+                new ObjectiveWeights(0.4, 0.4, 0.2));
+
+        OptimizationResponse response = travelOptimizationService.optimize(request);
+
+        assertTrue(response.isSuccess());
+        assertEquals("GENETIC_ALGORITHM", response.getSelectedAlgorithm());
+    }
+
+    @Test
+    void shouldRecognizeParetoDynamicProgrammingName() {
+        OptimizationRequest request = new OptimizationRequest(
+                "A",
+                "F",
+                220.0,
+                140.0,
+                "PARETO_DYNAMIC_PROGRAMMING",
+                new ObjectiveWeights(0.4, 0.4, 0.2));
+
+        OptimizationResponse response = travelOptimizationService.optimize(request);
+
+        assertTrue(response.isSuccess());
+        assertEquals("PARETO_FRONTIER", response.getSelectedAlgorithm());
+    }
+
+    @Test
     void shouldReturnComparisonAcrossAllAlgorithms() {
         OptimizationRequest request = new OptimizationRequest(
                 "A",
