@@ -94,8 +94,7 @@ public class TrafficService {
      * Get traffic-aware time for an edge
      */
     public int getEffectiveTime(RouteEdge edge, TransportMode mode) {
-         int baseTime = edge.getEstimatedTimeMinutes();
-         double timeMultiplier = mode.getTimeMultiplier();
+         int baseTime = edge.getEffectiveTimeForRoute(mode);
 
         // Apply traffic multiplier
         int trafficLevel = getTrafficLevel(edge.getId(), edge);
@@ -104,7 +103,7 @@ public class TrafficService {
         // Apply road quality multiplier
         double qualityMultiplier = getQualityMultiplier(edge.getRoadQuality());
 
-        return (int) Math.round(baseTime * timeMultiplier * trafficMultiplier * qualityMultiplier);
+        return (int) Math.round(baseTime * trafficMultiplier * qualityMultiplier);
     }
 
     private double getTrafficMultiplier(int level) {

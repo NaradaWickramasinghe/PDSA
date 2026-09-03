@@ -79,16 +79,6 @@ public class RouteEdge {
             calculatedTime *= mode.getTimeMultiplier();
         }
 
-        // Step 3: Apply traffic multiplier
-        if (trafficLevel != null) {
-            calculatedTime *= getTrafficMultiplier();
-        }
-
-        // Step 4: Apply road quality multiplier
-        if (roadQuality != null) {
-            calculatedTime *= getQualityMultiplier();
-        }
-
         // Ensure minimum time of 5 minutes
         return (int) Math.round(Math.max(calculatedTime, 5));
     }

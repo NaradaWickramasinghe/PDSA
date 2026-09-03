@@ -293,7 +293,7 @@ export default function RouteOptimization() {
 
           {/* Options toggles */}
           <div className="toggle-wrapper">
-            <span className="toggle-label">⏱️ Prioritize Time</span>
+            <span className="toggle-label"> Prioritize Time</span>
             <label className="toggle-switch">
               <input
                 type="checkbox"
@@ -305,7 +305,7 @@ export default function RouteOptimization() {
           </div>
 
           <div className="toggle-wrapper">
-            <span className="toggle-label">🛡️ Prefer Safe Route</span>
+            <span className="toggle-label">Prefer Safe Route</span>
             <label className="toggle-switch">
               <input
                 type="checkbox"
@@ -347,7 +347,7 @@ export default function RouteOptimization() {
         <div className="glass-panel">
           <h3>🚦 Live Network Status</h3>
           <div className="toggle-wrapper" style={{ marginBottom: 0 }}>
-            <span className="toggle-label">🔴 Show Live Traffic</span>
+            <span className="toggle-label">Show Live Traffic</span>
             <label className="toggle-switch">
               <input
                 type="checkbox"
@@ -370,12 +370,12 @@ export default function RouteOptimization() {
               <span className="loading-spinner" /> Calculating...
             </>
           ) : (
-            <>🚀 Calculate Route</>
+            <>Calculate Route</>
           )}
         </button>
 
         <button className="btn-secondary" onClick={handleSimulateTraffic}>
-          🔄 Simulate Traffic
+          Simulate Traffic
         </button>
 
         {/* Traffic status indicator */}
