@@ -1,11 +1,15 @@
 /* src/pages/Optimization/Optimization.css */
 
 .opt-container {
+  --color-primary: #06b6d4;
+  --color-primary-hover: #0891b2;
+  --color-success: #10b981;
+  
   display: grid;
   grid-template-columns: 340px 1fr 380px;
   gap: 1.25rem;
   padding: 1.25rem;
-  height: calc(100vh - var(--navbar-height));
+  height: calc(100vh - var(--nav-height, 68px));
   overflow-y: auto;
 }
 

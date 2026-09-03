@@ -12,10 +12,13 @@ export default function OptimizationPage() {
     networkData,
     optimizationResult,
     benchmarkResult,
+    scalabilityResults,
     loading,
     error,
     planRoute,
     runBenchmark,
+    runScalabilitySuite,
+    refreshNetwork,
     clearError,
   } = useOptimization();
 
@@ -76,6 +79,20 @@ export default function OptimizationPage() {
     }
   };
 
+  const handleRunScalabilitySuite = async () => {
+    try {
+      await runScalabilitySuite();
+    } catch (_) {
+    }
+  };
+
+  const handleRefreshNetwork = async () => {
+    try {
+      await refreshNetwork();
+    } catch (_) {
+    }
+  };
+
   // Determine active route path for the map
   const bestRoute = optimizationResult?.bestRoute;
   const alternatives = optimizationResult?.paretoAlternatives || [];
@@ -97,7 +114,15 @@ export default function OptimizationPage() {
         />
 
         {/* ── CENTER: Map ── */}
-        <div className="opt-section" style={{ padding: 0, overflow: 'hidden' }}>
+        <div className="opt-section" style={{ padding: 0, overflow: 'hidden', position: 'relative' }}>
+          <button 
+            className="opt-btn-primary" 
+            style={{ position: 'absolute', top: '10px', right: '10px', zIndex: 1000, padding: '0.4rem 0.8rem', fontSize: '0.8rem', width: 'auto', boxShadow: '0 2px 10px rgba(0,0,0,0.5)' }}
+            onClick={handleRefreshNetwork}
+            disabled={loading}
+          >
+            🔄 Refresh Network
+          </button>
           {error && (
             <div className="opt-error-banner">
               <span>⚠️ {error}</span>
@@ -253,15 +278,25 @@ export default function OptimizationPage() {
                 </>
               )}
 
-              {/* Benchmark Button */}
-              <button
-                className="opt-btn-primary"
-                onClick={handleBenchmark}
-                disabled={loading}
-                style={{ marginTop: '1rem', background: 'var(--color-bg-secondary)', color: 'var(--color-text-primary)', boxShadow: 'none', border: '1px solid var(--color-border)' }}
-              >
-                ⚡ Run Algorithm Benchmark
-              </button>
+              {/* Benchmark Buttons */}
+              <div style={{ display: 'flex', gap: '0.5rem', marginTop: '1rem' }}>
+                <button
+                  className="opt-btn-primary"
+                  onClick={handleBenchmark}
+                  disabled={loading}
+                  style={{ flex: 1, background: 'var(--color-bg-secondary)', color: 'var(--color-text-primary)', boxShadow: 'none', border: '1px solid var(--color-border)' }}
+                >
+                  ⚡ Run Benchmark
+                </button>
+                <button
+                  className="opt-btn-primary"
+                  onClick={handleRunScalabilitySuite}
+                  disabled={loading}
+                  style={{ flex: 1, background: 'var(--color-bg-secondary)', color: 'var(--color-text-primary)', boxShadow: 'none', border: '1px solid var(--color-border)' }}
+                >
+                  📈 Run Scalability Suite
+                </button>
+              </div>
 
               {/* Benchmark Results */}
               {benchmarkResult && (
@@ -285,6 +320,35 @@ export default function OptimizationPage() {
                         <span>🔍 Explored: {metric.nodesExplored}</span>
                         <span>{metric.foundValidPath ? '✅ Path found' : '❌ No path'}</span>
                       </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {/* Scalability Results */}
+              {scalabilityResults && scalabilityResults.length > 0 && (
+                <div style={{ marginTop: '1.5rem', borderTop: '1px solid var(--color-border)', paddingTop: '1rem' }}>
+                  <div className="opt-section-title" style={{ fontSize: '0.85rem' }}>
+                    📈 Scalability Suite Results
+                  </div>
+                  {scalabilityResults.map((result, idx) => (
+                    <div key={idx} style={{ marginTop: '1rem' }}>
+                      <div style={{ fontSize: '0.8rem', fontWeight: 600, color: 'var(--color-text-primary)' }}>
+                        {result.scenarioName} ({result.networkNodesCount} nodes, {result.networkEdgesCount} edges)
+                      </div>
+                      {result.algorithmMetrics && Object.entries(result.algorithmMetrics).map(([key, metric]) => (
+                        <div key={key} className="opt-stat-card" style={{ marginBottom: '0.5rem', marginTop: '0.5rem' }}>
+                          <div className="opt-stat-label" style={{ color: 'var(--color-primary)', fontWeight: 600 }}>
+                            {metric.algorithmName || key}
+                          </div>
+                          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.25rem', marginTop: '0.35rem', fontSize: '0.78rem', color: 'var(--color-text-secondary)' }}>
+                            <span>⏱ {metric.executionTimeMs?.toFixed(2)}ms</span>
+                            <span>💾 {metric.memoryUsedKb?.toFixed(1)}KB</span>
+                            <span>🎯 Score: {metric.bestCompositeScore?.toFixed(4)}</span>
+                            <span>🔍 Explored: {metric.nodesExplored}</span>
+                          </div>
+                        </div>
+                      ))}
                     </div>
                   ))}
                 </div>
