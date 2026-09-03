@@ -2,8 +2,8 @@ package com.nibm.intelligenttravelmanagementsystem.optimization.service;
 
 import com.nibm.intelligenttravelmanagementsystem.optimization.dto.*;
 import com.nibm.intelligenttravelmanagementsystem.optimization.model.*;
-import com.nibm.intelligenttravelmanagementsystem.optimization.repository.OptimizationEdgeRepository;
-import com.nibm.intelligenttravelmanagementsystem.optimization.repository.OptimizationNodeRepository;
+import com.nibm.intelligenttravelmanagementsystem.shared.db.repositories.EdgeRepository;
+import com.nibm.intelligenttravelmanagementsystem.shared.db.repositories.NodeRepository;
 import com.nibm.intelligenttravelmanagementsystem.shared.db.models.Edge;
 import com.nibm.intelligenttravelmanagementsystem.shared.db.models.Node;
 import jakarta.annotation.PostConstruct;
@@ -16,8 +16,8 @@ import java.util.*;
 @Service
 public class OptimizationService {
 
-    private final OptimizationNodeRepository nodeRepository;
-    private final OptimizationEdgeRepository edgeRepository;
+    private final NodeRepository nodeRepository;
+    private final EdgeRepository edgeRepository;
     private final BranchAndBoundOptimizer branchAndBoundOptimizer;
     private final ParetoFrontierOptimizer paretoFrontierOptimizer;
     private final GeneticRouteOptimizer geneticRouteOptimizer;
@@ -26,8 +26,8 @@ public class OptimizationService {
 
     private TravelGraph cachedGraph;
 
-    public OptimizationService(OptimizationNodeRepository nodeRepository,
-                               OptimizationEdgeRepository edgeRepository,
+    public OptimizationService(NodeRepository nodeRepository,
+                               EdgeRepository edgeRepository,
                                BranchAndBoundOptimizer branchAndBoundOptimizer,
                                ParetoFrontierOptimizer paretoFrontierOptimizer,
                                GeneticRouteOptimizer geneticRouteOptimizer,
@@ -76,11 +76,11 @@ public class OptimizationService {
                             .distanceKm(e.getDistanceKm() != null ? e.getDistanceKm() : 10.0)
                             .travelTimeMinutes(e.getTravelTimeMinutes() != null ? e.getTravelTimeMinutes() : 30)
                             .estimatedCostLkr(e.getEstimatedCostLkr() != null ? e.getEstimatedCostLkr() : 500)
-                            .roadQuality(e.getRoadQuality() != null ? e.getRoadQuality() : 3)
-                            .trafficLevel(e.getTrafficLevel() != null ? e.getTrafficLevel() : 2)
+                            .roadQuality(e.getRoadQuality() != null ? e.getRoadQuality().intValue() : 3)
+                            .trafficLevel(e.getTrafficLevel() != null ? e.getTrafficLevel().intValue() : 2)
                             .transportMode(e.getTransportMode() != null ? e.getTransportMode() : "ROAD")
-                            .accessibility(e.getAccessibility() != null ? e.getAccessibility() : 3)
-                            .riskLevel(e.getRiskLevel() != null ? e.getRiskLevel() : 2)
+                            .accessibility(e.getAccessibility() != null ? e.getAccessibility().intValue() : 3)
+                            .riskLevel(e.getRiskLevel() != null ? e.getRiskLevel().intValue() : 2)
                             .build();
                     graph.addEdge(forwardEdge);
 
@@ -101,12 +101,12 @@ public class OptimizationService {
                         graph.addEdge(reverseEdge);
                     }
                 }
+                log.info("Graph loaded successfully: {} nodes, {} edges.", graph.getNodeCount(), graph.getAllEdges().size());
             } else {
-                populateDefaultNetwork(graph);
+                log.warn("Database is empty — no nodes or edges found. The graph will be empty until data is seeded.");
             }
         } catch (Exception ex) {
-            log.warn("Database connection unavailable or empty, using in-memory network: {}", ex.getMessage());
-            populateDefaultNetwork(graph);
+            log.error("Database connection failed during graph load: {}. The optimization graph will be empty.", ex.getMessage());
         }
 
         this.cachedGraph = graph;
@@ -129,13 +129,17 @@ public class OptimizationService {
 
         // Fallback default endpoints if unspecified
         if (request.getSourceNodeId() == null || request.getSourceNodeId().isBlank()) {
-            request.setSourceNodeId("CMB");
+            graph.getAllNodes().stream().findFirst()
+                    .ifPresent(n -> request.setSourceNodeId(n.getNodeId()));
         }
         if (request.getDestinationNodeId() == null || request.getDestinationNodeId().isBlank()) {
             if (!candidates.isEmpty()) {
                 request.setDestinationNodeId(candidates.get(0).getNodeId());
             } else {
-                request.setDestinationNodeId("ELL");
+                List<TravelNode> nodes = new ArrayList<>(graph.getAllNodes());
+                if (!nodes.isEmpty()) {
+                    request.setDestinationNodeId(nodes.get(nodes.size() - 1).getNodeId());
+                }
             }
         }
 
@@ -341,78 +345,5 @@ public class OptimizationService {
                 .build();
     }
 
-    public void populateDefaultNetwork(TravelGraph graph) {
-        addNodeHelper(graph, "CMB", "Colombo Fort", "CITY", "Western", "Colombo", 6.9344, 79.8428);
-        addNodeHelper(graph, "NEG", "Negombo Beach", "TOURIST_DESTINATION", "Western", "Gampaha", 7.2008, 79.8737);
-        addNodeHelper(graph, "KDY", "Kandy City", "TRANSPORT_HUB", "Central", "Kandy", 7.2906, 80.6337);
-        addNodeHelper(graph, "SIG", "Sigiriya Rock", "TOURIST_DESTINATION", "Central", "Matale", 7.9570, 80.7603);
-        addNodeHelper(graph, "NUE", "Nuwara Eliya", "TOURIST_DESTINATION", "Central", "Nuwara Eliya", 6.9497, 80.7891);
-        addNodeHelper(graph, "HOR", "Horton Plains", "TOURIST_DESTINATION", "Central", "Nuwara Eliya", 6.8028, 80.8044);
-        addNodeHelper(graph, "ADM", "Adam's Peak", "TOURIST_DESTINATION", "Sabaragamuwa", "Ratnapura", 6.8096, 80.4994);
-        addNodeHelper(graph, "ELL", "Ella Town", "TOURIST_DESTINATION", "Uva", "Badulla", 6.8667, 81.0466);
-        addNodeHelper(graph, "YAL", "Yala Park", "TOURIST_DESTINATION", "Southern", "Hambantota", 6.3725, 81.5165);
-        addNodeHelper(graph, "GLL", "Galle Fort", "CITY", "Southern", "Galle", 6.0535, 80.2210);
-        addNodeHelper(graph, "MIR", "Mirissa Coast", "TOURIST_DESTINATION", "Southern", "Matara", 5.9483, 80.4578);
-        addNodeHelper(graph, "TRI", "Trincomalee", "PORT", "Eastern", "Trincomalee", 8.5874, 81.2152);
-        addNodeHelper(graph, "JAF", "Jaffna Fort", "CITY", "Northern", "Jaffna", 9.6615, 80.0255);
-
-        addEdgeHelper(graph, "E1", "CMB", "NEG", 38.0, 45, 1200, 4, 3, "HIGHWAY", 5, 1);
-        addEdgeHelper(graph, "E2", "CMB", "KDY", 115.0, 190, 2500, 3, 4, "ROAD", 4, 2);
-        addEdgeHelper(graph, "E3", "CMB", "KDY", 120.0, 160, 1800, 4, 1, "RAIL", 5, 1);
-        addEdgeHelper(graph, "E4", "CMB", "GLL", 125.0, 95, 3200, 5, 2, "HIGHWAY", 5, 1);
-        addEdgeHelper(graph, "E5", "KDY", "SIG", 90.0, 140, 2200, 3, 2, "ROAD", 3, 2);
-        addEdgeHelper(graph, "E6", "KDY", "NUE", 75.0, 150, 2000, 3, 3, "ROAD", 3, 3);
-        addEdgeHelper(graph, "E7", "NUE", "HOR", 32.0, 75, 1500, 2, 1, "ROAD", 2, 4);
-        addEdgeHelper(graph, "E8", "HOR", "ELL", 48.0, 110, 1800, 3, 2, "ROAD", 3, 3);
-        addEdgeHelper(graph, "E9", "NUE", "ELL", 55.0, 120, 1200, 4, 1, "RAIL", 4, 1);
-        addEdgeHelper(graph, "E10", "ELL", "YAL", 95.0, 150, 3500, 3, 2, "ROAD", 3, 2);
-        addEdgeHelper(graph, "E11", "GLL", "MIR", 35.0, 45, 1000, 4, 3, "ROAD", 5, 1);
-        addEdgeHelper(graph, "E12", "MIR", "YAL", 110.0, 140, 2800, 4, 2, "HIGHWAY", 4, 1);
-        addEdgeHelper(graph, "E13", "SIG", "TRI", 100.0, 130, 2400, 3, 2, "ROAD", 4, 2);
-        addEdgeHelper(graph, "E14", "TRI", "JAF", 230.0, 290, 4500, 3, 2, "HIGHWAY", 4, 2);
-        addEdgeHelper(graph, "E15", "KDY", "ADM", 85.0, 180, 2200, 2, 2, "ROAD", 2, 4);
-        addEdgeHelper(graph, "E16", "ADM", "NUE", 65.0, 160, 2000, 2, 1, "ROAD", 2, 4);
-    }
-
-    private void addNodeHelper(TravelGraph g, String id, String name, String type, String prov, String dist, double lat, double lon) {
-        g.addNode(TravelNode.builder()
-                .nodeId(id)
-                .name(name)
-                .nodeType(type)
-                .province(prov)
-                .district(dist)
-                .latitude(lat)
-                .longitude(lon)
-                .build());
-    }
-
-    private void addEdgeHelper(TravelGraph g, String id, String u, String v, double dist, int time, int cost, int qual, int traf, String mode, int acc, int risk) {
-        g.addEdge(TravelEdge.builder()
-                .edgeId(id + "_F")
-                .source(u)
-                .destination(v)
-                .distanceKm(dist)
-                .travelTimeMinutes(time)
-                .estimatedCostLkr(cost)
-                .roadQuality(qual)
-                .trafficLevel(traf)
-                .transportMode(mode)
-                .accessibility(acc)
-                .riskLevel(risk)
-                .build());
-
-        g.addEdge(TravelEdge.builder()
-                .edgeId(id + "_R")
-                .source(v)
-                .destination(u)
-                .distanceKm(dist)
-                .travelTimeMinutes(time)
-                .estimatedCostLkr(cost)
-                .roadQuality(qual)
-                .trafficLevel(traf)
-                .transportMode(mode)
-                .accessibility(acc)
-                .riskLevel(risk)
-                .build());
-    }
 }
+

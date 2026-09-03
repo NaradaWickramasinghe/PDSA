@@ -8,6 +8,7 @@ export const useOptimization = () => {
   const [networkData, setNetworkData] = useState({ nodes: [], edges: [], nodeCount: 0, edgeCount: 0 });
   const [optimizationResult, setOptimizationResult] = useState(null);
   const [benchmarkResult, setBenchmarkResult] = useState(null);
+  const [scalabilityResults, setScalabilityResults] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
@@ -63,15 +64,49 @@ export const useOptimization = () => {
 
   const clearError = useCallback(() => setError(null), []);
 
+  const runScalabilitySuite = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    setScalabilityResults(null);
+    try {
+      const response = await optimizationService.getScalabilityBenchmarks();
+      setScalabilityResults(response.data);
+      return response.data;
+    } catch (err) {
+      setError(err.response?.data?.message || 'Failed to run scalability benchmarks');
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  const refreshNetwork = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const response = await optimizationService.refreshNetwork();
+      setNetworkData(response.data);
+      return response.data;
+    } catch (err) {
+      setError(err.response?.data?.message || 'Failed to refresh network topology');
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
   return {
     networkData,
     optimizationResult,
     benchmarkResult,
+    scalabilityResults,
     loading,
     error,
     fetchNetwork,
     planRoute,
     runBenchmark,
+    runScalabilitySuite,
+    refreshNetwork,
     clearError,
   };
 };
