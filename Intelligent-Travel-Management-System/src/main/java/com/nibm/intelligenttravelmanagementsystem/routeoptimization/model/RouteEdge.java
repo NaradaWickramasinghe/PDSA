@@ -27,12 +27,6 @@ public class RouteEdge {
     private int effectiveTimeMinutes;  // Calculated with traffic
 
 
-    // Additional fields from shared Edge
-//    private Double estimatedCostLkr;
-//    private Integer roadQuality;
-//    private Integer trafficLevel;
-//    private Integer accesibility;
-
     // Constructor with String ID
     public RouteEdge(String id, Location source, Location destination, double distanceKm,
                      int estimatedTimeMinutes, int riskLevel, String transportMode, boolean isOneWay) {
@@ -48,13 +42,25 @@ public class RouteEdge {
         this.trafficLevel = 1; // Default: low traffic
         this.roadQuality = 1;
     }
+    private double getRoadTypeSpeed() {
+        if (transportMode == null) return 50.0;
 
-    /**
-     * Calculate effective time based on traffic level
-     */
-    public int getEffectiveTimeMinutes() {
-        if (effectiveTimeMinutes > 0) return effectiveTimeMinutes;
-        return calculateEffectiveTime();
+        switch (transportMode.toUpperCase()) {
+            case "HIGHWAY":
+                return 90.0;      // 80-100 km/h
+            case "EXPRESSWAY":   // Alternative value
+                return 90.0;
+            case "ROAD":
+                return 50.0;      // 40-60 km/h
+            case "MAIN_ROAD":    // Alternative value
+                return 55.0;
+            case "FERRY":
+                return 18.0;      // 15-20 km/h
+            case "AIR":
+                return 300.0;     // Not used
+            default:
+                return 50.0;
+        }
     }
 
     public int calculateEffectiveTime() {
@@ -63,6 +69,28 @@ public class RouteEdge {
 
         double effectiveTime = estimatedTimeMinutes * trafficMultiplier * qualityMultiplier;
         return (int) Math.round(effectiveTime);
+    }
+
+    public int getEffectiveTimeForRoute(TransportMode mode) {
+        // Start with partner's calculated time (includes traffic and quality)
+        double speed = getRoadTypeSpeed();
+        double calculatedTime = (distanceKm / speed) * 60;
+        if (mode != null) {
+            calculatedTime *= mode.getTimeMultiplier();
+        }
+
+        // Step 3: Apply traffic multiplier
+        if (trafficLevel != null) {
+            calculatedTime *= getTrafficMultiplier();
+        }
+
+        // Step 4: Apply road quality multiplier
+        if (roadQuality != null) {
+            calculatedTime *= getQualityMultiplier();
+        }
+
+        // Ensure minimum time of 5 minutes
+        return (int) Math.round(Math.max(calculatedTime, 5));
     }
 
     private double getTrafficMultiplier() {
@@ -107,8 +135,11 @@ public class RouteEdge {
         }
     }
 
-    public int getEffectiveTimeMinutes(TransportMode mode) {
-        double timeWithMode = estimatedTimeMinutes * mode.getTimeMultiplier();
-        return (int) Math.round(timeWithMode);
+    public double getExpectedSpeed(TransportMode userTransport) {
+        double baseSpeed = getRoadTypeSpeed();
+        if (userTransport != null) {
+            baseSpeed /= userTransport.getTimeMultiplier();
+        }
+        return Math.max(baseSpeed, 10.0);
     }
 }

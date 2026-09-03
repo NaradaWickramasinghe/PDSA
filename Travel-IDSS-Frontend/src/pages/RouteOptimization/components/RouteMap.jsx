@@ -97,6 +97,7 @@ export default function RouteMap({ routeResult, liveTrafficData = [] }) {
     : [];
 
   return (
+      <div style={{ width: '100%', height: '100%', filter: 'invert(1) hue-rotate(180deg) brightness(95%) contrast(90%)' }}>
     <MapContainer
       center={defaultCenter}
       zoom={defaultZoom}
@@ -104,8 +105,8 @@ export default function RouteMap({ routeResult, liveTrafficData = [] }) {
       scrollWheelZoom={true}
     >
       <TileLayer
-        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
       />
 
       {path.length > 0 && <FitBounds path={path} />}
@@ -200,5 +201,6 @@ export default function RouteMap({ routeResult, liveTrafficData = [] }) {
         );
       })}
     </MapContainer>
+      </div>
   );
 }

@@ -75,14 +75,14 @@ public class AStarAlgorithm {
 
                 if (preferSafeRoute) {
                     double baseWeight = prioritizeTime ?
-                            trafficService.getEffectiveTime(edge, mode) :
+                            edge.getEffectiveTimeForRoute(mode):
                             edge.getDistanceKm();
                     double riskPenalty = (edge.getRiskLevel() - 1) * 2.0;
                     edgeWeight = baseWeight + riskPenalty;
                 }
                 else if (prioritizeTime) {
                     // USE TRAFFIC-AWARE EFFECTIVE TIME
-                    edgeWeight = trafficService.getEffectiveTime(edge, mode);
+                    edgeWeight = edge.getEffectiveTimeForRoute(mode);
                 } else {
                     // For shortest path, still use distance but with traffic consideration
                     // Add small penalty for traffic on shortest path too
@@ -129,8 +129,8 @@ public class AStarAlgorithm {
         double distanceKm = Math.sqrt(dx * dx + dy * dy);
 
         if (prioritizeTime) {
-            // Assume 50 km/h average with traffic (more conservative)
-            return (distanceKm / 50.0) * 60;
+            // Assume 60 km/h average with traffic (more conservative)
+            return (distanceKm / 60.0) * 60;
         } else {
             return distanceKm;
         }
