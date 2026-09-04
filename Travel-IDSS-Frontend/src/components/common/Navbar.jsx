@@ -24,7 +24,7 @@ export default function Navbar() {
       <Link to="/" className="header-brand">
         <div className="logo-icon">🌴</div>
         <div>
-          <div className="brand-title">Travel Planner</div>
+          <div className="brand-title">Travel IDSS</div>
           <div className="brand-sub">Sri Lanka</div>
         </div>
       </Link>
@@ -46,8 +46,8 @@ export default function Navbar() {
         <div className="user-greeting-badge" style={{ display: 'none' /* Hide on very small screens if needed, inline styling handled via CSS mostly */ }}>
           <span>🍃</span> Plan Smart, Travel Better
         </div>
-        <div className="avatar-circle">👤</div>
         
+
         <button
           className="navbar__toggle"
           onClick={() => setMenuOpen((prev) => !prev)}

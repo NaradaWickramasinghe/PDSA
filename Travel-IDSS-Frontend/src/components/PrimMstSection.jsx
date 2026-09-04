@@ -1,6 +1,7 @@
 // src/components/PrimMstSection.jsx
 import { useState, useMemo, useEffect } from 'react';
 import { networkService } from '../services/networkService';
+import { MapContainer, TileLayer, CircleMarker, Polyline, Tooltip } from 'react-leaflet';
 
 export function PrimMstSection({
   allNodes = [],
@@ -255,6 +256,70 @@ export function PrimMstSection({
                 <div className="na-stats__value">{mstResult.computationTimeMs ?? 0}ms</div>
                 <div className="na-stats__label">Computation Time</div>
               </div>
+            </div>
+
+            {/* Map Visualization */}
+            <div style={{ height: '400px', marginBottom: '1.5rem', borderRadius: '8px', overflow: 'hidden', border: '1px solid var(--color-border)' }}>
+              <MapContainer center={[7.8731, 80.7718]} zoom={7} scrollWheelZoom={true} style={{ height: '100%', width: '100%' }}>
+                <TileLayer
+                  url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                  attribution='&copy; OpenStreetMap contributors'
+                  className="dark-map-tiles"
+                />
+                
+                {/* Draw Edges */}
+                {displayedEdges.map((edge, idx) => {
+                  const fromId = edge.fromLocationId || edge.fromNodeId || edge.sourceNodeId || edge.fromId;
+                  const toId = edge.toLocationId || edge.toNodeId || edge.targetNodeId || edge.toId;
+                  const n1 = allNodes.find(n => (n.nodeId || n.id || n.code) === fromId);
+                  const n2 = allNodes.find(n => (n.nodeId || n.id || n.code) === toId);
+                  
+                  if (!n1 || !n2 || n1.latitude == null || n2.latitude == null) return null;
+
+                  return (
+                    <Polyline
+                      key={`mst-edge-${idx}`}
+                      positions={[
+                        [n1.latitude, n1.longitude],
+                        [n2.latitude, n2.longitude]
+                      ]}
+                      pathOptions={{ color: 'var(--color-accent-primary)', weight: 3, opacity: 0.8 }}
+                    />
+                  );
+                })}
+
+                {/* Draw Nodes */}
+                {allNodes.filter(n => n.latitude != null && n.longitude != null).map(n => {
+                   const nodeId = n.nodeId || n.id || n.code;
+                   
+                   // Find if the node is part of the displayed MST
+                   const inMST = displayedEdges.some(e => {
+                       const f = e.fromLocationId || e.fromNodeId || e.sourceNodeId || e.fromId;
+                       const t = e.toLocationId || e.toNodeId || e.targetNodeId || e.toId;
+                       return f === nodeId || t === nodeId;
+                   });
+                   
+                   if (!inMST) return null;
+
+                   return (
+                     <CircleMarker
+                       key={`node-${nodeId}`}
+                       center={[n.latitude, n.longitude]}
+                       radius={6}
+                       pathOptions={{ 
+                         color: 'var(--color-bg-secondary)', 
+                         fillColor: 'var(--color-accent-secondary)', 
+                         fillOpacity: 1, 
+                         weight: 2 
+                       }}
+                     >
+                       <Tooltip>
+                         <strong>{n.name || nodeId}</strong>
+                       </Tooltip>
+                     </CircleMarker>
+                   );
+                })}
+              </MapContainer>
             </div>
 
             {/* Tree Component Tabs (if graph has multiple components) */}
