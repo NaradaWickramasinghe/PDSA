@@ -1,0 +1,128 @@
+{
+	"info": {
+		"_postman_id": "b4a8e234-9271-419b-8c43-987162391004",
+		"name": "PDSA Group 4 - Intelligent Decision Engine API",
+		"description": "Postman Collection for Group 4 (Intelligent Decision Engine & Travel Recommendation System)",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "1. Health Check",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8085/api/decisions/health",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8085",
+					"path": [
+						"api",
+						"decisions",
+						"health"
+					]
+				},
+				"description": "Check operational status of Group 4 Intelligent Decision Engine"
+			},
+			"response": []
+		},
+		{
+			"name": "2. Get Travel Recommendations (Standard Profile)",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"budget\": 1200.00,\n  \"durationDays\": 5,\n  \"groupSize\": 2,\n  \"ageGroup\": \"YOUNG_ADULT\",\n  \"travelStyle\": \"COUPLE\",\n  \"beachPreference\": 9,\n  \"adventurePreference\": 7,\n  \"naturePreference\": 8,\n  \"culturePreference\": 5,\n  \"nightlifePreference\": 8,\n  \"relaxationPreference\": 9,\n  \"topN\": 5\n}"
+				},
+				"url": {
+					"raw": "http://localhost:8085/api/decisions/recommend",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8085",
+					"path": [
+						"api",
+						"decisions",
+						"recommend"
+					]
+				},
+				"description": "Generate personalized top N travel destination recommendations using KNN, Decision Tree, and Multi-Criteria Ranking algorithms."
+			},
+			"response": []
+		},
+		{
+			"name": "3. Get Travel Recommendations (Adventure & Nature)",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"budget\": 800.00,\n  \"durationDays\": 3,\n  \"groupSize\": 1,\n  \"ageGroup\": \"YOUNG_ADULT\",\n  \"travelStyle\": \"SOLO\",\n  \"beachPreference\": 3,\n  \"adventurePreference\": 10,\n  \"naturePreference\": 10,\n  \"culturePreference\": 4,\n  \"nightlifePreference\": 2,\n  \"relaxationPreference\": 5,\n  \"topN\": 3\n}"
+				},
+				"url": {
+					"raw": "http://localhost:8085/api/decisions/recommend",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8085",
+					"path": [
+						"api",
+						"decisions",
+						"recommend"
+					]
+				},
+				"description": "Request travel recommendations for a solo traveler prioritizing nature and adventure."
+			},
+			"response": []
+		},
+		{
+			"name": "4. Get Travel Recommendations (Culture & Relaxation)",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"budget\": 2500.00,\n  \"durationDays\": 7,\n  \"groupSize\": 4,\n  \"ageGroup\": \"ADULT\",\n  \"travelStyle\": \"FAMILY\",\n  \"beachPreference\": 4,\n  \"adventurePreference\": 3,\n  \"naturePreference\": 7,\n  \"culturePreference\": 10,\n  \"nightlifePreference\": 3,\n  \"relaxationPreference\": 9,\n  \"topN\": 5\n}"
+				},
+				"url": {
+					"raw": "http://localhost:8085/api/decisions/recommend",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8085",
+					"path": [
+						"api",
+						"decisions",
+						"recommend"
+					]
+				},
+				"description": "Request travel recommendations for a luxury family trip focused on culture and relaxation."
+			},
+			"response": []
+		}
+	]
+}
